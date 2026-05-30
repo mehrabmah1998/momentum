@@ -43,27 +43,27 @@ export default function HowItWorks() {
   ];
 
   return (
-    <section id="how-it-works" className="relative py-32 bg-[#020617] overflow-hidden dot-grid">
-      <div className="absolute top-[25%] right-[5%] w-[450px] h-[450px] rounded-full bg-brand-cyan/5 glow-spot" />
-      <div className="absolute bottom-[20%] left-[5%] w-[400px] h-[400px] rounded-full bg-brand-blue/5 glow-spot" />
+    <section id="how-it-works" className="relative py-32 bg-[var(--bg)] border-t border-[var(--border)] overflow-hidden dot-grid">
+      <div className="absolute top-[25%] right-[5%] w-[450px] h-[450px] rounded-full bg-[var(--accent-glow)] glow-spot" />
+      <div className="absolute bottom-[20%] left-[5%] w-[400px] h-[400px] rounded-full bg-[var(--accent-glow)] glow-spot" />
 
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 relative z-10">
         <div className="max-w-3xl mx-auto text-center mb-24">
-          <span className="text-[10px] uppercase tracking-[0.2em] font-mono text-brand-cyan font-semibold bg-brand-cyan/10 px-3 py-1 rounded-full mb-4 inline-block">
+          <span className="text-[10px] uppercase tracking-[0.2em] font-mono text-[var(--accent)] font-semibold bg-[var(--accent-subtle)] border border-[var(--accent)]/15 px-3 py-1 rounded-full mb-4 inline-block">
             The Continuous Loop
           </span>
-          <h2 className="text-3xl md:text-5xl font-sans font-bold tracking-tight text-white mb-6">
+          <h2 className="text-3xl md:text-5xl font-sans font-bold tracking-tight text-[var(--text-primary)] mb-6">
             The Momentum loop makes development bulletproof.
           </h2>
-          <p className="text-slate-400 text-base md:text-lg">
+          <p className="text-[var(--text-secondary)] text-base md:text-lg">
             A precise, continuous loop where human design coordinates with structured context, prompting, and automated system synchronization.
           </p>
         </div>
 
         {/* Timeline Flow */}
         <div className="relative max-w-4xl mx-auto">
-          {/* Vertical joining line with gradient glow */}
-          <div className="absolute left-[36px] top-4 bottom-4 w-[2px] bg-gradient-to-b from-brand-blue/40 via-brand-cyan/20 to-slate-800" />
+          {/* Vertical joining line with elegant gradient transition */}
+          <div className="absolute left-[36px] top-4 bottom-4 w-[2px] bg-gradient-to-b from-[var(--accent)]/60 via-[var(--accent-hover)]/30 to-[var(--border)]" />
 
           <div className="space-y-16">
             {steps.map((item, index) => {
@@ -78,26 +78,26 @@ export default function HowItWorks() {
                   className="flex items-start gap-8 relative group"
                 >
                   {/* Step Bubble marker */}
-                  <div className="relative z-10 flex items-center justify-center w-[74px] h-[74px] shrink-0 rounded-full border border-white/10 bg-[#090e1c] group-hover:border-brand-cyan/50 shadow-md group-hover:shadow-[0_0_15px_rgba(34,211,238,0.25)] transition-all duration-500">
-                    <span className="font-mono text-base font-bold text-slate-300 group-hover:text-brand-cyan transition-colors duration-300">
+                  <div className="relative z-10 flex items-center justify-center w-[74px] h-[74px] shrink-0 rounded-full border border-[var(--border)] bg-[var(--bg-card)] group-hover:border-[var(--accent)] shadow-md group-hover:shadow-[0_0_15px_var(--accent-glow)] transition-all duration-500">
+                    <span className="font-mono text-base font-bold text-[var(--text-secondary)] group-hover:text-[var(--accent)] transition-colors duration-300">
                       {item.step}
                     </span>
                   </div>
 
                   {/* Content Container */}
-                  <div className="flex-1 bg-[#090e1c]/50 p-8 rounded-3xl border border-white/5 group-hover:border-white/15 hover:bg-[#090e1c]/80 transition-all duration-300 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)]">
+                  <div className="flex-1 bg-[var(--bg-card)]/50 p-8 rounded-3xl border border-[var(--border)] group-hover:border-[var(--border-hover)] hover:bg-[var(--bg-card)]/80 transition-all duration-300 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)]">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between mb-4">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-white/5 border border-white/10 text-brand-blue">
+                        <div className="p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border)] text-[var(--accent)]">
                           <IconComp className="w-5 h-5" strokeWidth={1.5} />
                         </div>
-                        <h3 className="text-xl font-sans font-bold text-white tracking-tight">
+                        <h3 className="text-xl font-sans font-bold text-[var(--text-primary)] tracking-tight">
                           {item.title}
                         </h3>
                       </div>
                     </div>
 
-                    <p className="text-slate-400 text-sm sm:text-base leading-relaxed mb-5">
+                    <p className="text-[var(--text-secondary)] text-sm sm:text-base leading-relaxed mb-5">
                       {item.desc}
                     </p>
 
@@ -106,7 +106,7 @@ export default function HowItWorks() {
                       {item.tags.map((tg) => (
                         <span
                           key={tg}
-                          className="text-[9px] font-mono uppercase tracking-widest text-slate-400 bg-white/5 border border-white/10 px-2 py-0.5 rounded"
+                          className="text-[9px] font-mono uppercase tracking-widest text-[var(--text-secondary)] bg-[var(--bg-surface)] border border-[var(--border)] px-2 py-0.5 rounded"
                         >
                           {tg}
                         </span>

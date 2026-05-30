@@ -12,7 +12,7 @@ export default function WhoItsFor() {
       deliverable: "Locked Architectural Rails",
       desc: "Momentum holds context rules in place. Claude Code refers directly to the target schema, completing work 3x faster with zero regression bugs.",
       icon: User,
-      iconColor: "text-brand-blue"
+      iconColor: "text-[var(--accent)]"
     },
     {
       title: "The Squad (2-4 Devs)",
@@ -21,7 +21,7 @@ export default function WhoItsFor() {
       deliverable: "CI Git Collaborative Sync",
       desc: "Real-time collaborative diagram coordinates instantly with code changes. Every member of the squad generates prompts from the identical source.",
       icon: Users,
-      iconColor: "text-brand-cyan"
+      iconColor: "text-[var(--accent)]"
     },
     {
       title: "The Technical PM",
@@ -30,24 +30,24 @@ export default function WhoItsFor() {
       deliverable: "One-Click Prompt Synthesis",
       desc: "Momentum automates the context collection. Select the epic, query the dependencies, and instantly generate prompts containing exact constraints.",
       icon: FileSignature,
-      iconColor: "text-indigo-400"
+      iconColor: "text-[var(--accent)]"
     }
   ];
 
   return (
-    <section id="who-its-for" className="relative py-32 bg-[#030613]/80 border-t border-white/5 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-[#020617] via-transparent to-[#020617]" />
+    <section id="who-its-for" className="relative py-32 bg-[var(--bg)] border-t border-[var(--border)] overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg)] via-transparent to-[var(--bg)] pointer-events-none" />
 
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-20">
-          <span className="text-[10px] uppercase tracking-[0.2em] font-mono text-brand-cyan font-semibold bg-brand-cyan/10 px-3 py-1 rounded-full mb-4 inline-block">
+          <span className="text-[10px] uppercase tracking-[0.2em] font-mono text-[var(--accent)] font-semibold bg-[var(--accent-subtle)] border border-[var(--accent)]/15 px-3 py-1 rounded-full mb-4 inline-block">
             Target Audience
           </span>
-          <h2 className="text-3xl md:text-5xl font-sans font-bold tracking-tight text-white mb-6">
-            Designed for those who build with silicon.
+          <h2 className="text-3xl md:text-5xl font-sans font-bold tracking-tight text-[var(--text-primary)] mb-6">
+            Designed for those who build.
           </h2>
-          <p className="text-slate-400 text-lg">
-            Whether you operate as a solo developer with cursor or deploy in collaborative indie squads, Momentum streamlines your context.
+          <p className="text-[var(--text-secondary)] text-lg">
+            Solo founders, small engineering outfits, and cross-functional teams scale their architectural patterns without building debt. Keep momentum from day zero.
           </p>
         </div>
 
@@ -61,43 +61,49 @@ export default function WhoItsFor() {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.6, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                className="bg-[#090e1c]/40 border border-white/10 rounded-[2rem] p-8 flex flex-col justify-between hover:border-white/20 hover:bg-[#090e1c]/80 transition-all duration-300 relative group"
+                whileHover={{ y: -8 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 100,
+                  damping: 20,
+                  delay: index * 0.1
+                }}
+                className="bg-[var(--bg-card)]/40 border border-[var(--border)] rounded-[2rem] p-8 flex flex-col justify-between hover:border-[var(--border-hover)] hover:bg-[var(--bg-card)] transition-all duration-300 relative group"
               >
                 <div>
                   <div className="flex items-center justify-between mb-6">
-                    <span className="text-[9px] font-mono tracking-widest uppercase text-slate-400 bg-white/5 py-1 px-3 rounded border border-white/5">
+                    <span className="text-[9px] font-mono tracking-widest uppercase text-[var(--text-secondary)] bg-[var(--bg-surface)] py-1 px-3 rounded border border-[var(--border)] font-semibold">
                       {per.role}
                     </span>
-                    <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-brand-cyan block">
+                    <div className="p-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border)] text-[var(--accent)]">
                       <Icon className={`w-5 h-5 ${per.iconColor}`} strokeWidth={1.5} />
                     </div>
                   </div>
 
-                  <h3 className="text-2xl font-sans font-bold text-white mb-4 tracking-tight">
+                  <h3 className="text-2xl font-sans font-bold text-[var(--text-primary)] mb-4 tracking-tight">
                     {per.title}
                   </h3>
 
                   <div className="space-y-4 mb-6">
                     <div>
-                      <p className="text-[10px] font-mono text-rose-400 uppercase tracking-wider mb-1 font-bold">The Pain:</p>
-                      <p className="text-slate-400 text-xs sm:text-sm leading-relaxed italic">
+                      <p className="text-[10px] font-mono text-rose-500 uppercase tracking-wider mb-1 font-bold">The Pain:</p>
+                      <p className="text-[var(--text-secondary)] text-xs sm:text-sm leading-relaxed italic">
                         &ldquo;{per.frustration}&rdquo;
                       </p>
                     </div>
 
-                    <div className="pt-4 border-t border-white/5">
-                      <p className="text-[10px] font-mono text-emerald-400 uppercase tracking-wider mb-1 font-bold">The Momentum Value:</p>
-                      <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                        <strong className="text-white block mb-0.5">{per.deliverable}</strong>
+                    <div className="pt-4 border-t border-[var(--border)]">
+                      <p className="text-[10px] font-mono text-emerald-500 uppercase tracking-wider mb-1 font-bold">The Momentum Value:</p>
+                      <div className="text-[var(--text-secondary)] text-xs sm:text-sm leading-relaxed">
+                        <strong className="text-[var(--text-primary)] block mb-0.5">{per.deliverable}</strong>
                         {per.desc}
-                      </p>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-white/5 flex justify-end">
-                  <a href="#waitlist" className="text-xs font-mono uppercase tracking-widest text-slate-400 group-hover:text-brand-cyan inline-flex items-center gap-1.5 transition-colors duration-300">
+                <div className="mt-4 pt-4 border-t border-[var(--border)] flex justify-end">
+                  <a href="#waitlist" className="text-xs font-mono uppercase tracking-widest text-[var(--text-secondary)] group-hover:text-[var(--accent)] inline-flex items-center gap-1.5 transition-colors duration-300">
                     <span>Solve this</span>
                     <ArrowRight className="w-3.5 h-3.5" strokeWidth={1.5} />
                   </a>

@@ -1,20 +1,44 @@
 @import "tailwindcss";
 
+:root {
+  --bg: #000000;
+  --bg-surface: #0f0f0f;
+  --bg-card: #111111;
+  --border: rgba(255,255,255,0.08);
+  --border-hover: rgba(255,255,255,0.16);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255,255,255,0.5);
+  --text-muted: rgba(255,255,255,0.25);
+  --accent: #2563EB;
+  --accent-hover: #3B82F6;
+  --accent-glow: rgba(37,99,235,0.3);
+  --accent-subtle: rgba(37,99,235,0.08);
+}
+
+html.light {
+  --bg: #ffffff;
+  --bg-surface: #fafafa;
+  --bg-card: #f5f5f5;
+  --border: rgba(0,0,0,0.08);
+  --border-hover: rgba(0,0,0,0.16);
+  --text-primary: #000000;
+  --text-secondary: rgba(0,0,0,0.5);
+  --text-muted: rgba(0,0,0,0.3);
+  --accent: #2563EB;
+  --accent-hover: #1D4ED8;
+  --accent-glow: rgba(37,99,235,0.15);
+  --accent-subtle: rgba(37,99,235,0.06);
+}
+
 @theme {
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  
-  --color-brand-blue: #0ea5e9;
-  --color-brand-cyan: #22d3ee;
-  --color-brand-teal: #14b8a6;
-  --color-dark-bg: #020617;
-  --color-dark-card: #090e1c;
 }
 
 @layer base {
   body {
-    background-color: var(--color-dark-bg);
-    color: #f1f5f9;
+    background-color: var(--bg);
+    color: var(--text-primary);
   }
 }
 
@@ -24,19 +48,24 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #020617;
+  background: var(--bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: var(--border-hover);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: var(--text-muted);
 }
 
 /* Elite Dot matrix background */
 .dot-grid {
   background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+html.light .dot-grid {
+  background-image: radial-gradient(rgba(0, 0, 0, 0.06) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
@@ -47,9 +76,37 @@
   pointer-events: none;
 }
 
+html.light .glow-spot {
+  opacity: 0.06;
+}
+
 /* Selection and focus styling */
 ::selection {
-  background-color: rgba(14, 165, 233, 0.25);
-  color: #ffffff;
+  background-color: var(--accent-glow);
+  color: var(--text-primary);
 }
+
+/* Theme transition — smooth color shift on toggle */
+*, *::before, *::after {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.15s ease;
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 10s linear infinite;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 
