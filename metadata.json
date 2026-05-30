@@ -1,0 +1,6 @@
+{
+  "name": "Momentum",
+  "description": "The living knowledge and documentation layer for software projects, bridging human ideas and AI developers.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
