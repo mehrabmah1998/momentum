@@ -1,14 +1,49 @@
 "use client";
 
-import { motion } from "motion/react";
-import { ArrowRight, Sparkles, AlertTriangle, Cpu, GitBranch, RefreshCw, FileText } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import { ArrowRight, Sparkles, AlertTriangle, Cpu, GitBranch, RefreshCw, FileText, CheckCircle2, ChevronRight, Database, Code } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 
 export default function Hero() {
+  const [activeStep, setActiveStep] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Auto-slide loop every 7.5 seconds, paused on interactive click or hover
+  useEffect(() => {
+    if (!isPaused) {
+      timerRef.current = setInterval(() => {
+        setActiveStep((prev) => (prev + 1) % 3);
+      }, 7500);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [isPaused]);
+
+  const stepsInfo = [
+    {
+      title: "01 / The Blind Build",
+      subtitle: "Silent Regression Era",
+      desc: "Without Momentum, active AI builders write legacy sqlite queries, blind to live PostgreSQL production migrations.",
+    },
+    {
+      title: "02 / Live Knowledge Graph",
+      subtitle: "Continuous Git Sync",
+      desc: "Momentum intercepts commits, parsing Postgres schemas, webhook signatures, and APIs into a living semantic graph.",
+    },
+    {
+      title: "03 / Grounded Injection",
+      subtitle: "Real-Time Context Delivery",
+      desc: "The developer agent receives live schemas instantly injected. Code compiles cleanly on first run with zero regressions.",
+    }
+  ];
+
   return (
     <section className="relative min-h-[100dvh] pt-32 pb-24 overflow-hidden flex flex-col justify-center dot-grid">
-      {/* Background radial glows (Ethereal Glass theme adjusted) */}
-      <div className="absolute top-[10%] left-[20%] w-[400px] h-[400px] rounded-full bg-[var(--accent-glow)] glow-spot" />
-      <div className="absolute bottom-[10%] right-[15%] w-[500px] h-[500px] rounded-full bg-[var(--accent-glow)] glow-spot" />
+      {/* Background radial glows (Ethereal Glass theme) */}
+      <div className="absolute top-[10%] left-[20%] w-[400px] h-[400px] rounded-full bg-[var(--accent-glow)] glow-spot opacity-60" />
+      <div className="absolute bottom-[10%] right-[15%] w-[500px] h-[500px] rounded-full bg-[var(--accent-glow)] glow-spot opacity-40" />
 
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 relative z-10">
         <div className="text-center md:text-left max-w-5xl mx-auto">
@@ -34,7 +69,7 @@ export default function Hero() {
           >
             Your AI code builders are{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent)] via-[var(--accent-hover)] to-[var(--text-primary)]">
-              guessing.
+              guessing blind.
             </span>
           </motion.h1>
 
@@ -45,7 +80,7 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="text-[var(--text-secondary)] text-lg md:text-xl font-sans font-normal max-w-3xl leading-relaxed mb-10"
           >
-            Claude Code, Cursor, and Codex operate on flat files and loose chat contexts. Momentum maintains a structured, living database of your project’s architecture, constraints, and features—rendering precise prompt injection contexts and verifying every code commit automatically.
+            Claude Code, Cursor, and Codex operate on flat markdown files and loose logs. Momentum preserves a real-time, structured database of your project’s schema, architecture constraints, and hooks—rendering pixel-perfect prompt grounding and preventing codebase decay automatically.
           </motion.p>
 
           {/* Dual CTAs with Button-in-Button Arrow interaction */}
@@ -53,7 +88,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start mb-20"
+            className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start mb-16"
           >
             <a
               href="#waitlist"
@@ -74,106 +109,457 @@ export default function Hero() {
           </motion.div>
         </div>
 
-        {/* Cinematic Visual Comparison Split styled using Double-Bezel (Doppelrand) Pattern */}
+        {/* Master Integrated Interface Console (Double-Bezel Doppelrand Pattern) */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="relative max-w-5xl mx-auto rounded-[2.5rem] bg-[var(--border)] p-2 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.15)] overflow-hidden"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          className="relative max-w-5xl mx-auto rounded-[2.5rem] bg-[var(--border)] p-2 shadow-[0_45px_90px_-25px_rgba(0,0,0,0.25)] overflow-hidden"
         >
-          {/* Inner core with glass shadow highlights */}
-          <div className="rounded-[calc(2.5rem-0.5rem)] bg-[var(--bg-card)] border border-[var(--border)] p-4 sm:p-6 backdrop-blur-2xl relative overflow-hidden">
+          {/* Inner core with glass shadow highlights in a self-contained flex layer */}
+          <div className="rounded-[calc(2.5rem-0.5rem)] bg-[var(--bg-card)] border border-[var(--border)] p-4 sm:p-8 backdrop-blur-2xl relative overflow-hidden flex flex-col gap-6">
+            
             {/* Ambient shimmer background lines */}
             <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[var(--accent)] to-transparent opacity-40 animate-pulse" />
 
+            {/* INTEGRATED PIPELINE CONTROL PANEL HEADER */}
+            <div className="flex flex-col gap-4 border-b border-[var(--border)] pb-6 relative z-10">
+              
+              {/* Window Controls & Status Bar */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-left">
+                {/* Simulated IDE breadcrumbs & Window Actions */}
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500/70" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500/70" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/70" />
+                  </div>
+                  
+                  <div className="flex items-center gap-1.5 font-mono text-[9px] tracking-wider text-[var(--text-muted)] font-bold">
+                    <span>MOMENTUM_RUN</span>
+                    <span className="text-[var(--accent)]">/</span>
+                    <span className="text-[var(--text-secondary)]">CONTEXT_HYPOTHESIS_SIMULATOR</span>
+                  </div>
+                </div>
+
+                {/* Automation Running Banner */}
+                <div className="flex items-center gap-2 self-start sm:self-auto px-2.5 py-1 rounded bg-[var(--accent-subtle)] border border-[var(--border)]">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isPaused ? "bg-amber-400" : "bg-emerald-400"}`} />
+                    <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${isPaused ? "bg-amber-500" : "bg-emerald-500"}`} />
+                  </span>
+                  <span className="font-mono text-[8px] uppercase tracking-wider font-bold text-[var(--text-secondary)]">
+                    {isPaused ? "AUTO_ADVANCE_PAUSED_ON_INTERACT" : "PLAYING_SIMULATION_FLOW"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Grid of Integrated Tabs */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-[var(--bg-surface)] p-2 rounded-xl border border-[var(--border)]">
+                {stepsInfo.map((info, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      setActiveStep(idx);
+                      setIsPaused(true);
+                    }}
+                    className={`relative flex flex-col justify-start items-start p-4 sm:p-5 rounded-lg text-left select-none transition-all duration-300 overflow-hidden group border ${
+                      activeStep === idx 
+                        ? "border-[var(--accent)]/20 bg-[var(--bg-card)] shadow-[0_8px_30px_rgba(0,0,0,0.12)]" 
+                        : "border-transparent text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-card)]/40"
+                    }`}
+                  >
+                    {activeStep === idx && (
+                      <motion.div
+                        layoutId="activeStepIndicator"
+                        className="absolute inset-0 bg-[var(--accent-subtle)] z-0"
+                        transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                      />
+                    )}
+                    
+                    {/* Progress indicator representing active transition cooldown */}
+                    {activeStep === idx && !isPaused && (
+                      <motion.div 
+                        key={activeStep}
+                        initial={{ width: "0%" }}
+                        animate={{ width: "100%" }}
+                        transition={{ duration: 7.5, ease: "linear" }}
+                        className="absolute bottom-0 left-0 h-[1.5px] bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] z-10"
+                      />
+                    )}
+
+                    <div className="relative z-10 flex flex-col justify-start h-full w-full">
+                      <div className="flex items-center justify-between w-full mb-1">
+                        <span className={`font-sans text-xs sm:text-[13px] md:text-sm font-bold tracking-tight transition-colors duration-300 ${
+                          activeStep === idx ? "text-[var(--accent)]" : "text-[var(--text-primary)]/70 group-hover:text-[var(--text-primary)]"
+                        }`}>
+                          {info.title}
+                        </span>
+                        
+                        <div className={`w-1.5 h-1.5 rounded-full transition-all duration-300 shrink-0 ml-2 ${
+                          activeStep === idx 
+                            ? "bg-[var(--accent)] ring-4 ring-[var(--accent)]/15 animate-pulse" 
+                            : "bg-transparent border border-[var(--text-muted)]"
+                        }`} />
+                      </div>
+                      
+                      <span className={`font-mono text-[9px] sm:text-[10px] uppercase tracking-wider font-bold block mb-1 transition-colors duration-300 ${
+                        activeStep === idx ? "text-[var(--text-primary)]" : "text-[var(--text-muted)]"
+                      }`}>
+                        {info.subtitle}
+                      </span>
+                      <p className={`text-[11px] sm:text-[12px] leading-relaxed transition-colors duration-300 ${
+                        activeStep === idx ? "text-[var(--text-secondary)]" : "text-[var(--text-muted)]/80"
+                      }`}>
+                        {info.desc}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Simulated Live Comparative System Panel */}
             <div className="grid md:grid-cols-2 gap-6 relative z-10">
-              {/* Chaotic CLAUDE.md File (Left Side) */}
-              <div className="bg-[var(--bg-surface)] backdrop-blur-md rounded-2xl p-6 border border-[var(--border)] relative overflow-hidden flex flex-col justify-between min-h-[360px]">
+              
+              {/* SIDE A: PROJECT GROUNDING SOURCE OF TRUTH */}
+              <div className="bg-[var(--bg-surface)] backdrop-blur-md rounded-2xl p-6 border border-[var(--border)] flex flex-col justify-between min-h-[410px] relative overflow-hidden transition-all duration-500">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-[var(--accent-glow)] via-transparent to-transparent opacity-10 pointer-events-none" />
+                
                 <div>
                   <div className="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-4">
                     <div className="flex items-center gap-2">
-                      <FileText className="text-rose-500 w-4 h-4" strokeWidth={1.5} />
-                      <span className="text-xs font-mono text-[var(--text-secondary)] font-medium">CLAUDE.md (Out of Date)</span>
+                      <Database className="w-3.5 h-3.5 text-[var(--text-secondary)]" strokeWidth={1.5} />
+                      <span className="text-[10px] font-mono text-[var(--text-secondary)] font-bold tracking-wider uppercase">Project Source Architecture</span>
                     </div>
-                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-rose-500/10 border border-rose-500/15">
-                      <AlertTriangle className="w-3 h-3 text-rose-500 animate-pulse" />
-                      <span className="text-[9px] uppercase font-mono text-rose-500">Desynced</span>
+                    
+                    <div className="text-[9px] font-mono font-bold uppercase tracking-widest text-[var(--text-muted)]">
+                      NODE_VARS
                     </div>
                   </div>
 
-                  <div className="space-y-3.5 font-mono text-xs text-[var(--text-muted)]">
-                    <p className="text-[var(--text-secondary)] font-semibold"># System Architecture</p>
-                    <p>- Primary DB is <span className="text-rose-500/80 line-through">SQLite</span> <span className="text-rose-500 font-bold">{"(Wait, team migrated to Postgres last week)"}</span></p>
-                    <p>- Users sync auth through Clerk. <span className="text-rose-400 text-[10px] ml-2">{"(AI hallucinates Clerk functions in Stripe hook)"}</span></p>
-                    <p>- <span className="text-[var(--text-muted)]">{"(TODO: Update this file when adding Postgres vector configs)"}</span></p>
-                    <p>- Queue logic is in Redis. <span className="text-rose-500 font-medium">[CRITICAL: AI re-implemented queue using basic array stack]</span></p>
-                  </div>
+                  <AnimatePresence mode="wait">
+                    {activeStep === 0 && (
+                      <motion.div
+                        key="state-unaware"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.4 }}
+                        className="space-y-4 font-mono text-xs"
+                      >
+                        {/* Outdated text mockup */}
+                        <div className="p-3 bg-rose-500/5 rounded-xl border border-rose-500/10">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[10px] text-rose-500 font-bold uppercase tracking-wider">▲ Stale File: CLAUDE.md</span>
+                            <span className="text-[9px] text-[var(--text-muted)] bg-rose-500/10 px-1.5 py-0.5 rounded">14 Days Ago</span>
+                          </div>
+                          <p className="text-[var(--text-muted)] text-[11px] leading-relaxed">
+                            # Database Setup<br />
+                            - schema: SQLite db file local state.<br />
+                            - queue: Standard redis in-memory stack.<br />
+                            <span className="text-rose-400 font-bold italic block mt-1.5 font-sans">
+                              (Wait, the engineering team migrated to Postgres and deprecated Redis 2 days ago via Git commit #92fa3d)
+                            </span>
+                          </p>
+                        </div>
+
+                        {/* Flat folder structure mismatch visualization */}
+                        <div className="space-y-1 text-[11px] text-[var(--text-muted)] bg-[var(--bg-card)]/40 p-3 rounded-lg border border-[var(--border)]">
+                          <p className="text-[10px] font-bold text-[var(--text-secondary)] mb-1 uppercase tracking-wider">Loose flat context fed to AI:</p>
+                          <p className="text-rose-400 line-through">✓ database: sqlite3</p>
+                          <p className="text-rose-400 line-through">✓ queue: standard redis core</p>
+                          <p className="text-[var(--text-muted)] opacity-60">✓ main_router.ts</p>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {activeStep === 1 && (
+                      <motion.div
+                        key="state-syncing"
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.98 }}
+                        transition={{ duration: 0.5 }}
+                        className="space-y-4"
+                      >
+                        <div className="p-3 bg-amber-500/5 border border-amber-500/15 rounded-xl text-xs font-mono">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="flex items-center gap-1.5 text-amber-500 font-bold text-[10px] uppercase tracking-wider">
+                              <GitBranch className="w-3 h-3 text-amber-500 animate-spin-slow" /> Running Git Parser Sync
+                            </span>
+                            <span className="text-[9px] bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded font-bold">COMMIT_IN</span>
+                          </div>
+                          <p className="text-[var(--text-secondary)] text-[11px] leading-relaxed">
+                            Analyzing diff <span className="text-amber-400 font-bold font-mono">#92fa3d</span> (feat: postgres transition with relational constraints & NextEdge integration)...
+                          </p>
+                        </div>
+
+                        {/* Live active dependency graph simulation */}
+                        <div className="relative h-44 rounded-xl border border-[var(--border)] bg-[var(--bg-card)]/50 flex flex-col justify-center items-center overflow-hidden">
+                          <div className="absolute inset-0 grid grid-cols-4 grid-rows-4 opacity-[0.03] pointer-events-none">
+                            <div className="border border-[var(--text-primary)]" />
+                            <div className="border border-[var(--text-primary)]" />
+                            <div className="border border-[var(--text-primary)]" />
+                            <div className="border border-[var(--text-primary)]" />
+                          </div>
+
+                          {/* Render nodes and connections */}
+                          <div className="flex items-center gap-4 relative z-10">
+                            {/* Postgres Node */}
+                            <motion.div 
+                              animate={{ scale: [1, 1.05, 1] }}
+                              transition={{ repeat: Infinity, duration: 2.5 }}
+                              className="px-2.5 py-1.5 rounded bg-blue-500/10 border border-blue-500/30 text-blue-400 font-mono text-[9px] flex flex-col items-center"
+                            >
+                              <Database className="w-3.5 h-3.5 mb-1" />
+                              <span>Live Postgres</span>
+                            </motion.div>
+
+                            {/* Connecting Line */}
+                            <div className="w-8 h-[2px] bg-gradient-to-r from-blue-500/50 to-emerald-500/50 relative overflow-hidden">
+                              <motion.div 
+                                animate={{ x: ["-100%", "100%"] }}
+                                transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+                                className="absolute top-0 h-full w-2 bg-white"
+                              />
+                            </div>
+
+                            {/* Momentum Graph Hub */}
+                            <div className="p-2 rounded-full bg-[var(--accent)] text-[var(--bg)] animate-pulse">
+                              <Cpu className="w-4 h-4" />
+                            </div>
+
+                            {/* Connecting Line */}
+                            <div className="w-8 h-[2px] bg-gradient-to-r from-[var(--accent)]/50 to-[var(--text-secondary)]/50 relative overflow-hidden">
+                              <motion.div 
+                                animate={{ x: ["-100%", "100%"] }}
+                                transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+                                className="absolute top-0 h-full w-2 bg-emerald-400"
+                              />
+                            </div>
+
+                            {/* Mapped Hook Endpoint Node */}
+                            <motion.div 
+                              animate={{ scale: [1, 1.03, 1] }}
+                              transition={{ repeat: Infinity, duration: 3, delay: 0.5 }}
+                              className="px-2.5 py-1.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-[9px] flex flex-col items-center"
+                            >
+                              <Code className="w-3.5 h-3.5 mb-1" />
+                              <span>Stripe Endpoint</span>
+                            </motion.div>
+                          </div>
+
+                          <div className="absolute bottom-2 text-center">
+                            <span className="font-mono text-[8px] uppercase tracking-widest text-[var(--text-muted)] animate-pulse">
+                              Syncing dependency nodes: Postgres relations + constraints detected
+                            </span>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {activeStep === 2 && (
+                      <motion.div
+                        key="state-grounded"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        transition={{ duration: 0.4 }}
+                        className="space-y-4 font-mono text-xs"
+                      >
+                        {/* Synced Knowledge Base */}
+                        <div className="p-3 bg-emerald-500/5 rounded-xl border border-emerald-500/15">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3" /> SYNCHRONIZED ARCHITECTURE SYSTEM
+                            </span>
+                            <span className="text-[9px] text-emerald-500 bg-emerald-500/15 px-2 py-0.5 rounded font-bold">100% UP-TO-DATE</span>
+                          </div>
+                          
+                          <p className="text-[var(--text-secondary)] text-[10.5px] leading-relaxed mb-2 font-sans">
+                            Continuous commit mapping ensures Momentum knows perfectly thatSQLite was migrated and Redis deprecated.
+                          </p>
+
+                          <div className="space-y-1.5 text-[10px] border-t border-[var(--border)] pt-2 mt-2">
+                            <p className="text-emerald-400 flex items-center gap-1">
+                              ✓ database_schema: postgresql (primary schemas fully compiled)
+                            </p>
+                            <p className="text-emerald-400 flex items-center gap-1">
+                              ✓ auth_bridge: Clerk webhooks docked correctly
+                            </p>
+                            <p className="text-emerald-400 flex items-center gap-1">
+                              ✓ queue_layer: Active NextEdge serverless routing limit verified
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Interactive floating particles container */}
+                        <div className="p-3 bg-[var(--bg-card)] rounded-lg border border-[var(--border)] flex items-center justify-between text-[11px] text-[var(--text-secondary)]">
+                          <span>Graph status tracing: verified.</span>
+                          <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 text-[9px] rounded font-mono uppercase tracking-wider font-bold">
+                            Grounding Active
+                          </span>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                <div className="mt-8 border-t border-[var(--border)] pt-4">
-                  <div className="p-3 rounded-lg bg-rose-500/5 border border-rose-500/10 flex items-center gap-3">
-                    <div className="p-2 rounded-full bg-rose-500/10 text-rose-500 shrink-0">
-                      <AlertTriangle className="w-4 h-4" strokeWidth={1.5} />
-                    </div>
-                    <div className="text-[11px] font-sans leading-tight">
-                      <p className="font-semibold text-[var(--text-primary)]">The Context Gap</p>
-                      <p className="text-[var(--text-secondary)] mt-0.5">The AI doesn&apos;t know Redis was deprecated, breaking the API route under load.</p>
-                    </div>
-                  </div>
+                {/* Left card bottom state summary pill */}
+                <div className="mt-4 border-t border-[var(--border)] pt-4 z-10">
+                  <span className="font-mono text-[9px] text-[var(--text-muted)] tracking-wider">
+                    {activeStep === 0 && "SYSTEM STATUS: OUT-OF-DATE FLAT DOCUMENTATION"}
+                    {activeStep === 1 && "SYSTEM STATUS: CONSTRUCTING KNOWLEDGE SCHEMA"}
+                    {activeStep === 2 && "SYSTEM STATUS: ACTIVE CONTEXT INTEGRATION"}
+                  </span>
                 </div>
               </div>
 
-              {/* Structured Living Knowledge Graph (Right Side) */}
-              <div className="bg-[var(--bg-surface)] backdrop-blur-md rounded-2xl p-6 border border-[var(--accent)]/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] relative overflow-hidden flex flex-col justify-between min-h-[360px]">
+
+              {/* SIDE B: THE AI BUILDER WRAPPER TERMINAL */}
+              <div className="bg-[var(--bg-surface)] backdrop-blur-md rounded-2xl p-6 border border-[var(--border)] flex flex-col justify-between min-h-[410px] relative overflow-hidden transition-all duration-500">
+                
                 <div>
                   <div className="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-4">
                     <div className="flex items-center gap-2">
-                      <Cpu className="text-[var(--accent)] w-4 h-4 animate-pulse" strokeWidth={1.5} />
-                      <span className="text-xs font-mono text-[var(--text-secondary)] font-medium">Momentum Knowledge Graph</span>
+                      <Cpu className="w-3.5 h-3.5 text-[var(--accent)]" strokeWidth={1.5} />
+                      <span className="text-[10px] font-mono text-[var(--text-secondary)] font-bold tracking-wider uppercase">AI Agent Development Environment</span>
                     </div>
-                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[var(--accent-subtle)] border border-[var(--accent)]/15">
-                      <GitBranch className="w-3 h-3 text-[var(--accent)] animate-spin-slow" />
-                      <span className="text-[9px] uppercase font-mono text-[var(--accent)]">Synchronized</span>
+                    
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[var(--bg-card)] border border-[var(--border)] font-mono text-[9px] font-bold text-[var(--text-secondary)]">
+                      <span>LLM: CLAUDE_CODE</span>
                     </div>
                   </div>
 
-                  <div className="relative font-mono text-xs space-y-3">
-                    {/* Visual simulated graph nodes */}
-                    <div className="flex items-center gap-2 text-[var(--accent)] font-bold bg-[var(--accent-subtle)] py-1.5 px-3 rounded-lg border border-[var(--accent)]/20 w-fit">
-                      <span>Node: postgres_config</span>
-                      <span className="text-[9.5px] bg-emerald-500/20 text-emerald-500 px-1.5 py-0.5 rounded font-mono font-bold">Git-Confirmed</span>
+                  {/* Dev Input Bubble */}
+                  <div className="mb-4 bg-[var(--bg-card)] rounded-xl border border-[var(--border)] p-3 text-xs">
+                    <span className="font-mono text-[9px] text-[var(--accent)] font-bold uppercase tracking-wider block mb-1">Developer Command Inputs</span>
+                    <p className="text-[var(--text-primary)] font-mono text-[11px] leading-tight">
+                      &quot;Write payment checkout API route and map transaction records&quot;
+                    </p>
+                  </div>
+
+                  {/* AI Response Output Block */}
+                  <div className="bg-black/40 rounded-xl p-4 border border-[var(--border)] font-mono text-[11px] leading-normal min-h-[160px] flex flex-col justify-between">
+                    <div>
+                      <span className="text-[9px] uppercase tracking-wider text-[var(--text-muted)] block mb-2">Compiled Agent Code Generation:</span>
+                      
+                      <AnimatePresence mode="wait">
+                        {activeStep === 0 && (
+                          <motion.div
+                            key="gpt-fail-out"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="text-rose-400 space-y-2"
+                          >
+                            <p className="text-[10px] bg-rose-500/10 px-2 py-1 rounded inline-block font-sans font-bold">
+                              ❌ COMPILER ERROR: Database Mismatch
+                            </p>
+                            <p className="text-[11px] tracking-tight text-rose-500/90 leading-relaxed font-mono">
+                              &gt; initializing sqlite3 connection...<br />
+                              &gt; writing sqlite3_save_transaction_sqlite()...<br />
+                              &gt; <span className="font-bold underline text-rose-400">FAILED:</span> Table &apos;transactions&apos; does not inherit matching column constraints. Destination stack Postgres migration #92fa3d was ignored in flat context.
+                            </p>
+                          </motion.div>
+                        )}
+
+                        {activeStep === 1 && (
+                          <motion.div
+                            key="gpt-waiting-out"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 0.5 }}
+                            exit={{ opacity: 0 }}
+                            className="text-amber-400 text-center py-6 italic font-sans"
+                          >
+                            <RefreshCw className="w-5 h-5 mx-auto mb-2 animate-spin text-amber-500" />
+                            Intercepting Prompt Window...<br />
+                            Awaiting synchronized knowledge coordinates.
+                          </motion.div>
+                        )}
+
+                        {activeStep === 2 && (
+                          <motion.div
+                            key="gpt-success-out"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="text-emerald-400 space-y-2"
+                          >
+                            <p className="text-[10px] bg-emerald-500/10 px-2 py-1 rounded inline-block font-sans font-bold">
+                              ✓ BUILD SUCCESS: Momentum Context Injected
+                            </p>
+                            <p className="text-[11px] text-emerald-500/90 leading-relaxed font-mono">
+                              &gt; model system mapping verified Postgres schema...<br />
+                              &gt; detected foreign keys constraints from Stripe module...<br />
+                              &gt; writing NextEdge Pg pool config connection...<br />
+                              &gt; <span className="font-bold text-emerald-400">COMPILE SUCCESS:</span> Zero regressions detected. Saved 10,240 development tokens.
+                            </p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
 
-                    <div className="pl-6 border-l-2 border-[var(--border-hover)] space-y-2">
-                      <div className="text-[var(--text-secondary)] flex items-center gap-2 py-0.5">
-                        <span className="text-[var(--text-muted)] font-medium">↳ Relates to:</span>
-                        <span className="text-[var(--text-primary)] font-semibold bg-[var(--bg-card)] px-2 py-0.5 rounded border border-[var(--border)]">auth_service</span>
-                      </div>
-                      <div className="text-[var(--text-secondary)] flex items-center gap-2 py-0.5">
-                        <span className="text-[var(--text-muted)] font-medium">↳ Constraint:</span>
-                        <span className="text-[var(--accent)] font-semibold">vector_chunk_limit = 1536</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-[var(--text-secondary)] mt-2 bg-[var(--bg-card)] border border-[var(--border)] py-1.5 px-3 rounded w-fit text-[11px]">
-                      <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shrink-0" />
-                      <span>Active Plan: Migrate stripe events route to NextEdge.</span>
+                    {/* Grounding Context injection tag */}
+                    <div className="mt-4 border-t border-[var(--border)]/30 pt-2 flex items-center justify-between">
+                      <span className="text-[9px] text-[var(--text-muted)] font-mono">
+                        {activeStep === 0 && "CONSTRUCTOR STATUS: ZERO-GROUNDING PREDICTION"}
+                        {activeStep === 1 && "CONSTRUCTOR STATUS: CONSTRUCTING SHUNT INTEGRATION"}
+                        {activeStep === 2 && "CONSTRUCTOR STATUS: INJECTED SYNC_GRAPH_v2"}
+                      </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-6 border-t border-[var(--border)] pt-4 bg-gradient-to-r from-transparent to-[var(--accent-subtle)] -mx-6 -mb-6 p-6 rounded-b-2xl">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-full bg-[var(--accent-subtle)] text-[var(--accent)] shrink-0">
-                      <RefreshCw className="w-4 h-4 animate-spin-slow" strokeWidth={1.5} />
-                    </div>
-                    <div className="text-[11px] font-sans leading-tight">
-                      <p className="font-semibold text-[var(--text-primary)]">Graph-Guided prompt injected</p>
-                      <p className="text-[var(--text-secondary)] mt-0.5">Prompt verified: constraints mapped from PostgreSQL and Stripe modules.</p>
-                    </div>
-                  </div>
+                {/* Telemetry outcome feedback badge on Side B */}
+                <div className="mt-4 border-t border-[var(--border)] pt-4 relative z-10 flex items-center justify-between">
+                  <span className="font-mono text-[9px] uppercase font-bold tracking-widest text-[var(--text-muted)]">
+                    MOMENTUM PREVENTATIVE PIPELINE
+                  </span>
+
+                  <AnimatePresence mode="wait">
+                    {activeStep === 0 && (
+                      <motion.span
+                        key="badge-f"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="px-2 py-0.5 rounded bg-rose-500/10 border border-rose-500/20 text-rose-500 text-[9px] font-mono font-bold uppercase tracking-wider"
+                      >
+                        Severe Regression Risk
+                      </motion.span>
+                    )}
+
+                    {activeStep === 1 && (
+                      <motion.span
+                        key="badge-p"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[9px] font-mono font-bold uppercase tracking-wider"
+                      >
+                        Resolving Context Decoupling
+                      </motion.span>
+                    )}
+
+                    {activeStep === 2 && (
+                      <motion.span
+                        key="badge-s"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-mono font-bold uppercase tracking-wider"
+                      >
+                        100% Correct. 0 Regressions
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
+
             </div>
           </div>
         </motion.div>
@@ -181,3 +567,4 @@ export default function Hero() {
     </section>
   );
 }
+

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowRight, Menu, X, Sparkles, Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -127,16 +128,16 @@ export default function Navbar() {
                 </AnimatePresence>
               </button>
 
-              <a
-                href="#waitlist"
-                className="group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider text-white bg-[var(--accent)] hover:bg-[var(--accent-hover)] transition-all duration-300 active:scale-[0.98] shadow-[0_4px_20px_-4px_var(--accent-glow)] overflow-hidden"
+              <Link
+                href="/sign-in"
+                className="group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider text-white bg-[var(--accent)] hover:bg-[var(--accent-hover)] transition-all duration-300 active:scale-[0.98] shadow-[0_4px_20px_-4px_var(--accent-glow)] overflow-hidden font-sans"
               >
-                <span className="relative z-10">Get Early Access</span>
-                <span className="relative z-10 w-5 h-5 rounded-full bg-white/10 flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-[1px]">
+                <span className="relative z-10">Sign In</span>
+                <span className="relative z-10 w-5 h-5 rounded-full bg-white/10 flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-[1px]">
                   <ArrowRight className="w-3 h-3 text-white" strokeWidth={2.5} />
                 </span>
                 <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
-              </a>
+              </Link>
             </div>
 
             {/* Mobile Control Row (Theme Toggle & Menu) */}
@@ -207,14 +208,14 @@ export default function Navbar() {
                   <span>Theme:</span>
                   <span className="font-semibold text-[var(--text-primary)] capitalize">{theme}</span>
                 </div>
-                <a
-                  href="#waitlist"
+                <Link
+                  href="/sign-in"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold uppercase tracking-wider text-white bg-[var(--accent)] hover:bg-[var(--accent-hover)] transition-all shadow-lg w-full justify-center"
+                  className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-xs font-semibold uppercase tracking-wider text-white bg-[var(--accent)] hover:bg-[var(--accent-hover)] transition-all shadow-lg w-full justify-center"
                 >
-                  <span>Get Early Access</span>
+                  <span>Sign In</span>
                   <ArrowRight className="w-4 h-4 ml-1" strokeWidth={1.5} />
-                </a>
+                </Link>
               </motion.div>
             </div>
           </motion.div>
