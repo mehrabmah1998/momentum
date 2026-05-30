@@ -68,7 +68,7 @@ export default function Hero() {
             className="text-4xl sm:text-5xl md:text-6xl lg:text-[5.5rem] font-sans font-bold leading-[0.95] tracking-tighter text-[var(--text-primary)] mb-6"
           >
             Your AI code builders are{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent)] via-[var(--accent-hover)] to-[var(--text-primary)]">
+            <span className="premium-text-gradient">
               guessing blind.
             </span>
           </motion.h1>
@@ -78,7 +78,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="text-[var(--text-secondary)] text-lg md:text-xl font-sans font-normal max-w-3xl leading-relaxed mb-10"
+            className="text-[var(--text-secondary)] text-lg md:text-xl font-sans font-normal max-w-4xl lg:max-w-5xl leading-relaxed mb-10"
           >
             Claude Code, Cursor, and Codex operate on flat markdown files and loose logs. Momentum preserves a real-time, structured database of your project’s schema, architecture constraints, and hooks—rendering pixel-perfect prompt grounding and preventing codebase decay automatically.
           </motion.p>

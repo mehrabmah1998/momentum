@@ -3,10 +3,22 @@
 import React from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
+import { ArrowLeft } from "lucide-react";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-[100dvh] w-full flex items-center justify-center bg-[var(--bg)] relative overflow-hidden px-4 py-8">
+      {/* Floating Back to Home Trigger */}
+      <div className="absolute top-6 left-6 z-20">
+        <Link
+          href="/"
+          className="group inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--border)] bg-[var(--bg-card)]/50 backdrop-blur-md text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-all duration-300 select-none active:scale-[0.98] font-sans"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 transition-transform duration-300 group-hover:-translate-x-0.5" strokeWidth={2.5} />
+          <span>Back to Home</span>
+        </Link>
+      </div>
+
       <div className="w-full max-w-md mx-auto relative z-10 flex flex-col items-center">
         {/* Centered Momentum Logo */}
         <Link href="/" className="group flex items-center gap-3 mb-8 transition-opacity hover:opacity-90">

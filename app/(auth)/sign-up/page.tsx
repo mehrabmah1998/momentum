@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { User, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { User, Mail, Lock, Eye, EyeOff, ArrowRight, Check, X } from "lucide-react";
 import { signUp, signIn } from "@/lib/auth-client";
 
 export default function SignUpPage() {
@@ -14,11 +14,36 @@ export default function SignUpPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
+  // For live helper guidance
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+
   // Action states
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  // Live password requirements evaluation
+  const requirements = [
+    { id: "length", label: "At least 8 characters", valid: password.length >= 8 },
+    { id: "uppercase", label: "One uppercase letter (A-Z)", valid: /[A-Z]/.test(password) },
+    { id: "number", label: "One number (0-9)", valid: /[0-9]/.test(password) },
+    { id: "special", label: "One special character (!@#...)", valid: /[^A-Za-z0-9]/.test(password) },
+  ];
+
+  const fulfilledCount = requirements.filter(r => r.valid).length;
+  
+  // Color configuration depending on fulfillment status
+  const getStrengthConfig = () => {
+    if (password.length === 0) return { label: "Empty", colorClass: "bg-[var(--border)]", textClass: "text-[var(--text-muted)]" };
+    if (fulfilledCount <= 1) return { label: "Weak Security", colorClass: "bg-rose-500", textClass: "text-rose-400" };
+    if (fulfilledCount <= 3) return { label: "Medium Security", colorClass: "bg-amber-400", textClass: "text-amber-400" };
+    return { label: "Strong Guard Activated", colorClass: "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]", textClass: "text-emerald-400" };
+  };
+
+  const strength = getStrengthConfig();
 
   const handleGoogle = () => {
     setError("");
@@ -34,8 +59,31 @@ export default function SignUpPage() {
     e.preventDefault();
     if (isSubmitting) return;
 
-    setIsSubmitting(true);
     setError("");
+
+    // 1. Validate fields are populated
+    if (!name.trim()) {
+      setError("Please enter your full name.");
+      return;
+    }
+    if (!email.trim() || !email.includes("@")) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    // 2. Validate password strength criteria
+    if (fulfilledCount < 4) {
+      setError("Please satisfy all password safety requirements listed below.");
+      return;
+    }
+
+    // 3. Confirm password matching
+    if (password !== confirmPassword) {
+      setError("Passwords do not match. Please verify your entries.");
+      return;
+    }
+
+    setIsSubmitting(true);
     
     try {
       const res = await signUp.email({
@@ -57,10 +105,10 @@ export default function SignUpPage() {
   return (
     <motion.div
       key={pathname}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.98 }}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       className="w-full flex flex-col justify-start"
     >
       {/* Header */}
@@ -82,7 +130,7 @@ export default function SignUpPage() {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0 }}
-          className="w-full rounded-full bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] py-3 px-6 text-sm transition-all flex items-center justify-center gap-3 cursor-pointer select-none font-sans font-medium"
+          className="w-full rounded-full bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] py-3 px-6 text-sm transition-all flex items-center justify-center gap-3 cursor-pointer select-none font-sans font-medium hover:scale-[1.01] active:scale-[0.99]"
         >
           {/* Google Color G logo standard SVG */}
           <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -100,8 +148,8 @@ export default function SignUpPage() {
           type="button"
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.06 }}
-          className="w-full rounded-full bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] py-3 px-6 text-sm transition-all flex items-center justify-center gap-3 cursor-pointer select-none font-sans font-medium"
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
+          className="w-full rounded-full bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] py-3 px-6 text-sm transition-all flex items-center justify-center gap-3 cursor-pointer select-none font-sans font-medium hover:scale-[1.01] active:scale-[0.99]"
         >
           {/* Custom SVG cleaner github logo */}
           <svg className="w-4 h-4 shrink-0 fill-[var(--text-secondary)]" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -126,7 +174,7 @@ export default function SignUpPage() {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.12 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.10 }}
           className="flex flex-col justify-start"
         >
           <label className="text-[10px] uppercase tracking-[0.15em] font-mono text-[var(--text-muted)] mb-1 font-bold">
@@ -151,7 +199,7 @@ export default function SignUpPage() {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.17 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
           className="flex flex-col justify-start"
         >
           <label className="text-[10px] uppercase tracking-[0.15em] font-mono text-[var(--text-muted)] mb-1 font-bold">
@@ -176,7 +224,7 @@ export default function SignUpPage() {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.22 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.20 }}
           className="flex flex-col justify-start"
         >
           <label className="text-[10px] uppercase tracking-[0.15em] font-mono text-[var(--text-muted)] mb-1 font-bold">
@@ -191,6 +239,7 @@ export default function SignUpPage() {
               autoComplete="new-password"
               placeholder="Min. 8 characters"
               value={password}
+              onFocus={() => setIsPasswordFocused(true)}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-transparent border-b border-[var(--border)] focus:border-[var(--accent)] pl-8 pr-10 text-sm py-3 transition-colors outline-none placeholder:text-[var(--text-muted)] text-[var(--text-primary)]"
             />
@@ -204,6 +253,135 @@ export default function SignUpPage() {
           </div>
         </motion.div>
 
+        {/* Live Password Strength Indicator (Animated on focus or type) */}
+        <AnimatePresence>
+          {(isPasswordFocused || password.length > 0) && (
+            <motion.div
+              initial={{ opacity: 0, height: 0, marginTop: 0 }}
+              animate={{ opacity: 1, height: "auto", marginTop: 4 }}
+              exit={{ opacity: 0, height: 0, marginTop: 0 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              className="overflow-hidden bg-[var(--bg-card)] border border-[var(--border)] rounded-xl p-4 flex flex-col gap-3"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] uppercase font-mono tracking-wider font-bold text-[var(--text-muted)]">
+                  Strength Level
+                </span>
+                <span className={`text-[10px] uppercase font-mono tracking-wider font-bold transition-all duration-300 ${strength.textClass}`}>
+                  {strength.label}
+                </span>
+              </div>
+
+              {/* Segmented Strength Bar */}
+              <div className="grid grid-cols-4 gap-1.5 h-1.5 w-full">
+                {[1, 2, 3, 4].map((step) => {
+                  const isActive = password.length > 0 && fulfilledCount >= step;
+                  return (
+                    <div
+                      key={step}
+                      className="h-full rounded-full bg-[var(--border)] overflow-hidden relative"
+                    >
+                      {isActive && (
+                        <motion.div
+                          layoutId={`strengthBarSegment-${step}`}
+                          initial={{ scaleX: 0 }}
+                          animate={{ scaleX: 1 }}
+                          transition={{ duration: 0.3 }}
+                          className={`absolute inset-0 origin-left ${strength.colorClass}`}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Requirements Live Checklist with Micro staggers */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
+                {requirements.map((req, ridx) => (
+                  <motion.div
+                    key={req.id}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: ridx * 0.05 }}
+                    className="flex items-center gap-2"
+                  >
+                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-all duration-350 ${
+                      req.valid 
+                        ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400" 
+                        : "border-[var(--border)] text-[var(--text-muted)]"
+                    }`}>
+                      {req.valid ? (
+                        <Check className="w-2.5 h-2.5" strokeWidth={3} />
+                      ) : (
+                        <div className="w-1 h-1 rounded-full bg-[var(--text-muted)]" />
+                      )}
+                    </div>
+                    <span className={`text-[11px] font-sans transition-colors duration-300 ${
+                      req.valid ? "text-[var(--text-primary)] font-medium" : "text-[var(--text-muted)]"
+                    }`}>
+                      {req.label}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Confirm Password Input */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.25 }}
+          className="flex flex-col justify-start"
+        >
+          <label className="text-[10px] uppercase tracking-[0.15em] font-mono text-[var(--text-muted)] mb-1 font-bold">
+            Confirm Password
+          </label>
+          <div className="relative">
+            <Lock className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" strokeWidth={1.5} />
+            <input
+              required
+              type={showConfirmPassword ? "text" : "password"}
+              name="confirmPassword"
+              autoComplete="new-password"
+              placeholder="Re-enter your password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full bg-transparent border-b border-[var(--border)] focus:border-[var(--accent)] pl-8 pr-10 text-sm py-3 transition-colors outline-none placeholder:text-[var(--text-muted)] text-[var(--text-primary)]"
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-0 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors p-1 flex items-center justify-center cursor-pointer"
+            >
+              {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
+          {/* Real-time match visual validation indicator */}
+          {password && confirmPassword && (
+            <motion.p
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`text-[10px] uppercase tracking-wider font-mono font-bold mt-1.5 flex items-center gap-1 ${
+                password === confirmPassword ? "text-emerald-400" : "text-rose-400"
+              }`}
+            >
+              {password === confirmPassword ? (
+                <>
+                  <Check className="w-3 h-3 text-emerald-400" strokeWidth={2.5} />
+                  <span>Passwords match</span>
+                </>
+              ) : (
+                <>
+                  <X className="w-3 h-3 text-rose-400" strokeWidth={2.5} />
+                  <span>Passwords do not match</span>
+                </>
+              )}
+            </motion.p>
+          )}
+        </motion.div>
+
         {/* Submit button */}
         <motion.button
           type="submit"
@@ -212,8 +390,8 @@ export default function SignUpPage() {
           whileTap={{ scale: 0.98 }}
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.27 }}
-          className="w-full rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white uppercase tracking-wider text-xs font-semibold py-3.5 px-8 shadow-[0_4px_20px_-4px_var(--accent-glow)] flex items-center justify-center gap-2 cursor-pointer transition-colors mt-4 select-none"
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.30 }}
+          className="w-full rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white uppercase tracking-wider text-xs font-semibold py-3.5 px-8 shadow-[0_4px_20px_-4px_var(--accent-glow)] flex items-center justify-center gap-2 cursor-pointer transition-colors mt-4 select-none min-h-[48px]"
         >
           {isSubmitting ? (
             <>
