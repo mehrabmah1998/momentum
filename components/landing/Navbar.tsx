@@ -47,7 +47,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 pt-4 px-4 sm:px-6">
+      <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 pt-5 px-4 sm:px-6">
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -55,43 +55,48 @@ export default function Navbar() {
           className={cn(
             "mx-auto max-w-5xl rounded-full transition-all duration-500",
             scrolled
-              ? "bg-[var(--bg-card)]/80 border border-[var(--border)] shadow-[0_12px_40px_-12px_rgba(0,0,0,0.15)] backdrop-blur-xl px-6 py-3"
-              : "bg-transparent border border-transparent px-4 py-4"
+              ? "bg-[var(--bg-card)]/85 border border-[var(--border)] shadow-[0_12px_40px_-12px_rgba(0,0,0,0.3)] backdrop-blur-xl px-6 py-2.5"
+              : "bg-transparent border border-transparent shadow-none backdrop-blur-none px-6 py-3.5"
           )}
         >
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <a href="#" className="flex items-center gap-2.5 group">
-              <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--border)] p-[1px] overflow-hidden">
-                <div className="absolute inset-0 bg-[var(--bg-card)] rounded-[7px]" />
+            <a href="#" className="flex items-center gap-2 group select-none">
+              <div className="relative flex items-center justify-center w-7 h-7 rounded-lg bg-[var(--accent)]/[0.08] p-[1.5px] overflow-hidden border border-[var(--border)] group-hover:border-[var(--accent)]/40 transition-colors duration-300">
                 <motion.div
                   animate={{ rotate: [0, 360] }}
-                  transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
-                  className="z-10 w-2.5 h-2.5 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] rounded-full shadow-[0_0_8px_var(--accent-glow)]"
+                  transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
+                  className="z-10 w-2 h-2 bg-gradient-to-tr from-[var(--accent)] to-[var(--accent-hover)] rounded-full"
                 />
               </div>
-              <span className="font-sans font-bold tracking-tight text-lg text-[var(--text-primary)]">
+              <span className="font-sans font-extrabold tracking-tight text-[15px] sm:text-base text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors duration-300">
                 Momentum
               </span>
             </a>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-8">
+            <nav className="hidden md:flex items-center gap-1.5 relative">
               {navItems.map((item, index) => (
                 <a
                   key={item.name}
                   href={item.href}
-                  className="relative py-1 text-xs uppercase tracking-widest font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200"
+                  className={cn(
+                    "relative px-4 py-1.5 text-[13px] font-medium font-sans tracking-tight rounded-full transition-colors duration-300 select-none",
+                    hoveredIndex === index
+                      ? "text-[var(--text-primary)]"
+                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                  )}
                   onMouseEnter={() => setHoveredIndex(index)}
                   onMouseLeave={() => setHoveredIndex(null)}
                 >
-                  {item.name}
-                  <motion.span
-                    className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[var(--accent)] origin-left"
-                    initial={{ scaleX: 0 }}
-                    animate={{ scaleX: hoveredIndex === index ? 1 : 0 }}
-                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                  />
+                  <span className="relative z-10">{item.name}</span>
+                  {hoveredIndex === index && (
+                    <motion.div
+                      layoutId="navHover"
+                      className="absolute inset-0 bg-[var(--text-primary)]/[0.06] rounded-full -z-0"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
                 </a>
               ))}
             </nav>
@@ -101,7 +106,7 @@ export default function Navbar() {
               {/* Theme Toggle Button */}
               <button
                 onClick={toggle}
-                className="relative flex items-center justify-center w-8 h-8 rounded-full border border-[var(--border)] hover:border-[var(--border-hover)] bg-[var(--bg-surface)] hover:bg-[var(--bg-card)] text-[var(--text-primary)] transition-all duration-300 cursor-pointer active:scale-95"
+                className="relative flex items-center justify-center w-9 h-9 rounded-full border border-[var(--border)] hover:border-[var(--accent)]/30 bg-[var(--bg-surface)] hover:bg-[var(--text-primary)]/[0.04] text-[var(--text-primary)] transition-all duration-300 cursor-pointer active:scale-95"
                 aria-label="Toggle theme"
               >
                 <AnimatePresence mode="wait" initial={false}>
@@ -116,7 +121,7 @@ export default function Navbar() {
                     {theme === "dark" ? (
                       <Sun className="w-4 h-4 text-amber-400" strokeWidth={1.5} />
                     ) : (
-                      <Moon className="w-4 h-4 text-blue-600" strokeWidth={1.5} />
+                      <Moon className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.5} />
                     )}
                   </motion.div>
                 </AnimatePresence>
@@ -144,7 +149,7 @@ export default function Navbar() {
                 {theme === "dark" ? (
                   <Sun className="w-4 h-4 text-amber-400" strokeWidth={1.5} />
                 ) : (
-                  <Moon className="w-4 h-4 text-blue-600" strokeWidth={1.5} />
+                  <Moon className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.5} />
                 )}
               </button>
               

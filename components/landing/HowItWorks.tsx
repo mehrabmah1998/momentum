@@ -43,7 +43,7 @@ export default function HowItWorks() {
   ];
 
   return (
-    <section id="how-it-works" className="relative py-32 bg-[var(--bg)] border-t border-[var(--border)] overflow-hidden dot-grid">
+    <section id="how-it-works" className="relative py-32 bg-transparent border-t border-[var(--border)] overflow-hidden dot-grid">
       <div className="absolute top-[25%] right-[5%] w-[450px] h-[450px] rounded-full bg-[var(--accent-glow)] glow-spot" />
       <div className="absolute bottom-[20%] left-[5%] w-[400px] h-[400px] rounded-full bg-[var(--accent-glow)] glow-spot" />
 

@@ -32,7 +32,7 @@ export default function Waitlist() {
   };
 
   return (
-    <section id="waitlist" className="relative py-40 bg-[var(--bg)] border-t border-[var(--border)] overflow-hidden dot-grid">
+    <section id="waitlist" className="relative py-40 bg-transparent border-t border-[var(--border)] overflow-hidden dot-grid">
       <div className="absolute top-[35%] left-[30%] w-[500px] h-[500px] rounded-full bg-[var(--accent-glow)] glow-spot" />
 
       <div className="container mx-auto max-w-4xl px-4 sm:px-6 relative z-10 text-center">

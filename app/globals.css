@@ -11,8 +11,8 @@
   --text-muted: rgba(255,255,255,0.25);
   --accent: #2563EB;
   --accent-hover: #3B82F6;
-  --accent-glow: rgba(37,99,235,0.3);
-  --accent-subtle: rgba(37,99,235,0.08);
+  --accent-glow: rgba(0,0,0,0.4);
+  --accent-subtle: rgba(37,99,235,0.03);
 }
 
 html.light {
@@ -26,8 +26,8 @@ html.light {
   --text-muted: rgba(0,0,0,0.3);
   --accent: #2563EB;
   --accent-hover: #1D4ED8;
-  --accent-glow: rgba(37,99,235,0.15);
-  --accent-subtle: rgba(37,99,235,0.06);
+  --accent-glow: rgba(0,0,0,0.06);
+  --accent-subtle: rgba(37,99,235,0.02);
 }
 
 @theme {
@@ -69,15 +69,13 @@ html.light .dot-grid {
   background-size: 24px 24px;
 }
 
-/* Glowing ambient shapes */
+/* Glowing ambient shapes - disabled completely for crisp minimalism */
 .glow-spot {
-  filter: blur(140px);
-  opacity: 0.12;
-  pointer-events: none;
+  display: none !important;
 }
 
 html.light .glow-spot {
-  opacity: 0.06;
+  display: none !important;
 }
 
 /* Selection and focus styling */

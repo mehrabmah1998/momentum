@@ -30,7 +30,7 @@ export default function KnowledgeViews() {
   ];
 
   return (
-    <section id="knowledge-views" className="relative py-32 bg-[var(--bg)] overflow-hidden border-t border-[var(--border)] dot-grid">
+    <section id="knowledge-views" className="relative py-32 bg-transparent overflow-hidden border-t border-[var(--border)] dot-grid">
       <div className="absolute top-[25%] left-[20%] w-[500px] h-[500px] rounded-full bg-[var(--accent-glow)] glow-spot" />
       <div className="absolute bottom-[25%] right-[20%] w-[500px] h-[500px] rounded-full bg-[var(--accent-glow)] glow-spot" />
 
