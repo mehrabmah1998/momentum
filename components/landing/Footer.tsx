@@ -4,7 +4,7 @@ import { useTheme } from "@/hooks/useTheme";
 
 export default function Footer() {
   return (
-    <footer className="bg-[var(--bg-card)] border-t border-[var(--border)] py-12 px-4 relative z-10 font-mono text-xs">
+    <footer className="bg-[var(--bg-card)] backdrop-blur-md border-t border-[var(--border)] py-12 px-4 relative z-10 font-mono text-xs">
       <div className="container mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-6 text-[var(--text-secondary)] text-center sm:text-left">
         
         {/* Brand logo details */}

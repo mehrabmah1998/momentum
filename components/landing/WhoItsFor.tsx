@@ -68,7 +68,7 @@ export default function WhoItsFor() {
                   damping: 20,
                   delay: index * 0.1
                 }}
-                className="bg-[var(--bg-card)]/40 border border-[var(--border)] rounded-[2rem] p-8 flex flex-col justify-between hover:border-[var(--border-hover)] hover:bg-[var(--bg-card)] transition-all duration-300 relative group"
+                className="bg-[var(--bg-card)]/40 backdrop-blur-md border border-[var(--border)] rounded-[2rem] p-8 flex flex-col justify-between hover:border-[var(--border-hover)] hover:bg-[var(--bg-card)]/80 transition-all duration-300 relative group"
               >
                 <div>
                   <div className="flex items-center justify-between mb-6">

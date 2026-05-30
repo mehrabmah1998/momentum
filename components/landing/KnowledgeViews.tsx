@@ -60,7 +60,7 @@ export default function KnowledgeViews() {
               className={`flex items-center gap-2.5 px-6 py-3 rounded-full text-xs font-mono uppercase tracking-widest transition-all duration-300 border font-medium cursor-pointer ${
                 activeTab === tab.id
                   ? "bg-[var(--accent)] text-white border-transparent shadow-[0_4px_12px_var(--accent-glow)]"
-                  : "bg-[var(--bg-card)]/50 text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)]"
+                  : "bg-[var(--bg-card)]/50 backdrop-blur-md text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)]/80"
               }`}
             >
               <tab.icon className="w-4 h-4" strokeWidth={1.5} />
@@ -70,9 +70,9 @@ export default function KnowledgeViews() {
         </div>
 
         {/* The Frame / OS Window chrome */}
-        <div className="max-w-5xl mx-auto rounded-3xl border border-[var(--border)] bg-[var(--bg-card)]/90 shadow-[0_45px_100px_-25px_rgba(0,0,0,0.15)] overflow-hidden">
+        <div className="max-w-5xl mx-auto rounded-3xl border border-[var(--border)] bg-[var(--bg-card)]/60 backdrop-blur-xl shadow-[0_45px_100px_-25px_rgba(0,0,0,0.15)] overflow-hidden">
           {/* OS Header Bar */}
-          <div className="bg-[var(--bg-surface)] border-b border-[var(--border)] py-4 px-6 flex items-center justify-between">
+          <div className="bg-[var(--bg-surface)] backdrop-blur-md border-b border-[var(--border)] py-4 px-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-rose-500/80" />
               <span className="w-3 h-3 rounded-full bg-amber-500/80" />
@@ -86,7 +86,7 @@ export default function KnowledgeViews() {
             <div className="w-12 h-1.5" />
           </div>
 
-          <div className="p-6 sm:p-8 min-h-[440px] flex items-center justify-center relative bg-[var(--bg-card)]/40">
+          <div className="p-6 sm:p-8 min-h-[440px] flex items-center justify-center relative bg-[var(--bg-card)]/30 backdrop-blur-md">
             <AnimatePresence mode="wait">
               {/* Tab 1: Document View */}
               {activeTab === "document" && (
@@ -99,7 +99,7 @@ export default function KnowledgeViews() {
                   className="w-full grid md:grid-cols-3 gap-6"
                 >
                   {/* Left Column Section Tree */}
-                  <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-4 font-mono text-xs space-y-2.5">
+                  <div className="bg-[var(--bg-surface)] backdrop-blur-md border border-[var(--border)] rounded-2xl p-4 font-mono text-xs space-y-2.5">
                     <div className="text-[var(--text-muted)] uppercase tracking-widest text-[9px] mb-3 font-semibold">Project Modules</div>
                     <div className="text-[var(--accent)] font-bold flex items-center gap-2 py-1 px-2 rounded bg-[var(--accent-subtle)] border-l-2 border-[var(--accent)]">
                       <FileText className="w-3.5 h-3.5 animate-pulse" />
@@ -120,7 +120,7 @@ export default function KnowledgeViews() {
                   </div>
 
                   {/* Right Column Content View */}
-                  <div className="md:col-span-2 bg-[var(--bg-surface)]/50 border border-[var(--border)] rounded-2xl p-6 font-mono text-xs text-[var(--text-secondary)] flex flex-col justify-between">
+                  <div className="md:col-span-2 bg-[var(--bg-surface)]/50 backdrop-blur-md border border-[var(--border)] rounded-2xl p-6 font-mono text-xs text-[var(--text-secondary)] flex flex-col justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-4">
                         <span className="p-1.5 rounded bg-[var(--accent-subtle)] text-[var(--accent)] font-bold text-[10px]">active</span>
@@ -174,7 +174,7 @@ export default function KnowledgeViews() {
                         damping: 20,
                         delay: nIdx * 0.05
                       }}
-                      className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-solid p-1 flex flex-col justify-center items-center shadow-lg cursor-pointer ${node.size} ${node.color}`}
+                      className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-solid backdrop-blur-md p-1 flex flex-col justify-center items-center shadow-lg cursor-pointer ${node.size} ${node.color}`}
                     >
                       <span className="text-[9px] sm:text-[10px] font-mono text-[var(--text-primary)] font-bold text-center leading-none px-1">
                         {node.label}
@@ -245,7 +245,7 @@ export default function KnowledgeViews() {
                         viewport={{ once: true }}
                         transition={{ duration: 0.5, delay: idx * 0.05, ease: [0.16, 1, 0.3, 1] }}
                         whileHover={{ scale: 1.01 }}
-                        className="bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-hover)] p-4 rounded-xl flex flex-col justify-between min-h-[90px] transition-all duration-300 hover:shadow-md cursor-pointer group"
+                        className="bg-[var(--bg-surface)] backdrop-blur-md border border-[var(--border)] hover:border-[var(--border-hover)] p-4 rounded-xl flex flex-col justify-between min-h-[90px] transition-all duration-300 hover:shadow-md cursor-pointer group"
                       >
                         <div>
                           <p className={`text-[10px] font-mono tracking-wider uppercase font-bold ${tile.textColor}`}>

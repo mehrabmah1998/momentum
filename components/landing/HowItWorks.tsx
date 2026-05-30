@@ -78,14 +78,14 @@ export default function HowItWorks() {
                   className="flex items-start gap-8 relative group"
                 >
                   {/* Step Bubble marker */}
-                  <div className="relative z-10 flex items-center justify-center w-[74px] h-[74px] shrink-0 rounded-full border border-[var(--border)] bg-[var(--bg-card)] group-hover:border-[var(--accent)] shadow-md group-hover:shadow-[0_0_15px_var(--accent-glow)] transition-all duration-500">
+                  <div className="relative z-10 flex items-center justify-center w-[74px] h-[74px] shrink-0 rounded-full border border-[var(--border)] bg-[var(--bg-card)] backdrop-blur-md group-hover:border-[var(--accent)] shadow-md group-hover:shadow-[0_0_15px_var(--accent-glow)] transition-all duration-500">
                     <span className="font-mono text-base font-bold text-[var(--text-secondary)] group-hover:text-[var(--accent)] transition-colors duration-300">
                       {item.step}
                     </span>
                   </div>
 
                   {/* Content Container */}
-                  <div className="flex-1 bg-[var(--bg-card)]/50 p-8 rounded-3xl border border-[var(--border)] group-hover:border-[var(--border-hover)] hover:bg-[var(--bg-card)]/80 transition-all duration-300 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)]">
+                  <div className="flex-1 bg-[var(--bg-card)]/50 backdrop-blur-md p-8 rounded-3xl border border-[var(--border)] group-hover:border-[var(--border-hover)] hover:bg-[var(--bg-card)]/80 transition-all duration-300 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)]">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between mb-4">
                       <div className="flex items-center gap-3">
                         <div className="p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border)] text-[var(--accent)]">

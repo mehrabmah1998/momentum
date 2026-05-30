@@ -64,7 +64,7 @@ export default function Problem() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.7, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                className="group relative rounded-3xl bg-[var(--bg-card)] border border-[var(--border)] p-8 hover:border-[var(--border-hover)] transition-all duration-300 overflow-hidden flex flex-col justify-between"
+                className="group relative rounded-3xl bg-[var(--bg-card)] backdrop-blur-md border border-[var(--border)] p-8 hover:border-[var(--border-hover)] transition-all duration-300 overflow-hidden flex flex-col justify-between"
               >
                 {/* Subtle highlight sheen */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-[var(--accent)]/2 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />

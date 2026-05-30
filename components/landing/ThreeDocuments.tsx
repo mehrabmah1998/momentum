@@ -107,7 +107,7 @@ export default function ThreeDocuments() {
                 className="bg-[var(--border)] border border-[var(--border)] rounded-[2rem] p-1.5 shadow-[0_20px_40px_-15px_var(--accent-glow)] transition-all duration-300 hover:border-[var(--border-hover)] group flex flex-col justify-between"
               >
                 {/* Inner Bezel core */}
-                <div className="bg-[var(--bg-card)] rounded-[1.8rem] p-8 border border-[var(--border)] h-full flex flex-col justify-between">
+                <div className="bg-[var(--bg-card)] backdrop-blur-md rounded-[1.8rem] p-8 border border-[var(--border)] h-full flex flex-col justify-between">
                   <div>
                     {/* Header line */}
                     <div className="flex items-center justify-between mb-6">
@@ -129,7 +129,7 @@ export default function ThreeDocuments() {
                   </div>
 
                   {/* Render simulated beautifully styled sub-preview */}
-                  <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-5">
+                  <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] backdrop-blur-md p-5">
                     {doc.preview}
                   </div>
                 </div>

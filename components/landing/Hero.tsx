@@ -17,7 +17,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="inline-flex items-center gap-2 px-3 py-1 bg-[var(--bg-card)] border border-[var(--border)] rounded-full mb-6"
+            className="inline-flex items-center gap-2 px-3 py-1 bg-[var(--bg-card)] backdrop-blur-md border border-[var(--border)] rounded-full mb-6"
           >
             <Sparkles className="w-3.5 h-3.5 text-[var(--accent)]" strokeWidth={1.5} />
             <span className="text-[10px] uppercase tracking-[0.2em] font-mono text-[var(--text-secondary)] font-medium">
@@ -88,7 +88,7 @@ export default function Hero() {
 
             <div className="grid md:grid-cols-2 gap-6 relative z-10">
               {/* Chaotic CLAUDE.md File (Left Side) */}
-              <div className="bg-[var(--bg-surface)] rounded-2xl p-6 border border-[var(--border)] relative overflow-hidden flex flex-col justify-between min-h-[360px]">
+              <div className="bg-[var(--bg-surface)] backdrop-blur-md rounded-2xl p-6 border border-[var(--border)] relative overflow-hidden flex flex-col justify-between min-h-[360px]">
                 <div>
                   <div className="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-4">
                     <div className="flex items-center gap-2">
@@ -124,7 +124,7 @@ export default function Hero() {
               </div>
 
               {/* Structured Living Knowledge Graph (Right Side) */}
-              <div className="bg-[var(--bg-surface)] rounded-2xl p-6 border border-[var(--accent)]/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] relative overflow-hidden flex flex-col justify-between min-h-[360px]">
+              <div className="bg-[var(--bg-surface)] backdrop-blur-md rounded-2xl p-6 border border-[var(--accent)]/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] relative overflow-hidden flex flex-col justify-between min-h-[360px]">
                 <div>
                   <div className="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-4">
                     <div className="flex items-center gap-2">

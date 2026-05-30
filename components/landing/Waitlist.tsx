@@ -38,7 +38,7 @@ export default function Waitlist() {
       <div className="container mx-auto max-w-4xl px-4 sm:px-6 relative z-10 text-center">
         <div className="max-w-2xl mx-auto">
           {/* Eyebrow tag */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-[var(--bg-card)] border border-[var(--border)] rounded-full mb-6 relative">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-[var(--bg-card)] backdrop-blur-md border border-[var(--border)] rounded-full mb-6 relative">
             <Sparkles className="w-3.5 h-3.5 text-[var(--accent)]" strokeWidth={1.5} />
             <span className="text-[10px] uppercase tracking-[0.2em] font-mono text-[var(--text-secondary)] font-medium">
               Join the Private Beta
@@ -62,7 +62,7 @@ export default function Waitlist() {
                 onSubmit={handleSubmit}
                 className="w-full max-w-lg mx-auto"
               >
-                <div className="relative p-1.5 rounded-full bg-[var(--bg-card)] border border-[var(--border)] hover:border-[var(--border-hover)] focus-within:border-[var(--accent)] transition-all duration-300 shadow-[0_30px_60px_-15px_var(--accent-glow)] flex items-center gap-2">
+                <div className="relative p-1.5 rounded-full bg-[var(--bg-card)] backdrop-blur-md border border-[var(--border)] hover:border-[var(--border-hover)] focus-within:border-[var(--accent)] transition-all duration-300 shadow-[0_30px_60px_-15px_var(--accent-glow)] flex items-center gap-2">
                   <input
                     type="email"
                     value={email}
