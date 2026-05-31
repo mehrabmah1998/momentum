@@ -296,7 +296,7 @@ export default function DashboardClient() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="max-w-5xl mx-auto px-8 py-10"
+              className="w-full max-w-7xl xl:max-w-[1500px] 2xl:max-w-[1700px] mx-auto px-6 md:px-10 py-10"
             >
               {/* Page header */}
               <div className="flex items-start justify-between mb-10">
