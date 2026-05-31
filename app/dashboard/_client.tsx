@@ -26,6 +26,12 @@ import {
   Hash
 } from "lucide-react";
 
+import GraphTab from "./tabs/graph";
+import SchemaTab from "./tabs/schema";
+import DocumentsTab from "./tabs/documents";
+import KeysTab from "./tabs/keys";
+import SettingsTab from "./tabs/settings";
+
 const navItems = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "projects", label: "Projects", icon: GitBranch },
@@ -863,6 +869,16 @@ export default function DashboardClient() {
               </div>
 
             </motion.div>
+          ) : activeTab === "graph" ? (
+            <GraphTab key="graph" />
+          ) : activeTab === "schema" ? (
+            <SchemaTab key="schema" />
+          ) : activeTab === "documents" ? (
+            <DocumentsTab key="documents" />
+          ) : activeTab === "keys" ? (
+            <KeysTab key="keys" />
+          ) : activeTab === "settings" ? (
+            <SettingsTab key="settings" />
           ) : (
             <motion.div
               key={activeTab}
