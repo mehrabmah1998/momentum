@@ -631,7 +631,7 @@ export default function GraphTab() {
                       y1={fromNode.y}
                       x2={toNode.x}
                       y2={toNode.y}
-                      initial={{ opacity: 0 }}
+                      initial={false}
                       animate={{
                         opacity: isFiltered ? 0.05 : isHovered ? Math.min(style.opacity + 0.3, 1.0) : style.opacity,
                         strokeWidth: isHovered ? style.width + 1 : style.width,
@@ -662,7 +662,7 @@ export default function GraphTab() {
                   return (
                     <motion.g
                       key={node.id}
-                      initial={{ opacity: 0, scale: 0.6 }}
+                      initial={false}
                       animate={{
                         opacity: isFiltered ? 0.15 : 1,
                         scale: hoveredNode === node.id ? 1.15 : 1,
@@ -825,7 +825,7 @@ export default function GraphTab() {
           <AnimatePresence>
             {tooltip && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={false}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.12 }}
@@ -856,7 +856,7 @@ export default function GraphTab() {
 
         {/* DETAILS SIDEBAR PANEL */}
         <motion.div
-          initial={{ x: 40, opacity: 0 }}
+          initial={false}
           animate={{ x: 0, opacity: 1 }}
           transition={{ type: "spring", stiffness: 300, damping: 28 }}
           className="w-full md:w-85 shrink-0 border border-[var(--border)] bg-[var(--bg-card)] rounded-2xl p-6 flex flex-col justify-between overflow-y-auto relative"

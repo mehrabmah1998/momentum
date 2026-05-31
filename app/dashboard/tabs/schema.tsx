@@ -367,7 +367,7 @@ export default function SchemaTab() {
       <div key={section.id} className="flex flex-col" id={`schema-item-${section.id.replace(/\*/g, "-").replace(/\./g, "-")}`}>
         {/* Row Element with Mount-Stagger Trigger */}
         <motion.div
-          initial={{ opacity: 0, x: -8 }}
+          initial={false}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: visualIndex * 0.03, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           onClick={(e) => handleRowClick(section, e)}
@@ -455,7 +455,7 @@ export default function SchemaTab() {
         <AnimatePresence initial={false}>
           {hasChildren && isExpanded && (
             <motion.div
-              initial={{ height: 0, opacity: 0 }}
+              initial={false}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.22, ease: "easeInOut" }}
@@ -476,7 +476,7 @@ export default function SchemaTab() {
     <div className="w-full flex flex-col min-h-screen bg-[var(--bg)] font-sans" id="schema-explorer-root">
       {/* PAGE HEADER */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
         className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 px-8 pt-8 pb-5"
@@ -543,7 +543,7 @@ export default function SchemaTab() {
         <div className="flex-1 flex flex-col h-[520px] lg:h-[650px]" id="schema-detail-panel-outer-wrapper">
           <motion.div
             key={selectedSection?.id}
-            initial={{ opacity: 0, y: 8 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-6 flex flex-col gap-6 h-full overflow-y-auto relative"
