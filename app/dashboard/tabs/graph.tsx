@@ -485,6 +485,20 @@ export default function GraphTab() {
   const filterOptions = ["All", "Module", "Feature", "Decision", "Constraint", "Entity"];
 
   return (
+    <div style={{
+      '--bg': '#090a0f',
+      '--bg-surface': 'rgba(13, 14, 20, 0.45)',
+      '--bg-card': 'rgba(20, 21, 28, 0.55)',
+      '--border': 'rgba(255,255,255,0.06)',
+      '--border-hover': 'rgba(255,255,255,0.12)',
+      '--text-primary': '#ffffff',
+      '--text-secondary': 'rgba(255,255,255,0.6)',
+      '--text-muted': 'rgba(255,255,255,0.3)',
+      '--accent': '#2563EB',
+      '--accent-hover': '#3B82F6',
+      '--accent-glow': 'rgba(37,99,235,0.15)',
+      '--accent-subtle': 'rgba(37,99,235,0.04)',
+    } as React.CSSProperties}>
     <div className="w-full flex flex-col min-h-screen bg-[var(--bg)] font-sans" id="graph-root">
       {/* PAGE HEADER */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 px-8 pt-8 pb-4" id="graph-header">
@@ -1019,6 +1033,7 @@ export default function GraphTab() {
           ))}
         </div>
       </div>
+    </div>
     </div>
   );
 }
