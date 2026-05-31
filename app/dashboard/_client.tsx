@@ -17,7 +17,13 @@ import {
   Zap,
   Activity,
   GitCommit,
-  AlertCircle
+  AlertCircle,
+  Clock,
+  RefreshCw,
+  Table2,
+  Code2,
+  ExternalLink,
+  Hash
 } from "lucide-react";
 
 const navItems = [
@@ -33,6 +39,60 @@ const mockProjects = [
   { id: "api-service", name: "api-service", branch: "main", status: "Synced" },
   { id: "web-frontend", name: "web-frontend", branch: "develop", status: "Syncing" },
   { id: "auth-worker", name: "auth-worker", branch: "main", status: "Idle" },
+];
+
+const mockProjectDetails = [
+  {
+    id: "api-service",
+    name: "api-service",
+    owner: "mehrabmah1998",
+    branch: "main",
+    status: "Synced",
+    lastSync: "2 min ago",
+    schemaNodes: 412,
+    apiNodes: 867,
+    webhookNodes: 234,
+    tables: 18,
+    contextCalls: 142,
+    commits: [
+      { hash: "a3f92c1", message: "Add users.verified_at column", time: "2m ago" },
+      { hash: "bb04d7e", message: "Update POST /v2/invoices route", time: "1h ago" },
+      { hash: "c91e03a", message: "Refactor auth_middleware token check", time: "3h ago" },
+    ],
+  },
+  {
+    id: "web-frontend",
+    name: "web-frontend",
+    owner: "mehrabmah1998",
+    branch: "develop",
+    status: "Syncing",
+    lastSync: "Syncing...",
+    schemaNodes: 87,
+    apiNodes: 204,
+    webhookNodes: 0,
+    tables: 4,
+    contextCalls: 98,
+    commits: [
+      { hash: "d44a1b2", message: "Add dashboard sidebar layout", time: "18m ago" },
+      { hash: "e02f8c9", message: "Wire up auth-client sign out", time: "2h ago" },
+    ],
+  },
+  {
+    id: "auth-worker",
+    name: "auth-worker",
+    owner: "mehrabmah1998",
+    branch: "main",
+    status: "Idle",
+    lastSync: "6 hours ago",
+    schemaNodes: 23,
+    apiNodes: 51,
+    webhookNodes: 12,
+    tables: 3,
+    contextCalls: 44,
+    commits: [
+      { hash: "f18b3d0", message: "Fix token expiry edge case", time: "6h ago" },
+    ],
+  },
 ];
 
 const mockActivity = [
@@ -567,6 +627,241 @@ export default function DashboardClient() {
                   </div>
                 </div>
               </motion.div>
+            </motion.div>
+          ) : activeTab === "projects" ? (
+            <motion.div
+              key="projects"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="w-full max-w-7xl xl:max-w-[1500px] 2xl:max-w-[1700px] mx-auto px-6 md:px-10 py-10"
+            >
+              {/* PAGE HEADER */}
+              <div className="flex items-start justify-between mb-10">
+                <div>
+                  <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--accent)] font-bold mb-1">
+                    CONNECTED REPOSITORIES
+                  </div>
+                  <h1 className="text-2xl font-bold font-sans text-[var(--text-primary)] tracking-tight">
+                    Projects
+                  </h1>
+                  <p className="font-mono text-[11px] text-[var(--text-muted)] mt-1.5">
+                    {mockProjectDetails.length} repositories connected · graph sync active
+                  </p>
+                </div>
+
+                <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold uppercase tracking-wider transition-all shadow-[0_4px_20px_-4px_var(--accent-glow)] active:scale-[0.98] cursor-pointer">
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Connect Repo</span>
+                </button>
+              </div>
+
+              {/* SUMMARY STATS ROW */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 mt-10">
+                {[
+                  { id: "repos", label: "Total Repos", value: "3", sub: "All connected via webhook", icon: GitBranch },
+                  { id: "tables", label: "Schema Tables", value: "25", sub: "Across all projects", icon: Table2 },
+                  { id: "endpoints", label: "API Endpoints", value: "1,122", sub: "Parsed and indexed", icon: Code2 },
+                  { id: "calls", label: "Context Calls", value: "284", sub: "Total today", icon: Zap },
+                ].map((stat, idx) => {
+                  const StatIcon = stat.icon;
+                  return (
+                    <motion.div
+                      key={stat.id}
+                      initial={{ opacity: 0, y: 14 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.07, duration: 0.5 }}
+                      className="bg-[var(--bg-card)] backdrop-blur-xl border border-[var(--border)] rounded-2xl p-5 relative overflow-hidden flex flex-col justify-between"
+                    >
+                      {/* Top highlight bar */}
+                      <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--accent)]/20 to-transparent" />
+
+                      {/* Icon */}
+                      <div className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-[var(--accent-subtle)] border border-[var(--accent)]/10 flex items-center justify-center">
+                        <StatIcon className="w-4 h-4 text-[var(--accent)]" />
+                      </div>
+
+                      {/* Label & Value */}
+                      <div className="flex-1 flex flex-col justify-end mt-4">
+                        <span className="text-[10px] uppercase font-mono tracking-wider text-[var(--text-muted)] font-bold mb-2 block">
+                          {stat.label}
+                        </span>
+                        <span className="text-3xl font-bold font-sans text-[var(--text-primary)] leading-none">
+                          {stat.value}
+                        </span>
+                        <span className="text-[11px] font-mono text-[var(--text-muted)] mt-1.5 block">
+                          {stat.sub}
+                        </span>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+
+              {/* PROJECT CARDS */}
+              <div className="flex flex-col gap-6 mt-2">
+                {mockProjectDetails.map((proj, index) => (
+                  <motion.div
+                    key={proj.id}
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1, duration: 0.5 }}
+                    className="bg-[var(--bg-card)] backdrop-blur-xl border border-[var(--border)] rounded-2xl p-6 relative overflow-hidden"
+                  >
+                    {/* Top highlight bar */}
+                    <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--accent)]/20 to-transparent" />
+
+                    {/* CARD HEADER ROW */}
+                    <div className="flex items-start justify-between mb-5">
+                      <div className="flex items-center gap-3">
+                        {/* GitHub SVG icon box */}
+                        <div className="w-9 h-9 rounded-xl bg-[var(--bg-surface)] border border-[var(--border)] flex items-center justify-center shrink-0">
+                          <svg className="fill-[var(--text-muted)] w-4 h-4 shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482C19.138 20.197 22 16.44 22 12.017 22 6.484 17.522 2 12 2z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <span className="text-base font-mono font-bold text-[var(--text-primary)] leading-tight block">
+                            {proj.name}
+                          </span>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-[10px] font-mono text-[var(--text-muted)]">
+                              {proj.owner} / {proj.branch}
+                            </span>
+                            <span className="font-mono text-[9px] px-2 py-0.5 rounded-full bg-[var(--accent-subtle)] border border-[var(--accent)]/15 text-[var(--accent)] font-bold uppercase">
+                              {proj.branch}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {/* Status Badge */}
+                        {proj.status === "Synced" && (
+                          <span className="font-mono text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full border text-emerald-400 bg-emerald-500/[0.08] border-emerald-500/20 font-bold">
+                            Synced
+                          </span>
+                        )}
+                        {proj.status === "Syncing" && (
+                          <span className="font-mono text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full border text-[var(--accent)] bg-[var(--accent-subtle)] border-[var(--accent)]/20 flex items-center gap-1.5 font-bold">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse" />
+                            <span>Syncing</span>
+                          </span>
+                        )}
+                        {proj.status === "Idle" && (
+                          <span className="font-mono text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full border text-[var(--text-muted)] bg-[var(--bg-card)] border-[var(--border)] font-bold">
+                            Idle
+                          </span>
+                        )}
+
+                        {/* Last sync */}
+                        <div className="flex items-center gap-1.5 text-[10px] font-mono text-[var(--text-muted)]">
+                          <Clock className="w-3.5 h-3.5" />
+                          <span>{proj.lastSync}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* STATS MINI ROW */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+                      {[
+                        { label: "Graph Nodes", value: String(proj.schemaNodes + proj.apiNodes + proj.webhookNodes), icon: Network },
+                        { label: "Tables", value: String(proj.tables), icon: Table2 },
+                        { label: "API Endpoints", value: String(proj.apiNodes), icon: Hash },
+                        { label: "Context Calls", value: String(proj.contextCalls), icon: Zap },
+                      ].map((mini, mIdx) => {
+                        const MiniIcon = mini.icon;
+                        return (
+                          <div key={mIdx} className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-3">
+                            <div className="flex justify-between items-start">
+                              <span className="text-[9px] uppercase font-mono tracking-wider text-[var(--text-muted)] font-bold block mb-1">
+                                {mini.label}
+                              </span>
+                              <MiniIcon className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
+                            </div>
+                            <span className="text-xl font-bold font-sans text-[var(--text-primary)] leading-none mt-1 block">
+                              {mini.value}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* BOTTOM ROW */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {/* LEFT - Recent Commits */}
+                      <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-4">
+                        <div className="flex items-center gap-1.5 mb-3">
+                          <GitCommit className="w-3.5 h-3.5 text-[var(--accent)]" />
+                          <span className="text-[10px] uppercase font-mono tracking-wider text-[var(--text-muted)] font-bold">
+                            Recent Commits
+                          </span>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          {proj.commits.map((commit, cIdx) => (
+                            <div key={cIdx} className="flex items-start gap-2.5">
+                              <span className="font-mono text-[9px] bg-[var(--bg-card)] border border-[var(--border)] px-1.5 py-0.5 rounded text-[var(--text-muted)] shrink-0">
+                                {commit.hash}
+                              </span>
+                              <span className="text-xs font-sans text-[var(--text-secondary)] flex-1 leading-snug truncate">
+                                {commit.message}
+                              </span>
+                              <span className="text-[10px] font-mono text-[var(--text-muted)] shrink-0">
+                                {commit.time}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* RIGHT - Actions */}
+                      <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-4">
+                        <span className="text-[10px] uppercase font-mono tracking-wider text-[var(--text-muted)] font-bold mb-3 block">
+                          Quick Actions
+                        </span>
+                        <div className="flex flex-col gap-2">
+                          <button className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border)] hover:border-[var(--border-hover)] cursor-pointer transition-colors text-xs font-sans font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+                            <Network className="w-3.5 h-3.5 text-[var(--accent)]" />
+                            <span>View Knowledge Graph</span>
+                            <ExternalLink className="w-3 h-3 text-[var(--text-muted)] ml-auto" />
+                          </button>
+                          <button className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border)] hover:border-[var(--border-hover)] cursor-pointer transition-colors text-xs font-sans font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+                            <Database className="w-3.5 h-3.5 text-[var(--accent)]" />
+                            <span>Explore Schema</span>
+                            <ExternalLink className="w-3 h-3 text-[var(--text-muted)] ml-auto" />
+                          </button>
+                          <button className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border)] hover:border-[var(--border-hover)] cursor-pointer transition-colors text-xs font-sans font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+                            <FileText className="w-3.5 h-3.5 text-[var(--accent)]" />
+                            <span>View Documents</span>
+                            <ExternalLink className="w-3 h-3 text-[var(--text-muted)] ml-auto" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* EMPTY STATE CARD */}
+              <div className="bg-[var(--bg-card)] backdrop-blur-xl border border-dashed border-[var(--border)] rounded-2xl p-8 relative overflow-hidden flex flex-col items-center text-center gap-4 mt-6">
+                <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--accent)]/20 to-transparent" />
+                <div className="w-12 h-12 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border)] flex items-center justify-center">
+                  <Plus className="w-5 h-5 text-[var(--accent)]" />
+                </div>
+                <h3 className="text-base font-bold font-sans text-[var(--text-primary)]">
+                  Connect a Repository
+                </h3>
+                <p className="text-sm text-[var(--text-muted)] font-sans max-w-sm">
+                  Link a GitHub repo to start parsing schemas, APIs and building your knowledge graph.
+                </p>
+                <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold uppercase tracking-wider transition-all shadow-[0_4px_20px_-4px_var(--accent-glow)] active:scale-[0.98] cursor-pointer">
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Connect Repository</span>
+                </button>
+              </div>
+
             </motion.div>
           ) : (
             <motion.div
