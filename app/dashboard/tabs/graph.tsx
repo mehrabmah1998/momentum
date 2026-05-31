@@ -855,122 +855,117 @@ export default function GraphTab() {
         </div>
 
         {/* DETAILS SIDEBAR PANEL */}
-        <AnimatePresence>
-          {selectedNode && (
-            <motion.div
-              initial={{ x: 40, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: 40, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 28 }}
-              className="w-full md:w-85 shrink-0 border border-[var(--border)] bg-[var(--bg-card)] rounded-2xl p-6 flex flex-col justify-between overflow-y-auto relative"
-              id="details-panel"
-            >
-              <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--accent)]/10 to-transparent" />
+        <motion.div
+          initial={{ x: 40, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 300, damping: 28 }}
+          className="w-full md:w-85 shrink-0 border border-[var(--border)] bg-[var(--bg-card)] rounded-2xl p-6 flex flex-col justify-between overflow-y-auto relative"
+          id="details-panel"
+        >
+          <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--accent)]/10 to-transparent" />
 
-              {/* Close Button */}
-              <button
-                onClick={() => setSelectedNode(null)}
-                className="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--bg-surface)] border-none bg-transparent cursor-pointer"
-                id="panel-close-btn"
-              >
-                <X className="w-4 h-4" />
-              </button>
+          {/* Close Button */}
+          <button
+            onClick={() => setSelectedNode(NODES.find(n => n.id === "m1") || null)}
+            className="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--bg-surface)] border-none bg-transparent cursor-pointer"
+            id="panel-close-btn"
+          >
+            <X className="w-4 h-4" />
+          </button>
 
-              {/* Primary Panel Content */}
-              <div className="flex-1">
-                {/* Type badge */}
-                <span className={`text-[9px] font-mono uppercase tracking-widest px-2.5 py-1 rounded-full border font-bold inline-block mb-3 ${NODE_STYLES[selectedNode.type]?.badgeClass}`}>
-                  {selectedNode.type}
-                </span>
+          {/* Primary Panel Content */}
+          <div className="flex-1">
+            {/* Type badge */}
+            <span className={`text-[9px] font-mono uppercase tracking-widest px-2.5 py-1 rounded-full border font-bold inline-block mb-3 ${selectedNode ? NODE_STYLES[selectedNode.type]?.badgeClass : ""}`}>
+              {selectedNode?.type}
+            </span>
 
-                {/* Node heading info */}
-                <h2 className="text-lg font-bold font-sans text-[var(--text-primary)] tracking-tight mb-4" id="panel-node-title">
-                  {selectedNode.label}
-                </h2>
+            {/* Node heading info */}
+            <h2 className="text-lg font-bold font-sans text-[var(--text-primary)] tracking-tight mb-4" id="panel-node-title">
+              {selectedNode?.label}
+            </h2>
 
-                {/* Description */}
-                <div className="mb-6">
-                  <span className="text-[9px] font-mono uppercase tracking-widest text-[var(--text-muted)] font-bold block mb-1.5">
-                    Description
-                  </span>
-                  <p className="text-sm font-sans text-[var(--text-secondary)] leading-relaxed bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-3" id="panel-node-desc">
-                    {selectedNode.description}
-                  </p>
-                </div>
+            {/* Description */}
+            <div className="mb-6">
+              <span className="text-[9px] font-mono uppercase tracking-widest text-[var(--text-muted)] font-bold block mb-1.5">
+                Description
+              </span>
+              <p className="text-sm font-sans text-[var(--text-secondary)] leading-relaxed bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-3" id="panel-node-desc">
+                {selectedNode?.description}
+              </p>
+            </div>
 
-                {/* Status Column */}
-                <div className="mb-6">
-                  <span className="text-[9px] font-mono uppercase tracking-widest text-[var(--text-muted)] font-bold block mb-1.5">
-                    Indexing Status
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 text-[9px] font-mono uppercase tracking-wider px-3 py-1 rounded-full border text-emerald-400 bg-emerald-500/[0.08] border-emerald-500/20 font-bold">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span>{selectedNode.status}</span>
-                  </span>
-                </div>
+            {/* Status Column */}
+            <div className="mb-6">
+              <span className="text-[9px] font-mono uppercase tracking-widest text-[var(--text-muted)] font-bold block mb-1.5">
+                Indexing Status
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-[9px] font-mono uppercase tracking-wider px-3 py-1 rounded-full border text-emerald-400 bg-emerald-500/[0.08] border-emerald-500/20 font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span>{selectedNode?.status}</span>
+              </span>
+            </div>
 
-                {/* Connections List section */}
-                <div className="mb-6">
-                  <span className="text-[9px] font-mono uppercase tracking-widest text-[var(--text-muted)] font-bold block mb-2">
-                    Graph Connections ({connectedNodesList.length})
-                  </span>
+            {/* Connections List section */}
+            <div className="mb-6">
+              <span className="text-[9px] font-mono uppercase tracking-widest text-[var(--text-muted)] font-bold block mb-2">
+                Graph Connections ({connectedNodesList.length})
+              </span>
 
-                  {connectedNodesList.length > 0 ? (
-                    <div className="flex flex-col gap-2 max-h-[220px] overflow-y-auto pr-1" id="panel-connections-list">
-                      {connectedNodesList.slice(0, 8).map((item, cIndex) => {
-                        const styleColor = EDGE_STYLES[item.edge.type]?.color || "var(--accent)";
-                        return (
-                          <div
-                            key={cIndex}
-                            onClick={() => setSelectedNode(item.node)}
-                            className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-hover)] transition-colors cursor-pointer group/link select-none"
-                            title={`Jump to ${item.node.label}`}
-                          >
-                            <div className="min-w-0 flex-1">
-                              <span className="text-xs font-semibold font-sans text-[var(--text-primary)] group-hover/link:text-[var(--accent)] transition-colors block truncate">
-                                {item.node.label}
-                              </span>
-                              <span className="text-[9px] font-mono text-[var(--text-muted)] mt-0.5 block">
-                                {item.node.type}
-                              </span>
-                            </div>
-                            <span 
-                              className="font-mono text-[8px] uppercase tracking-wider px-2 py-0.5 rounded border font-bold shrink-0 text-center"
-                              style={{ 
-                                color: styleColor, 
-                                borderColor: `${styleColor}25`, 
-                                backgroundColor: `${styleColor}08` 
-                              }}
-                            >
-                              {item.isOutgoing ? `→ ${item.edge.type.replace("_", " ")}` : `← ${item.edge.type.replace("_", " ")}`}
-                            </span>
-                          </div>
-                        );
-                      })}
-                      {connectedNodesList.length > 8 && (
-                        <div className="text-[10px] font-mono text-[var(--text-muted)] text-center py-1 mt-1">
-                          + {connectedNodesList.length - 8} more relationships
+              {connectedNodesList.length > 0 ? (
+                <div className="flex flex-col gap-2 max-h-[220px] overflow-y-auto pr-1" id="panel-connections-list">
+                  {connectedNodesList.slice(0, 8).map((item, cIndex) => {
+                    const styleColor = EDGE_STYLES[item.edge.type]?.color || "var(--accent)";
+                    return (
+                      <div
+                        key={cIndex}
+                        onClick={() => setSelectedNode(item.node)}
+                        className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-hover)] transition-colors cursor-pointer group/link select-none"
+                        title={`Jump to ${item.node.label}`}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <span className="text-xs font-semibold font-sans text-[var(--text-primary)] group-hover/link:text-[var(--accent)] transition-colors block truncate">
+                            {item.node.label}
+                          </span>
+                          <span className="text-[9px] font-mono text-[var(--text-muted)] mt-0.5 block">
+                            {item.node.type}
+                          </span>
                         </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="text-xs font-sans text-[var(--text-muted)] italic py-3 text-center bg-[var(--bg-surface)] border border-dashed border-[var(--border)] rounded-xl">
-                      No immediate relationships mapped
+                        <span 
+                          className="font-mono text-[8px] uppercase tracking-wider px-2 py-0.5 rounded border font-bold shrink-0 text-center"
+                          style={{ 
+                            color: styleColor, 
+                            borderColor: `${styleColor}25`, 
+                            backgroundColor: `${styleColor}08` 
+                          }}
+                        >
+                          {item.isOutgoing ? `→ ${item.edge.type.replace("_", " ")}` : `← ${item.edge.type.replace("_", " ")}`}
+                        </span>
+                      </div>
+                    );
+                  })}
+                  {connectedNodesList.length > 8 && (
+                    <div className="text-[10px] font-mono text-[var(--text-muted)] text-center py-1 mt-1">
+                      + {connectedNodesList.length - 8} more relationships
                     </div>
                   )}
                 </div>
-              </div>
+              ) : (
+                <div className="text-xs font-sans text-[var(--text-muted)] italic py-3 text-center bg-[var(--bg-surface)] border border-dashed border-[var(--border)] rounded-xl">
+                  No immediate relationships mapped
+                </div>
+              )}
+            </div>
+          </div>
 
-              {/* FOOTER METADATA TIP info */}
-              <div className="pt-4 border-t border-[var(--border)] flex gap-2 items-start opacity-75" id="panel-bottom-note">
-                <HelpCircle className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0 mt-0.5" />
-                <p className="font-mono text-[9px] text-[var(--text-muted)] leading-relaxed">
-                  This node lives in the knowledge graph and is used in document generation and prompt context selection.
-                </p>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          {/* FOOTER METADATA TIP info */}
+          <div className="pt-4 border-t border-[var(--border)] flex gap-2 items-start opacity-75" id="panel-bottom-note">
+            <HelpCircle className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0 mt-0.5" />
+            <p className="font-mono text-[9px] text-[var(--text-muted)] leading-relaxed">
+              This node lives in the knowledge graph and is used in document generation and prompt context selection.
+            </p>
+          </div>
+        </motion.div>
       </div>
 
       {/* LEGEND BAR */}

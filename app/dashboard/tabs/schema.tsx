@@ -541,170 +541,155 @@ export default function SchemaTab() {
 
         {/* RIGHT — Detail panel */}
         <div className="flex-1 flex flex-col h-[520px] lg:h-[650px]" id="schema-detail-panel-outer-wrapper">
-          {selectedSection ? (
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={selectedSection.id}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-6 flex flex-col gap-6 h-full overflow-y-auto relative"
-                id="selected-detail-card"
-              >
-                <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--accent)]/15 to-transparent" />
+          <motion.div
+            key={selectedSection?.id}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-6 flex flex-col gap-6 h-full overflow-y-auto relative"
+            id="selected-detail-card"
+          >
+            <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--accent)]/15 to-transparent" />
 
-                {/* Header block */}
-                <div id="detail-header-block">
-                  <span className="font-mono text-[10px] text-[var(--text-muted)] tracking-widest mb-1.5 block">
-                    ID: {selectedSection.id}
+            {/* Header block */}
+            <div id="detail-header-block">
+              <span className="font-mono text-[10px] text-[var(--text-muted)] tracking-widest mb-1.5 block">
+                ID: {selectedSection?.id}
+              </span>
+              <h2 className="text-xl font-bold font-sans text-[var(--text-primary)] tracking-tight">
+                {selectedSection?.label}
+              </h2>
+
+              <div className="flex flex-wrap items-center gap-2 mt-2.5" id="detail-badge-block">
+                {/* Type badge */}
+                <span
+                  className={`text-[9px] font-mono uppercase tracking-widest px-2.5 py-0.5 rounded-full border font-bold ${
+                    selectedSection?.type === "pre-defined"
+                      ? "text-[#4f8ef7] bg-[#4f8ef7]/10 border-[#4f8ef7]/20"
+                      : selectedSection?.type === "expandable"
+                      ? "text-[#f59e0b] bg-[#f59e0b]/10 border-[#f59e0b]/20"
+                      : "text-[#34d399] bg-[#34d399]/10 border-[#34d399]/20"
+                  }`}
+                >
+                  {selectedSection?.type}
+                </span>
+
+                {/* Locked badge if locked */}
+                {selectedSection?.locked && (
+                  <span className="inline-flex items-center gap-1 text-[9px] font-mono text-[var(--text-muted)] bg-[var(--bg-surface)] border border-[var(--border)] px-2.5 py-0.5 rounded-full font-bold">
+                    <Lock className="w-3 h-3 text-[var(--text-muted)]/70" />
+                    <span>Locked</span>
                   </span>
-                  <h2 className="text-xl font-bold font-sans text-[var(--text-primary)] tracking-tight">
-                    {selectedSection.label}
-                  </h2>
+                )}
+              </div>
+            </div>
 
-                  <div className="flex flex-wrap items-center gap-2 mt-2.5" id="detail-badge-block">
-                    {/* Type badge */}
-                    <span
-                      className={`text-[9px] font-mono uppercase tracking-widest px-2.5 py-0.5 rounded-full border font-bold ${
-                        selectedSection.type === "pre-defined"
-                          ? "text-[#4f8ef7] bg-[#4f8ef7]/10 border-[#4f8ef7]/20"
-                          : selectedSection.type === "expandable"
-                          ? "text-[#f59e0b] bg-[#f59e0b]/10 border-[#f59e0b]/20"
-                          : "text-[#34d399] bg-[#34d399]/10 border-[#34d399]/20"
-                      }`}
-                    >
-                      {selectedSection.type}
-                    </span>
-
-                    {/* Locked badge if locked */}
-                    {selectedSection.locked && (
-                      <span className="inline-flex items-center gap-1 text-[9px] font-mono text-[var(--text-muted)] bg-[var(--bg-surface)] border border-[var(--border)] px-2.5 py-0.5 rounded-full font-bold">
-                        <Lock className="w-3 h-3 text-[var(--text-muted)]/70" />
-                        <span>Locked</span>
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Description block */}
-                <div id="detail-content-description">
-                  <span className="text-[9px] font-mono uppercase tracking-widest text-[var(--text-muted)] font-bold block mb-1.5">
-                    What belongs here
-                  </span>
-                  <p className="text-sm font-sans text-[var(--text-secondary)] leading-relaxed p-3.5 bg-[var(--bg-surface)] rounded-xl border border-[var(--border)]">
-                    {selectedSection.description}
-                  </p>
-                </div>
-
-                {/* Rules 2x2 grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" id="detail-rules-grid">
-                  {/* Card 1: Cardinality */}
-                  <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-3">
-                    <div className="flex items-center justify-between text-[var(--text-muted)] mb-1">
-                      <span className="text-[10px] uppercase font-mono tracking-wider font-bold">
-                        Cardinality
-                      </span>
-                      {selectedSection.cardinality === "single" ? (
-                        <Square className="w-3.5 h-3.5 text-[var(--accent)]" />
-                      ) : (
-                        <Layers className="w-3.5 h-3.5 text-[var(--accent)]" />
-                      )}
-                    </div>
-                    <div className="text-xs font-sans text-[var(--text-primary)] font-semibold">
-                      {selectedSection.cardinality === "single"
-                        ? "Single Node Allowed"
-                        : selectedSection.cardinality === "many"
-                        ? "Many Nodes Stacked"
-                        : "No Limit Spec"}
-                    </div>
-                  </div>
-
-                  {/* Card 2: Required */}
-                  <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-3">
-                    <div className="flex items-center justify-between text-[var(--text-muted)] mb-1">
-                      <span className="text-[10px] uppercase font-mono tracking-wider font-bold">
-                        Required
-                      </span>
-                      {selectedSection.required ? (
-                        <ShieldCheck className="w-3.5 h-3.5 text-[var(--accent)]" />
-                      ) : (
-                        <Shield className="w-3.5 h-3.5 text-[var(--text-muted)]" />
-                      )}
-                    </div>
-                    <div className="text-xs font-sans text-[var(--text-primary)] font-semibold">
-                      {selectedSection.required ? "Required — Must be filled" : "Optional Section"}
-                    </div>
-                  </div>
-
-                  {/* Card 3: Minimum target */}
-                  <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-3">
-                    <div className="flex items-center justify-between text-[var(--text-muted)] mb-1">
-                      <span className="text-[10px] uppercase font-mono tracking-wider font-bold">
-                        Minimum Entries
-                      </span>
-                      <Hash className="w-3.5 h-3.5 text-[var(--accent)]" />
-                    </div>
-                    <div className="text-xs font-sans text-[var(--text-primary)] font-semibold">
-                      {selectedSection.min !== undefined ? `At least ${selectedSection.min} node(s)` : "No minimum restriction"}
-                    </div>
-                  </div>
-
-                  {/* Card 4: Node count */}
-                  <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-3">
-                    <div className="flex items-center justify-between text-[var(--text-muted)] mb-1">
-                      <span className="text-[10px] uppercase font-mono tracking-wider font-bold">
-                        Current Nodes
-                      </span>
-                      <Circle className="w-3.5 h-3.5 text-[var(--accent)]" />
-                    </div>
-                    <div className="text-xs font-sans text-[var(--text-primary)] font-semibold">
-                      {selectedSection.nodeCount ?? 0} mapped nodes
-                    </div>
-                  </div>
-                </div>
-
-                {/* Confidence Status Banner */}
-                <div id="detail-confidence-section">
-                  <span className="text-[9px] font-mono uppercase tracking-widest text-[var(--text-muted)] font-bold block mb-2">
-                    Confidence Status
-                  </span>
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-3">
-                    <span className={`inline-flex items-center gap-1.5 text-[9px] font-mono uppercase tracking-wider px-3 py-1 rounded-full border font-bold w-fit ${getConfidenceBadgeStyles(selectedSection.confidence)}`}>
-                      {selectedSection.confidence === "confirmed" && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />}
-                      {selectedSection.confidence === "needs-input" && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />}
-                      <span>{selectedSection.confidence === "confirmed" ? "Human Confirmed" : selectedSection.confidence === "needs-input" ? "Needs Input" : "Empty"}</span>
-                    </span>
-                    <span className="text-xs font-sans text-[var(--text-secondary)]">
-                      {selectedSection.confidence === "confirmed"
-                        ? "This ecosystem is fully verified and matches production standards."
-                        : selectedSection.confidence === "needs-input"
-                        ? "Sub-definitions require human input during extraction cycles."
-                        : "No claims recorded to complete these architectural constraints."}
-                    </span>
-                  </div>
-                </div>
-
-                {/* AI Routing note (soft banner at bottom) */}
-                <div className="bg-[var(--accent)]/[0.04] border border-[var(--accent)]/10 rounded-xl p-3.5 flex gap-2.5 items-start mt-auto" id="ai-soft-callout">
-                  <Zap className="w-4 h-4 text-[var(--accent)] shrink-0 mt-0.5" />
-                  <p className="text-xs font-sans text-[var(--text-muted)] leading-relaxed">
-                    When new information arrives, the AI reads this section&apos;s description to determine if the input belongs here. It scores each section and routes the node to the best match.
-                  </p>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          ) : (
-            <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl flex flex-col items-center justify-center text-center p-8 h-full select-none" id="detail-empty-card">
-              <Database className="w-8 h-8 text-[var(--text-muted)]/30 mb-3" />
-              <h3 className="text-sm font-semibold text-[var(--text-primary)]">
-                Select a section
-              </h3>
-              <p className="text-xs text-[var(--text-muted)]/60 max-w-xs mt-1">
-                Click any section in the tree to explore its schema definition.
+            {/* Description block */}
+            <div id="detail-content-description">
+              <span className="text-[9px] font-mono uppercase tracking-widest text-[var(--text-muted)] font-bold block mb-1.5">
+                What belongs here
+              </span>
+              <p className="text-sm font-sans text-[var(--text-secondary)] leading-relaxed p-3.5 bg-[var(--bg-surface)] rounded-xl border border-[var(--border)]">
+                {selectedSection?.description}
               </p>
             </div>
-          )}
+
+            {/* Rules 2x2 grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" id="detail-rules-grid">
+              {/* Card 1: Cardinality */}
+              <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-3">
+                <div className="flex items-center justify-between text-[var(--text-muted)] mb-1">
+                  <span className="text-[10px] uppercase font-mono tracking-wider font-bold">
+                    Cardinality
+                  </span>
+                  {selectedSection?.cardinality === "single" ? (
+                    <Square className="w-3.5 h-3.5 text-[var(--accent)]" />
+                  ) : (
+                    <Layers className="w-3.5 h-3.5 text-[var(--accent)]" />
+                  )}
+                </div>
+                <div className="text-xs font-sans text-[var(--text-primary)] font-semibold">
+                  {selectedSection?.cardinality === "single"
+                    ? "Single Node Allowed"
+                    : selectedSection?.cardinality === "many"
+                    ? "Many Nodes Stacked"
+                    : "No Limit Spec"}
+                </div>
+              </div>
+
+              {/* Card 2: Required */}
+              <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-3">
+                <div className="flex items-center justify-between text-[var(--text-muted)] mb-1">
+                  <span className="text-[10px] uppercase font-mono tracking-wider font-bold">
+                    Required
+                  </span>
+                  {selectedSection?.required ? (
+                    <ShieldCheck className="w-3.5 h-3.5 text-[var(--accent)]" />
+                  ) : (
+                    <Shield className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+                  )}
+                </div>
+                <div className="text-xs font-sans text-[var(--text-primary)] font-semibold">
+                  {selectedSection?.required ? "Required — Must be filled" : "Optional Section"}
+                </div>
+              </div>
+
+              {/* Card 3: Minimum target */}
+              <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-3">
+                <div className="flex items-center justify-between text-[var(--text-muted)] mb-1">
+                  <span className="text-[10px] uppercase font-mono tracking-wider font-bold">
+                    Minimum Entries
+                  </span>
+                  <Hash className="w-3.5 h-3.5 text-[var(--accent)]" />
+                </div>
+                <div className="text-xs font-sans text-[var(--text-primary)] font-semibold">
+                  {selectedSection?.min !== undefined ? `At least ${selectedSection?.min} node(s)` : "No minimum restriction"}
+                </div>
+              </div>
+
+              {/* Card 4: Node count */}
+              <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-3">
+                <div className="flex items-center justify-between text-[var(--text-muted)] mb-1">
+                  <span className="text-[10px] uppercase font-mono tracking-wider font-bold">
+                    Current Nodes
+                  </span>
+                  <Circle className="w-3.5 h-3.5 text-[var(--accent)]" />
+                </div>
+                <div className="text-xs font-sans text-[var(--text-primary)] font-semibold">
+                  {selectedSection?.nodeCount ?? 0} mapped nodes
+                </div>
+              </div>
+            </div>
+
+            {/* Confidence Status Banner */}
+            <div id="detail-confidence-section">
+              <span className="text-[9px] font-mono uppercase tracking-widest text-[var(--text-muted)] font-bold block mb-2">
+                Confidence Status
+              </span>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-3">
+                <span className={`inline-flex items-center gap-1.5 text-[9px] font-mono uppercase tracking-wider px-3 py-1 rounded-full border font-bold w-fit ${getConfidenceBadgeStyles(selectedSection?.confidence || "empty")}`}>
+                  {selectedSection?.confidence === "confirmed" && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />}
+                  {selectedSection?.confidence === "needs-input" && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />}
+                  <span>{selectedSection?.confidence === "confirmed" ? "Human Confirmed" : selectedSection?.confidence === "needs-input" ? "Needs Input" : "Empty"}</span>
+                </span>
+                <span className="text-xs font-sans text-[var(--text-secondary)]">
+                  {selectedSection?.confidence === "confirmed"
+                    ? "This ecosystem is fully verified and matches production standards."
+                    : selectedSection?.confidence === "needs-input"
+                    ? "Sub-definitions require human input during extraction cycles."
+                    : "No claims recorded to complete these architectural constraints."}
+                </span>
+              </div>
+            </div>
+
+            {/* AI Routing note (soft banner at bottom) */}
+            <div className="bg-[var(--accent)]/[0.04] border border-[var(--accent)]/10 rounded-xl p-3.5 flex gap-2.5 items-start mt-auto" id="ai-soft-callout">
+              <Zap className="w-4 h-4 text-[var(--accent)] shrink-0 mt-0.5" />
+              <p className="text-xs font-sans text-[var(--text-muted)] leading-relaxed">
+                When new information arrives, the AI reads this section&apos;s description to determine if the input belongs here. It scores each section and routes the node to the best match.
+              </p>
+            </div>
+          </motion.div>
         </div>
       </div>
     </div>
