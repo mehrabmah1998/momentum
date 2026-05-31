@@ -3,8 +3,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
-  FileText, Orbit, AlertTriangle, ShieldCheck, CheckCircle2, 
-  Database, Cpu, GitBranch, ArrowRight, Terminal, Activity 
+  FileText, Orbit, ShieldCheck, CheckCircle2, 
+  Database, Cpu, Terminal, Activity 
 } from "lucide-react";
 
 type ActiveView = "document" | "constellation" | "health";
@@ -27,159 +27,160 @@ interface ConstellationNode {
   outgoing: string;
 }
 
+const constellationNodes: ConstellationNode[] = [
+  { 
+    id: "auth", 
+    label: "auth_middleware", 
+    tag: "MIDDLEWARE",
+    desc: "Token validation & session security credentials.",
+    features: 6, 
+    trust: "Git-Confirmed", 
+    level: "Verified",
+    x: 125, 
+    y: 100, 
+    icon: ShieldCheck, 
+    textColor: "text-blue-400",
+    borderColor: "border-blue-500/30 group-hover:border-blue-500",
+    bgGlow: "rgba(59, 130, 246, 0.08)",
+    incoming: "Client Web Browser / API Route",
+    outgoing: "users/:id/POST"
+  },
+  { 
+    id: "endpoint", 
+    label: "users/:id/POST", 
+    tag: "API ENDPOINT",
+    desc: "Primary creation schema, initiates Stripe billing flow.",
+    features: 8, 
+    trust: "Git-Confirmed", 
+    level: "Synced",
+    x: 235, 
+    y: 285, 
+    icon: FileText, 
+    textColor: "text-indigo-400",
+    borderColor: "border-indigo-500/30 group-hover:border-indigo-500",
+    bgGlow: "rgba(99, 102, 241, 0.08)",
+    incoming: "auth_middleware",
+    outgoing: "postgres_db_schema"
+  },
+  { 
+    id: "queue", 
+    label: "redis_queue_handler", 
+    tag: "ASYNC QUEUE",
+    desc: "Handles async cache updates & Stripe webhook retries.",
+    features: 4, 
+    trust: "AI-Suggested", 
+    level: "AI Synced",
+    x: 455, 
+    y: 100, 
+    icon: Cpu, 
+    textColor: "text-amber-400",
+    borderColor: "border-amber-500/30 group-hover:border-amber-500",
+    bgGlow: "rgba(245, 158, 11, 0.08)",
+    incoming: "stripe_webhook",
+    outgoing: "postgres_db_schema"
+  },
+  { 
+    id: "database", 
+    label: "postgres_db_schema", 
+    tag: "RELATIONAL DB",
+    desc: "Core database storing user and subscription structures.",
+    features: 16, 
+    trust: "Human-Confirmed", 
+    level: "Verified",
+    x: 475, 
+    y: 300, 
+    icon: Database, 
+    textColor: "text-emerald-400",
+    borderColor: "border-emerald-500/30 group-hover:border-emerald-500",
+    bgGlow: "rgba(16, 185, 129, 0.08)",
+    incoming: "users/:id/POST, redis_queue_handler",
+    outgoing: "Analytics Pipeline"
+  },
+  { 
+    id: "webhook", 
+    label: "stripe_webhook", 
+    tag: "WEBHOOK RECEIVER",
+    desc: "Captures billing triggers & charge statuses.",
+    features: 12, 
+    trust: "Validated", 
+    level: "Consistent",
+    x: 695, 
+    y: 195, 
+    icon: CheckCircle2, 
+    textColor: "text-violet-400",
+    borderColor: "border-violet-500/30 group-hover:border-violet-500",
+    bgGlow: "rgba(139, 92, 246, 0.08)",
+    incoming: "Stripe API Webhook Gate",
+    outgoing: "redis_queue_handler, postgres_db_schema"
+  }
+];
+
+// Active simulated telemetry payload values
+const liveTelemetryData: Record<string, any> = {
+  auth: {
+    latency: "14ms",
+    invocations: "14.2k/m",
+    lastEvent: "AUTH_SUCCESS",
+    codeRef: "src/lib/jwt_verifier.ts",
+    activeRevision: "rev-24.8"
+  },
+  endpoint: {
+    latency: "42ms",
+    invocations: "8.1k/m",
+    lastEvent: "POST_OK user_9ac",
+    codeRef: "src/app/api/users/route.ts",
+    activeRevision: "rev-10.2"
+  },
+  queue: {
+    latency: "3ms",
+    invocations: "2.4k/m",
+    lastEvent: "CACHE_INVALIDATED",
+    codeRef: "src/workers/redis_queue.ts",
+    activeRevision: "rev-04.5"
+  },
+  database: {
+    latency: "8ms",
+    invocations: "41.6k/m",
+    lastEvent: "COMMIT user_sub_9ac",
+    codeRef: "prisma/schema.prisma",
+    activeRevision: "rev-99.1"
+  },
+  webhook: {
+    latency: "19ms",
+    invocations: "4.8k/m",
+    lastEvent: "WEBHOOK_OK evt_SUBS_041",
+    codeRef: "src/app/api/stripe/route.ts",
+    activeRevision: "rev-08.9"
+  }
+};
+
+const healthTiles = [
+  { name: "Auth Module Config", trust: "Human-Confirmed", level: "high", textColor: "text-emerald-500" },
+  { name: "POST /v1/users Endpoint", trust: "Git-Confirmed", level: "high", textColor: "text-emerald-500" },
+  { name: "Database Schema postgres", trust: "Human-Confirmed", level: "high", textColor: "text-emerald-500" },
+  { name: "Stripe Event Router", trust: "Git-Confirmed", level: "high", textColor: "text-emerald-500" },
+  { name: "Redis Invalidation Queue", trust: "AI-Suggested", level: "medium", textColor: "text-amber-500" },
+  { name: "Clerk Session Webhook", trust: "AI-Suggested", level: "medium", textColor: "text-amber-500" },
+  { name: "S3 Picture Upload Hook", trust: "Empty / Unverified", level: "low", textColor: "text-rose-500" },
+  { name: "Postgres Vector Extension", trust: "Human-Confirmed", level: "high", textColor: "text-emerald-500" },
+  { name: "Sendgrid Email Router", trust: "Desynced (Git Diverged)", level: "low", textColor: "text-rose-500" }
+];
+
 export default function KnowledgeViews() {
   const [activeTab, setActiveTab] = useState<ActiveView>("document");
   const [progress, setProgress] = useState(0);
-  const [snoozeUntil, setSnoozeUntil] = useState<number>(0);
+  const [isSnoozed, setIsSnoozed] = useState(false);
+  const snoozeTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   // Constellation interactive state
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const [activeCycleIndex, setActiveCycleIndex] = useState(0);
 
-  const constellationNodes: ConstellationNode[] = [
-    { 
-      id: "auth", 
-      label: "auth_middleware", 
-      tag: "MIDDLEWARE",
-      desc: "Token validation & session security credentials.",
-      features: 6, 
-      trust: "Git-Confirmed", 
-      level: "Verified",
-      x: 140, 
-      y: 110, 
-      icon: ShieldCheck, 
-      textColor: "text-blue-400",
-      borderColor: "border-blue-500/30 group-hover:border-blue-500",
-      bgGlow: "rgba(59, 130, 246, 0.08)",
-      incoming: "Client Web Browser / API Route",
-      outgoing: "users/:id/POST"
-    },
-    { 
-      id: "endpoint", 
-      label: "users/:id/POST", 
-      tag: "API ENDPOINT",
-      desc: "Primary creation schema, initiates Stripe billing flow.",
-      features: 8, 
-      trust: "Git-Confirmed", 
-      level: "Synced",
-      x: 230, 
-      y: 260, 
-      icon: FileText, 
-      textColor: "text-indigo-400",
-      borderColor: "border-indigo-500/30 group-hover:border-indigo-500",
-      bgGlow: "rgba(99, 102, 241, 0.08)",
-      incoming: "auth_middleware",
-      outgoing: "postgres_db_schema"
-    },
-    { 
-      id: "queue", 
-      label: "redis_queue_handler", 
-      tag: "ASYNC QUEUE",
-      desc: "Handles async cache updates & Stripe webhook retries.",
-      features: 4, 
-      trust: "AI-Suggested", 
-      level: "AI Synced",
-      x: 430, 
-      y: 95, 
-      icon: Cpu, 
-      textColor: "text-amber-400",
-      borderColor: "border-amber-500/30 group-hover:border-amber-500",
-      bgGlow: "rgba(245, 158, 11, 0.08)",
-      incoming: "stripe_webhook",
-      outgoing: "postgres_db_schema"
-    },
-    { 
-      id: "database", 
-      label: "postgres_db_schema", 
-      tag: "RELATIONAL DB",
-      desc: "Core database storing user and subscription structures.",
-      features: 16, 
-      trust: "Human-Confirmed", 
-      level: "Verified",
-      x: 450, 
-      y: 310, 
-      icon: Database, 
-      textColor: "text-emerald-400",
-      borderColor: "border-emerald-500/30 group-hover:border-emerald-500",
-      bgGlow: "rgba(16, 185, 129, 0.08)",
-      incoming: "users/:id/POST, redis_queue_handler",
-      outgoing: "Analytics Pipeline"
-    },
-    { 
-      id: "webhook", 
-      label: "stripe_webhook", 
-      tag: "WEBHOOK RECEIVER",
-      desc: "Captures billing triggers & charge statuses.",
-      features: 12, 
-      trust: "Validated", 
-      level: "Consistent",
-      x: 660, 
-      y: 195, 
-      icon: CheckCircle2, 
-      textColor: "text-violet-400",
-      borderColor: "border-violet-500/30 group-hover:border-violet-500",
-      bgGlow: "rgba(139, 92, 246, 0.08)",
-      incoming: "Stripe API Webhook Gate",
-      outgoing: "redis_queue_handler, postgres_db_schema"
-    }
-  ];
-
-  // Active simulated telemetry payload values
-  const liveTelemetryData: Record<string, any> = {
-    auth: {
-      latency: "14ms",
-      invocations: "14.2k/m",
-      lastEvent: "AUTH_SUCCESS",
-      codeRef: "src/lib/jwt_verifier.ts",
-      activeRevision: "rev-24.8"
-    },
-    endpoint: {
-      latency: "42ms",
-      invocations: "8.1k/m",
-      lastEvent: "POST_OK user_9ac",
-      codeRef: "src/app/api/users/route.ts",
-      activeRevision: "rev-10.2"
-    },
-    queue: {
-      latency: "3ms",
-      invocations: "2.4k/m",
-      lastEvent: "CACHE_INVALIDATED",
-      codeRef: "src/workers/redis_queue.ts",
-      activeRevision: "rev-04.5"
-    },
-    database: {
-      latency: "8ms",
-      invocations: "41.6k/m",
-      lastEvent: "COMMIT user_sub_9ac",
-      codeRef: "prisma/schema.prisma",
-      activeRevision: "rev-99.1"
-    },
-    webhook: {
-      latency: "19ms",
-      invocations: "4.8k/m",
-      lastEvent: "WEBHOOK_OK evt_SUBS_041",
-      codeRef: "src/app/api/stripe/route.ts",
-      activeRevision: "rev-08.9"
-    }
-  };
-
-  const healthTiles = [
-    { name: "Auth Module Config", trust: "Human-Confirmed", level: "high", textColor: "text-emerald-500" },
-    { name: "POST /v1/users Endpoint", trust: "Git-Confirmed", level: "high", textColor: "text-emerald-500" },
-    { name: "Database Schema postgres", trust: "Human-Confirmed", level: "high", textColor: "text-emerald-500" },
-    { name: "Stripe Event Router", trust: "Git-Confirmed", level: "high", textColor: "text-emerald-500" },
-    { name: "Redis Invalidation Queue", trust: "AI-Suggested", level: "medium", textColor: "text-amber-500" },
-    { name: "Clerk Session Webhook", trust: "AI-Suggested", level: "medium", textColor: "text-amber-500" },
-    { name: "S3 Picture Upload Hook", trust: "Empty / Unverified", level: "low", textColor: "text-rose-500" },
-    { name: "Postgres Vector Extension", trust: "Human-Confirmed", level: "high", textColor: "text-emerald-500" },
-    { name: "Sendgrid Email Router", trust: "Desynced (Git Diverged)", level: "low", textColor: "text-rose-500" }
-  ];
-
   // Tab cycling autoplay with micro progress bar tracker
   useEffect(() => {
     const cycleInterval = setInterval(() => {
       // Pause progression during snooze
-      if (Date.now() < snoozeUntil) {
+      if (isSnoozed) {
         return;
       }
 
@@ -197,7 +198,7 @@ export default function KnowledgeViews() {
     }, 80);
 
     return () => clearInterval(cycleInterval);
-  }, [snoozeUntil]);
+  }, [isSnoozed]);
 
   // Telemetry cycle when not hovered
   useEffect(() => {
@@ -208,11 +209,27 @@ export default function KnowledgeViews() {
     return () => clearInterval(telemetryInterval);
   }, [activeTab, hoveredNodeId]);
 
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (snoozeTimerRef.current) {
+        clearTimeout(snoozeTimerRef.current);
+      }
+    };
+  }, []);
+
   const handleTabSelect = (tabId: ActiveView) => {
     setActiveTab(tabId);
     setProgress(0);
+    
     // Snooze autoplay for 15 seconds so developers can manually interact at length
-    setSnoozeUntil(Date.now() + 15000);
+    setIsSnoozed(true);
+    if (snoozeTimerRef.current) {
+      clearTimeout(snoozeTimerRef.current);
+    }
+    snoozeTimerRef.current = setTimeout(() => {
+      setIsSnoozed(false);
+    }, 15000);
   };
 
   const activeNode = hoveredNodeId 
@@ -382,30 +399,30 @@ export default function KnowledgeViews() {
 
                       {/* SVG Bezier path links connecting elements */}
                       {/* Connection 1: Auth -> Endpoint */}
-                      <path d="M 140 110 Q 180 180 230 260" stroke="url(#glow-grad)" strokeWidth="1" fill="none" strokeDasharray="3 3" />
+                      <path d="M 125 100 Q 180 192 235 285" stroke="url(#glow-grad)" strokeWidth="1" fill="none" strokeDasharray="3 3" />
                       {/* Connection 2: Endpoint -> Database */}
-                      <path d="M 230 260 Q 330 295 450 310" stroke="url(#glow-grad)" strokeWidth="1" fill="none" strokeDasharray="3 3" />
+                      <path d="M 235 285 Q 355 292 475 300" stroke="url(#glow-grad)" strokeWidth="1" fill="none" strokeDasharray="3 3" />
                       {/* Connection 3: Auth -> Queue */}
-                      <path d="M 140 110 Q 280 85 430 95" stroke="url(#glow-grad)" strokeWidth="1" fill="none" strokeDasharray="3 3" />
+                      <path d="M 125 100 Q 290 100 455 100" stroke="url(#glow-grad)" strokeWidth="1" fill="none" strokeDasharray="3 3" />
                       {/* Connection 4: Queue -> Database */}
-                      <path d="M 430 95 Q 450 200 450 310" stroke="url(#glow-grad)" strokeWidth="1" fill="none" strokeDasharray="3 3" />
+                      <path d="M 455 100 Q 465 200 475 300" stroke="url(#glow-grad)" strokeWidth="1" fill="none" strokeDasharray="3 3" />
                       {/* Connection 5: Webhook -> Database */}
-                      <path d="M 660 195 Q 560 270 450 310" stroke="url(#glow-grad)" strokeWidth="1" fill="none" strokeDasharray="3 3" />
+                      <path d="M 695 195 Q 585 247 475 300" stroke="url(#glow-grad)" strokeWidth="1" fill="none" strokeDasharray="3 3" />
                       {/* Connection 6: Webhook -> Queue */}
-                      <path d="M 660 195 Q 530 130 430 95" stroke="url(#glow-grad)" strokeWidth="1" fill="none" strokeDasharray="3 3" />
+                      <path d="M 695 195 Q 575 147 455 100" stroke="url(#glow-grad)" strokeWidth="1" fill="none" strokeDasharray="3 3" />
 
                       {/* Animated Flowing packet light indicators */}
                       <circle r="3" fill="#3b82f6" opacity="0.95">
-                        <animateMotion dur="2.8s" repeatCount="indefinite" path="M 140 110 Q 180 180 230 260" />
+                        <animateMotion dur="2.8s" repeatCount="indefinite" path="M 125 100 Q 180 192 235 285" />
                       </circle>
                       <circle r="3" fill="#10b981" opacity="0.95">
-                        <animateMotion dur="3.2s" repeatCount="indefinite" path="M 230 260 Q 330 295 450 310" />
+                        <animateMotion dur="3.2s" repeatCount="indefinite" path="M 235 285 Q 355 292 475 300" />
                       </circle>
                       <circle r="3" fill="#f59e0b" opacity="0.95">
-                        <animateMotion dur="3.8s" repeatCount="indefinite" path="M 140 110 Q 280 85 430 95" />
+                        <animateMotion dur="3.8s" repeatCount="indefinite" path="M 125 100 Q 290 100 455 100" />
                       </circle>
                       <circle r="3" fill="#8b5cf6" opacity="0.95">
-                        <animateMotion dur="3.1s" repeatCount="indefinite" path="M 660 195 Q 563 270 450 310" />
+                        <animateMotion dur="3.1s" repeatCount="indefinite" path="M 695 195 Q 585 247 475 300" />
                       </circle>
                     </svg>
 

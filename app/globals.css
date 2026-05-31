@@ -108,8 +108,8 @@ html.light .glow-spot {
 }
 
 @keyframes text-gradient-shift {
-  0% { background-position: 0% 50%; }
-  100% { background-position: -200% 50%; }
+  0% { background-position: -200% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .premium-text-gradient {
