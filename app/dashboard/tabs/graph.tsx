@@ -370,7 +370,9 @@ const EDGE_STYLES: Record<string, { color: string; opacity: number; width: numbe
 
 export default function GraphTab() {
   // Required state variables (matched exactly to specs)
-  const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  const [selectedNode, setSelectedNode] = useState<Node | null>(
+    NODES.find(n => n.id === "m1") || null
+  );
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<{ x: number; y: number; node: Node } | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>("All");

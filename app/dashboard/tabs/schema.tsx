@@ -303,8 +303,8 @@ const getFlatSectionList = (sections: SchemaSection[]): SchemaSection[] => {
 };
 
 export default function SchemaTab() {
-  const [selectedSection, setSelectedSection] = useState<SchemaSection | null>(null);
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set(["organization", "project"]));
+  const [selectedSection, setSelectedSection] = useState<SchemaSection | null>(SCHEMA[0]);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set(["organization", "project", "organization.audience", "organization.positioning", "project.modules"]));
   const [expandAll, setExpandAll] = useState(false);
 
   // Stats calculation
