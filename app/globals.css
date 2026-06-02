@@ -84,8 +84,10 @@ html.light .glow-spot {
   color: var(--text-primary);
 }
 
-/* Theme transition — smooth color shift on toggle */
-*, *::before, *::after {
+/* Theme transition — smooth color shift on toggle, excluding blur containers and overlays */
+*:not(.premium-blur-container):not(.premium-overlay-blur):not(.premium-blur-container *),
+*:not(.premium-blur-container):not(.premium-overlay-blur):not(.premium-blur-container *)::before,
+*:not(.premium-blur-container):not(.premium-overlay-blur):not(.premium-blur-container *)::after {
   transition: background-color 0.3s ease, border-color 0.3s ease, color 0.15s ease;
 }
 
@@ -139,5 +141,28 @@ html.light .premium-text-gradient {
   );
   background-size: 200% auto;
 }
+
+/* Premium Glassmorphism Blurs */
+.premium-blur-container {
+  background-color: rgba(12, 13, 18, 0.65) !important;
+  backdrop-filter: blur(24px) saturate(210%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(210%) !important;
+  transition: none !important;
+}
+
+html.light .premium-blur-container {
+  background-color: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(24px) saturate(210%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(210%) !important;
+  transition: none !important;
+}
+
+.premium-overlay-blur {
+  background-color: rgba(6, 7, 10, 0.6) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  transition: none !important;
+}
+
 
 

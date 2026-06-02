@@ -3,353 +3,464 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
-  GitBranch,
-  Network,
-  FileText,
+  FolderGit2,
+  ChevronDown,
   Plus,
+  ArrowRight,
+  GitPullRequest,
+  CheckCircle2,
+  X,
+  FileText,
+  Network,
   Clock,
-  X
+  Sparkles
 } from "lucide-react";
 
 interface Project {
   id: string;
   name: string;
   description: string;
-  nodes: number;
-  documents: number;
-  lastUpdated: string;
-  status: string;
+  completeness: number;
+  docStatus: "KNOWLEDGE COMPLETE" | "DOCS STALE" | "EXTRACTION NEEDED" | "NEVER EXTRACTED";
+  repo: string;
+  lastGenerated: string;
+  lastActivity: string;
+  techStack: string[];
   color: string;
 }
 
-export default function ProjectsTab() {
-  const [projects, setProjects] = useState<Project[]>([
-    {
-      id: "momentum-core",
-      name: "Momentum Core",
-      description: "Primary knowledge base for product architecture, decisions, and technical documentation.",
-      nodes: 412,
-      documents: 67,
-      lastUpdated: "2 hours ago",
-      status: "active",
-      color: "var(--accent)",
-    },
-    {
-      id: "research-archive",
-      name: "Research Archive",
-      description: "Collection of research papers, competitive analysis, and market insights.",
-      nodes: 289,
-      documents: 43,
-      lastUpdated: "Yesterday",
-      status: "active",
-      color: "#a78bfa",
-    },
-    {
-      id: "personal-notes",
-      name: "Personal Notes",
-      description: "Private workspace for personal knowledge, ideas, and scratch notes.",
-      nodes: 146,
-      documents: 14,
-      lastUpdated: "3 days ago",
-      status: "idle",
-      color: "#34d399",
-    },
-  ]);
+const mockProjects: Project[] = [
+  {
+    id: "momentum-core",
+    name: "Momentum Core",
+    description: "Main monorepo containing the Next.js frontend, Python extraction workers, and graph database schemas.",
+    completeness: 87,
+    docStatus: "DOCS STALE",
+    repo: "github.com/buildwithmomentum/core · main",
+    lastGenerated: "3 days ago",
+    lastActivity: "2h ago",
+    techStack: ["Next.js", "Python", "Neo4j"],
+    color: "#06B6D4",
+  },
+  {
+    id: "chrome-extension",
+    name: "Context Capture Extension",
+    description: "Browser extension that intercepts and formats developer reading history for the knowledge graph.",
+    completeness: 100,
+    docStatus: "KNOWLEDGE COMPLETE",
+    repo: "github.com/buildwithmomentum/extension · master",
+    lastGenerated: "Just now",
+    lastActivity: "Just now",
+    techStack: ["React", "TypeScript", "Chrome API"],
+    color: "#10B981",
+  },
+  {
+    id: "pricing-engine",
+    name: "Stripe Billing Engine",
+    description: "Standalone service for handling usage-based billing, webhooks, and subscription metered plans.",
+    completeness: 42,
+    docStatus: "EXTRACTION NEEDED",
+    repo: "github.com/buildwithmomentum/billing · main",
+    lastGenerated: "Never",
+    lastActivity: "Yesterday",
+    techStack: ["Node.js", "Stripe", "PostgreSQL"],
+    color: "#F59E0B",
+  },
+  {
+    id: "marketing-site",
+    name: "Marketing & Blog",
+    description: "Public facing landing pages, blog using MDX, and documentation site.",
+    completeness: 0,
+    docStatus: "NEVER EXTRACTED",
+    repo: "github.com/buildwithmomentum/site · main",
+    lastGenerated: "Never",
+    lastActivity: "5 days ago",
+    techStack: ["Next.js", "Tailwind", "MDX"],
+    color: "#EF4444",
+  }
+];
 
+export default function ProjectsTab() {
+  const [projects, setProjects] = useState<Project[]>(mockProjects);
+  const [activeProjectId, setActiveProjectId] = useState("momentum-core");
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+  const [showSwitcherDropdown, setShowSwitcherDropdown] = useState(false);
+  
+  // Modal state
+  const [newName, setNewName] = useState("");
+  const [newDesc, setNewDesc] = useState("");
+  const [newRepo, setNewRepo] = useState("");
+
+  const activeProject = projects.find(p => p.id === activeProjectId) || projects[0];
+  const otherProjects = projects.filter(p => p.id !== activeProjectId);
+  const activeKnowledgeCount = projects.filter(p => ["KNOWLEDGE COMPLETE", "DOCS STALE"].includes(p.docStatus)).length;
 
   const handleCreateProject = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
+    if (!newName.trim()) return;
 
-    const newProject: Project = {
-      id: name.toLowerCase().trim().replace(/\s+/g, "-"),
-      name: name.trim(),
-      description: description.trim() || "No description provided.",
-      nodes: 0,
-      documents: 0,
-      lastUpdated: "Just now",
-      status: "active",
-      color: "var(--accent)",
+    const proj: Project = {
+      id: newName.toLowerCase().replace(/\s+/g, '-'),
+      name: newName,
+      description: newDesc || "No description provided.",
+      completeness: 0,
+      docStatus: "NEVER EXTRACTED",
+      repo: newRepo || "No repository connected",
+      lastGenerated: "Never",
+      lastActivity: "Just now",
+      techStack: ["Draft"],
+      color: "#6B7280"
     };
 
-    setProjects([...projects, newProject]);
-    setName("");
-    setDescription("");
+    setProjects([proj, ...projects]);
+    setActiveProjectId(proj.id);
+    setNewName("");
+    setNewDesc("");
+    setNewRepo("");
     setShowNewProjectModal(false);
   };
 
-  const handleDeleteProject = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Avoid triggering any card-clicks
-    setProjects(projects.filter((p) => p.id !== id));
+  const getStatusColor = (status: Project["docStatus"]) => {
+    switch (status) {
+      case "KNOWLEDGE COMPLETE": return "text-emerald-400 bg-emerald-400/10 border-emerald-400/20";
+      case "DOCS STALE": return "text-amber-400 bg-amber-400/10 border-amber-400/20";
+      case "EXTRACTION NEEDED": return "text-orange-400 bg-orange-400/10 border-orange-400/20";
+      case "NEVER EXTRACTED": return "text-rose-400 bg-rose-400/10 border-rose-400/20";
+      default: return "text-gray-400 bg-gray-400/10 border-gray-400/20";
+    }
   };
 
-  // Derivative metrics
-  const totalProjects = projects.length;
-  const totalNodes = projects.reduce((acc, p) => acc + p.nodes, 0);
-  const totalDocuments = projects.reduce((acc, p) => acc + p.documents, 0);
-
-  return (
-    <div className="w-full px-8 py-8 relative" id="projects-tab-root">
-      {/* Page header row */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-8" id="projects-header-row">
-        <div>
-          <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[var(--accent)] px-2.5 py-1 rounded-full border border-[var(--accent)]/20 bg-[var(--accent)]/[0.06] font-bold inline-block" id="projects-label">
-            Projects
-          </span>
-          <h1 className="text-2xl font-bold font-sans text-[var(--text-primary)] mt-3 tracking-tight" id="projects-title">
-            Your Projects
-          </h1>
-          <p className="text-sm text-[var(--text-muted)] font-sans mt-1" id="projects-subtitle">
-            Organize your knowledge into focused workspaces.
-          </p>
-        </div>
-
-        <motion.button
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={() => setShowNewProjectModal(true)}
-          className="rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold uppercase tracking-wider px-5 py-2.5 flex items-center gap-2 shadow-[0_4px_20px_-4px_var(--accent-glow)] transition-all cursor-pointer border-none"
-          id="btn-new-project"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          <span>New Project</span>
-        </motion.button>
-      </div>
-
-      {/* Stats row */}
-      {totalProjects > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8" id="projects-stats-row">
-          {[
-            { label: "Total Projects", value: totalProjects, icon: GitBranch },
-            { label: "Active Nodes", value: totalNodes, icon: Network },
-            { label: "Documents", value: totalDocuments, icon: FileText },
-          ].map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.07, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl px-5 py-4 relative overflow-hidden flex flex-col justify-between"
-                id={`stat-card-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}
-              >
-                <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--accent)]/10 to-transparent" />
-                <div className="flex items-center justify-between" id={`stat-header-${index}`}>
-                  <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-[var(--text-muted)] font-bold">
-                    {stat.label}
-                  </span>
-                  <div className="w-8 h-8 rounded-lg bg-[var(--accent)]/[0.08] flex items-center justify-center">
-                    <Icon className="w-4 h-4 text-[var(--accent)]" />
-                  </div>
-                </div>
-                <div className="text-2xl font-bold font-mono text-[var(--text-primary)] mt-3" id={`stat-val-${index}`}>
-                  {stat.value.toLocaleString()}
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Section label */}
-      {totalProjects > 0 && (
-        <div className="text-[9px] font-mono uppercase tracking-[0.2em] text-[var(--text-muted)] font-bold mb-4" id="section-label-all-workspaces">
-          All Workspaces
-        </div>
-      )}
-
-      {/* Projects Grid / Empty State */}
-      {totalProjects > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4" id="projects-list-grid">
-          {projects.map((proj, index) => (
-            <motion.div
-              key={proj.id}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.08, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              whileHover={{ y: -2 }}
-              className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-5 cursor-pointer relative overflow-hidden hover:border-[var(--border-hover)] transition-colors duration-200 group flex flex-col justify-between min-h-[180px]"
-              id={`project-card-${proj.id}`}
-            >
-              {/* Left accent strip */}
-              <div
-                className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-2xl"
-                style={{ backgroundColor: proj.color }}
-              />
-
-              {/* Main content wrapper */}
-              <div>
-                {/* Header row */}
-                <div className="flex items-start justify-between gap-4 mb-2" id={`proj-card-header-${proj.id}`}>
-                  <h3 className="text-base font-semibold font-sans text-[var(--text-primary)] tracking-tight">
-                    {proj.name}
-                  </h3>
-                  <div className="flex items-center gap-2" id={`proj-badge-row-${proj.id}`}>
-                    <span
-                      className={`text-[9px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full border font-bold ${
-                        proj.status === "active"
-                          ? "text-emerald-400 bg-emerald-400/10 border-emerald-400/20"
-                          : "text-[var(--text-muted)] bg-[var(--bg-surface)] border-[var(--border)]"
-                      }`}
-                    >
-                      {proj.status}
-                    </span>
-                    {/* Trash bin to delete workspace and test empty state */}
-                    <button
-                      onClick={(e) => handleDeleteProject(proj.id, e)}
-                      className="opacity-0 group-hover:opacity-100 p-1 rounded-md hover:bg-rose-500/10 hover:text-rose-400 transition-all text-[var(--text-muted)] cursor-pointer border-none bg-transparent"
-                      title="Delete Workspace"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Description */}
-                <p className="text-sm font-sans text-[var(--text-muted)] line-clamp-2 leading-relaxed" id={`proj-card-desc-${proj.id}`}>
-                  {proj.description}
-                </p>
-              </div>
-
-              {/* Stats row */}
-              <div className="mt-4 pt-4 border-t border-[var(--border)] flex items-center justify-between text-xs" id={`proj-card-stats-${proj.id}`}>
-                <div className="flex items-center gap-4">
-                  <span className="flex items-center gap-1.5 font-sans" id={`nodes-stat-${proj.id}`}>
-                    <Network className="w-3.5 h-3.5 text-[var(--text-muted)]" />
-                    <span className="font-mono text-xs text-[var(--text-primary)] font-semibold">{proj.nodes}</span>
-                    <span className="text-[var(--text-muted)] text-[11px]">nodes</span>
-                  </span>
-                  <span className="flex items-center gap-1.5 font-sans" id={`docs-stat-${proj.id}`}>
-                    <FileText className="w-3.5 h-3.5 text-[var(--text-muted)]" />
-                    <span className="font-mono text-xs text-[var(--text-primary)] font-semibold">{proj.documents}</span>
-                    <span className="text-[var(--text-muted)] text-[11px]">docs</span>
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-1 text-[10px] font-mono text-[var(--text-muted)]" id={`last-updated-${proj.id}`}>
-                  <Clock className="w-3 h-3 text-[var(--text-muted)]" />
-                  <span>{proj.lastUpdated}</span>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      ) : (
-        <div className="min-h-[300px] flex flex-col items-center justify-center text-center p-8 bg-[var(--bg-card)] border border-dashed border-[var(--border)] rounded-2xl relative overflow-hidden" id="projects-empty-state">
-          <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--accent)]/10 to-transparent" />
-          <div className="w-12 h-12 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border)] flex items-center justify-center mb-4">
-            <GitBranch className="w-6 h-6 text-[var(--text-muted)]/60" />
+  if (projects.length === 0) {
+    return (
+      <div className="w-full max-w-7xl xl:max-w-[1500px] 2xl:max-w-[1700px] mx-auto px-6 md:px-10 py-10 relative">
+        <div className="min-h-[500px] flex flex-col items-center justify-center text-center p-12 bg-[var(--bg-card)] border border-dashed border-[var(--border)] rounded-2xl relative overflow-hidden">
+          <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--accent)]/20 to-transparent" />
+          <div className="w-16 h-16 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border)] flex items-center justify-center mb-6">
+            <FolderGit2 className="w-8 h-8 text-[var(--accent)]/60" />
           </div>
-          <h3 className="text-base font-bold font-sans text-[var(--text-primary)]" id="empty-title">
+          <h2 className="text-2xl font-bold font-sans text-[var(--text-primary)] tracking-tight mb-2">
             No projects yet
-          </h3>
-          <p className="text-sm text-[var(--text-muted)] font-sans max-w-sm mt-1 mb-6" id="empty-desc">
-            Create your first project to get started.
+          </h2>
+          <p className="text-[var(--text-muted)] max-w-md mx-auto mb-8 leading-relaxed">
+            Create your first project to start building your knowledge base. Momentum will extract and structure your context.
           </p>
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => setShowNewProjectModal(true)}
-            className="rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold uppercase tracking-wider px-5 py-2.5 flex items-center gap-2 shadow-[0_4px_20px_-4px_var(--accent-glow)] transition-all cursor-pointer border-none"
-            id="empty-btn-create"
+            className="rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-sm font-semibold uppercase tracking-wider px-8 py-4 flex items-center gap-2 shadow-[0_4px_20px_-4px_var(--accent-glow)] transition-all cursor-pointer border-none"
           >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Create Project</span>
+            <Plus className="w-4 h-4" />
+            <span>Create First Project</span>
           </motion.button>
         </div>
+        
+        <AnimatePresence>
+          {showNewProjectModal && <NewProjectModal onClose={() => setShowNewProjectModal(false)} onSubmit={handleCreateProject} newName={newName} setNewName={setNewName} newDesc={newDesc} setNewDesc={setNewDesc} newRepo={newRepo} setNewRepo={setNewRepo} />}
+        </AnimatePresence>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full max-w-7xl xl:max-w-[1500px] 2xl:max-w-[1700px] mx-auto px-6 md:px-10 py-10 relative">
+      
+      {/* PAGE HEADER */}
+      <div className="flex items-start justify-between mb-8 pr-48">
+        <div>
+          <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--accent)] font-bold mb-2">
+            PROJECTS
+          </div>
+          <h1 className="text-3xl font-bold font-sans text-[var(--text-primary)] tracking-tight mb-2">
+            Your Projects
+          </h1>
+          <p className="font-mono text-xs text-[var(--text-muted)]">
+            {projects.length} projects · {activeKnowledgeCount} with active knowledge extraction
+          </p>
+        </div>
+
+        <div>
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => setShowNewProjectModal(true)}
+            className="rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold uppercase tracking-wider px-5 py-2.5 flex items-center gap-2 shadow-[0_4px_20px_-4px_var(--accent-glow)] transition-all cursor-pointer border-none"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>New Project</span>
+          </motion.button>
+        </div>
+      </div>
+
+      {/* ACTIVE PROJECT BANNER */}
+      {activeProject && (
+        <div className="mb-10 relative group">
+          <div className="absolute -inset-[1px] bg-gradient-to-r from-[var(--accent)]/40 to-transparent rounded-[2rem] opacity-50 blur-sm pointer-events-none" />
+          <div className="bg-[var(--bg-card)] border border-[var(--accent)]/30 rounded-[2rem] p-8 relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+            <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-[var(--accent)]/50 to-transparent" />
+            <div className="absolute left-0 inset-y-0 w-1 bg-[var(--accent)]" />
+            
+            <div className="flex-1 min-w-0 pl-2">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-[10px] font-mono uppercase tracking-[0.2em] font-bold text-[var(--accent)]">ACTIVE PROJECT</span>
+                <span className={`text-[9px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full border font-bold ${getStatusColor(activeProject.docStatus)}`}>
+                  {activeProject.docStatus}
+                </span>
+              </div>
+              <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight mb-2 truncate">
+                {activeProject.name}
+              </h2>
+              <p className="text-sm text-[var(--text-muted)] mb-5 max-w-2xl line-clamp-2 leading-relaxed">
+                {activeProject.description}
+              </p>
+              
+              <div className="flex flex-wrap items-center gap-3">
+                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="px-4 py-2 bg-[var(--text-primary)] text-[var(--bg)] hover:bg-white text-xs font-bold rounded-full transition-colors flex items-center gap-2">
+                  <span>Open Project</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </motion.button>
+                <button className="px-4 py-2 bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-primary)] text-xs font-semibold rounded-full transition-colors flex items-center gap-2">
+                  <FileText className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+                  <span>Generate Docs</span>
+                </button>
+                <button className="px-4 py-2 bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-primary)] text-xs font-semibold rounded-full transition-colors flex items-center gap-2">
+                  <Sparkles className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+                  <span>Plan Feature</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center shrink-0 pr-4">
+              {/* Circular Progress Indicator for Completeness */}
+              <div className="relative w-24 h-24 mb-3">
+                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="40" fill="transparent" stroke="var(--bg-surface)" strokeWidth="8" />
+                  <circle 
+                    cx="50" cy="50" r="40" fill="transparent" 
+                    stroke="var(--accent)" strokeWidth="8" 
+                    strokeLinecap="round"
+                    strokeDasharray={251.2} 
+                    strokeDashoffset={251.2 - (251.2 * activeProject.completeness) / 100}
+                    className="transition-all duration-1000 ease-out"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-xl font-bold font-mono text-[var(--text-primary)]">{activeProject.completeness}%</span>
+                </div>
+              </div>
+              <div className="text-[10px] font-mono text-[var(--text-muted)] uppercase tracking-wider text-center">
+                Knowledge<br/>Extracted
+              </div>
+              <div className="mt-4 text-[11px] text-[var(--text-muted)] flex items-center gap-1.5 opacity-80">
+                <Clock className="w-3 h-3" />
+                <span>Last worked on {activeProject.lastActivity}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PROJECTS GRID */}
+      {otherProjects.length > 0 && (
+        <>
+          <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-muted)] font-bold mb-4">
+            Other Projects
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            {otherProjects.map((proj, idx) => (
+              <motion.div
+                key={proj.id}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.05, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                className="bg-[var(--bg-card)] border border-[var(--border)] rounded-[1.5rem] p-6 hover:border-[var(--border-hover)] transition-colors flex flex-col justify-between group h-full"
+              >
+                {/* TOP ROW */}
+                <div className="mb-5">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center border border-[var(--border)] font-bold text-lg font-mono" style={{ backgroundColor: proj.color + "15", color: proj.color }}>
+                        {proj.name.charAt(0)}
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-[var(--text-primary)] whitespace-nowrap overflow-hidden text-ellipsis max-w-[200px]">{proj.name}</h3>
+                        <div className="flex gap-1.5 mt-1">
+                          {proj.techStack.slice(0, 3).map(tag => (
+                            <span key={tag} className="text-[9px] px-1.5 py-0.5 rounded bg-[var(--bg-surface)] text-[var(--text-secondary)] border border-[var(--border)] font-mono">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <span className={`text-[9px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full border font-bold shrink-0 ${getStatusColor(proj.docStatus)}`}>
+                      {proj.docStatus}
+                    </span>
+                  </div>
+                </div>
+
+                {/* MIDDLE ROW */}
+                <div className="mb-6 space-y-3">
+                  <div>
+                    <div className="flex justify-between text-[11px] mb-1.5 font-medium">
+                      <span className="text-[var(--text-secondary)]">Knowledge Completeness</span>
+                      <span className="font-mono text-[var(--text-primary)]">{proj.completeness}%</span>
+                    </div>
+                    <div className="h-1.5 bg-[var(--bg-surface)] rounded-full overflow-hidden border border-[var(--border)]">
+                      <div className="h-full rounded-full transition-all duration-1000 ease-out" style={{ width: proj.completeness + "%", backgroundColor: proj.color }} />
+                    </div>
+                  </div>
+                  
+                  <div className="text-[11px] text-[var(--text-muted)] flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Docs · Last generated {proj.lastGenerated}</span>
+                  </div>
+                  <div className="text-[11px] text-[var(--text-muted)] flex items-center gap-1.5 font-mono">
+                    <GitPullRequest className="w-3.5 h-3.5" />
+                    <span className="truncate">{proj.repo}</span>
+                  </div>
+                </div>
+
+                {/* BOTTOM ROW */}
+                <div className="flex items-center justify-between pt-4 border-t border-[var(--border)] gap-2">
+                  <div className="flex gap-2">
+                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => setActiveProjectId(proj.id)} className="px-3 py-1.5 bg-[var(--text-primary)] hover:bg-white text-[var(--bg)] text-[11px] font-bold rounded-lg transition-colors leading-none">
+                      Open
+                    </motion.button>
+                    <button className="px-3 py-1.5 bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-primary)] text-[11px] font-semibold rounded-lg transition-colors leading-none">
+                      Generate
+                    </button>
+                    <button className="px-3 py-1.5 bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-primary)] text-[11px] font-semibold rounded-lg transition-colors leading-none hidden sm:block">
+                      Plan
+                    </button>
+                  </div>
+                  <div className="text-[10px] text-[var(--text-muted)] font-mono text-right whitespace-nowrap shrink-0">
+                    Active {proj.lastActivity}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </>
       )}
 
       {/* NEW PROJECT MODAL */}
       <AnimatePresence>
-        {showNewProjectModal && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" id="modal-container">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 8 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 8 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-6 w-full max-w-md shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)] relative overflow-hidden"
-              id="modal-card"
-            >
-              <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--accent)]/20 to-transparent" />
-
-              {/* Close Button */}
-              <button
-                onClick={() => setShowNewProjectModal(false)}
-                className="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--bg-surface)] border-none bg-transparent cursor-pointer"
-                id="modal-close-btn"
-              >
-                <X className="w-4 h-4" />
-              </button>
-
-              <h2 className="text-lg font-bold font-sans text-[var(--text-primary)] tracking-tight mb-4" id="modal-title">
-                New Project
-              </h2>
-
-              <form onSubmit={handleCreateProject} className="space-y-5" id="new-project-form">
-                <div>
-                  <label className="block text-[10px] uppercase font-mono tracking-wider text-[var(--text-muted)] font-bold mb-1.5" htmlFor="project-name-input">
-                    Project Name
-                  </label>
-                  <input
-                    id="project-name-input"
-                    type="text"
-                    required
-                    placeholder="e.g. My Workspace"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="bg-transparent border-b border-[var(--border)] focus:border-[var(--accent)] py-3 text-sm focus:outline-none w-full text-[var(--text-primary)] placeholder-gray-500 transition-colors bg-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] uppercase font-mono tracking-wider text-[var(--text-muted)] font-bold mb-1.5" htmlFor="project-desc-input">
-                    Description
-                  </label>
-                  <textarea
-                    id="project-desc-input"
-                    rows={3}
-                    placeholder="Short description of this project's purpose..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className="bg-transparent border-b border-[var(--border)] focus:border-[var(--accent)] py-3 text-sm focus:outline-none w-full text-[var(--text-primary)] placeholder-gray-500 resize-none transition-colors"
-                  />
-                </div>
-
-                <div className="flex items-center justify-end gap-3 pt-4 border-t border-[var(--border)]" id="modal-button-row">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowNewProjectModal(false);
-                      setName("");
-                      setDescription("");
-                    }}
-                    className="text-xs uppercase tracking-wider font-mono font-bold text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors py-2.5 px-4 rounded-full border-none bg-transparent cursor-pointer"
-                    id="modal-cancel-btn"
-                  >
-                    Cancel
-                  </button>
-                  <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    type="submit"
-                    disabled={!name.trim()}
-                    className="rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold uppercase tracking-wider px-5 py-2.5 flex items-center gap-2 shadow-[0_4px_20px_-4px_var(--accent-glow)] transition-all cursor-pointer border-none disabled:opacity-50 disabled:cursor-not-allowed"
-                    id="modal-submit-btn"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Create Project</span>
-                  </motion.button>
-                </div>
-              </form>
-            </motion.div>
-          </div>
-        )}
+        {showNewProjectModal && <NewProjectModal onClose={() => setShowNewProjectModal(false)} onSubmit={handleCreateProject} newName={newName} setNewName={setNewName} newDesc={newDesc} setNewDesc={setNewDesc} newRepo={newRepo} setNewRepo={setNewRepo} />}
       </AnimatePresence>
+    </div>
+  );
+}
+
+function NewProjectModal({ onClose, onSubmit, newName, setNewName, newDesc, setNewDesc, newRepo, setNewRepo }: any) {
+  return (
+    <div 
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <motion.div
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.95, y: 8 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 8 }}
+        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+        className="bg-[var(--bg-card)] border border-[var(--border)] rounded-[2rem] p-6 sm:p-8 w-full max-w-lg shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)] relative overflow-hidden"
+      >
+        <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--accent)]/30 to-transparent" />
+
+        <button
+          onClick={onClose}
+          className="absolute top-6 right-6 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-2 rounded-xl hover:bg-[var(--bg-surface)] border-none bg-transparent cursor-pointer"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        <div className="mb-8">
+          <div className="w-12 h-12 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border)] flex items-center justify-center mb-5">
+            <Plus className="w-6 h-6 text-[var(--text-primary)]" />
+          </div>
+          <h2 className="text-2xl font-bold font-sans text-[var(--text-primary)] tracking-tight">
+            Create New Project
+          </h2>
+          <p className="text-[var(--text-muted)] text-sm mt-1">Connect a repository and start extracting knowledge.</p>
+        </div>
+
+        <form onSubmit={onSubmit} className="space-y-5">
+          <div>
+            <label className="block text-[11px] uppercase font-mono tracking-wider text-[var(--text-muted)] font-bold mb-2">
+              Project Name *
+            </label>
+            <input
+              type="text"
+              required
+              autoFocus
+              placeholder="e.g. Core Mono Repo"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              className="bg-[var(--bg-surface)] border border-[var(--border)] focus:border-[var(--accent)] rounded-xl px-4 py-3.5 text-sm outline-none w-full text-[var(--text-primary)] placeholder-gray-500 transition-colors"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[11px] uppercase font-mono tracking-wider text-[var(--text-muted)] font-bold mb-2">
+              Short Description
+            </label>
+            <textarea
+              rows={2}
+              placeholder="What is this project?"
+              value={newDesc}
+              onChange={(e) => setNewDesc(e.target.value)}
+              className="bg-[var(--bg-surface)] border border-[var(--border)] focus:border-[var(--accent)] rounded-xl px-4 py-3.5 text-sm outline-none w-full text-[var(--text-primary)] placeholder-gray-500 resize-none transition-colors"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[11px] uppercase font-mono tracking-wider text-[var(--text-muted)] font-bold mb-2 flex items-center justify-between">
+              <span>Connect Repository</span>
+              <button type="button" className="text-[var(--accent)] hover:underline capitalize text-[10px]">
+                Connect GitHub App
+              </button>
+            </label>
+            <input
+              type="text"
+              placeholder="https://github.com/organization/repo"
+              value={newRepo}
+              onChange={(e) => setNewRepo(e.target.value)}
+              className="bg-[var(--bg-[var(--bg-surface)])] border border-[var(--border)] focus:border-[var(--accent)] rounded-xl px-4 py-3.5 text-sm outline-none w-full text-[var(--text-primary)] placeholder-gray-500 transition-colors font-mono"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-[11px] uppercase font-mono tracking-wider text-[var(--text-muted)] font-bold mb-2">
+              Tech Stack
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. Next.js, FastAPI, PostgreSQL (comma separated)"
+              className="bg-[var(--bg-[var(--bg-surface)])] border border-[var(--border)] focus:border-[var(--accent)] rounded-xl px-4 py-3.5 text-sm outline-none w-full text-[var(--text-primary)] placeholder-gray-500 transition-colors"
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-6 mt-4 border-t border-[var(--border)]">
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-xs uppercase tracking-wider font-mono font-bold text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors py-3 px-5 rounded-full border-none bg-transparent cursor-pointer"
+            >
+              Cancel
+            </button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="submit"
+              disabled={!newName.trim()}
+              className="rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold uppercase tracking-wider px-6 py-3.5 flex items-center gap-2 shadow-[0_4px_20px_-4px_var(--accent-glow)] transition-all cursor-pointer border-none disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span>Create & Start Extraction</span>
+            </motion.button>
+          </div>
+        </form>
+      </motion.div>
     </div>
   );
 }
