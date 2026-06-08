@@ -39,7 +39,9 @@ import {
   FolderPlus,
   Edit2,
   Layers,
-  Grid
+  Grid,
+  ArrowRight,
+  ArrowUpRight
 } from "lucide-react";
 
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
@@ -257,6 +259,8 @@ export interface WorkspaceProject {
   color: string;
   description: string;
   recentActivity: string;
+  docStatus?: "KNOWLEDGE COMPLETE" | "DOCS STALE" | "EXTRACTION NEEDED" | "NEVER EXTRACTED";
+  completeness?: number;
 }
 
 export default function DashboardClient() {
@@ -296,10 +300,10 @@ export default function DashboardClient() {
       }
     }
     return [
-      { id: "momentum-core", name: "Momentum Core", color: "#06B6D4", description: "Core service containing unified auth microservices, node orchestration, and context injection controllers.", recentActivity: "Extracted database mutation context 12m ago" },
-      { id: "chrome-extension", name: "Context Capture Extension", color: "#10B981", description: "Browser utility mapping developer web workflows directly into the central schema graph.", recentActivity: "Refreshed session variables and webhooks 2h ago" },
-      { id: "pricing-engine", name: "Stripe Billing Engine", color: "#F59E0B", description: "Plan synchronizer, checkout tunnels, and subscription webhook controllers.", recentActivity: "Successfully synced with gateway sandbox 4h ago" },
-      { id: "marketing-site", name: "Marketing & Blog", color: "#EF4444", description: "Next-gen static frontend showcasing product modules, blog articles, and feature telemetry.", recentActivity: "Skipped documentation refresh due to metadata check 1d ago" }
+      { id: "momentum-core", name: "Momentum Core", color: "#06B6D4", description: "Core service containing unified auth microservices, node orchestration, and context injection controllers.", recentActivity: "Extracted database mutation context 12m ago", docStatus: "DOCS STALE", completeness: 87 },
+      { id: "chrome-extension", name: "Context Capture Extension", color: "#10B981", description: "Browser utility mapping developer web workflows directly into the central schema graph.", recentActivity: "Refreshed session variables and webhooks 2h ago", docStatus: "KNOWLEDGE COMPLETE", completeness: 100 },
+      { id: "pricing-engine", name: "Stripe Billing Engine", color: "#F59E0B", description: "Plan synchronizer, checkout tunnels, and subscription webhook controllers.", recentActivity: "Successfully synced with gateway sandbox 4h ago", docStatus: "EXTRACTION NEEDED", completeness: 42 },
+      { id: "marketing-site", name: "Marketing & Blog", color: "#EF4444", description: "Next-gen static frontend showcasing product modules, blog articles, and feature telemetry.", recentActivity: "Skipped documentation refresh due to metadata check 1d ago", docStatus: "NEVER EXTRACTED", completeness: 0 }
     ];
   });
 
@@ -406,7 +410,8 @@ export default function DashboardClient() {
   return (
     <div className="h-[100dvh] w-full flex flex-row bg-[var(--bg)] overflow-hidden">
       {/* LEFT: Collapsible Sidebar */}
-      <motion.aside 
+      {activeTab !== "extraction" && (
+        <motion.aside 
         animate={{ 
           width: isSidebarCollapsed ? 68 : 240,
         }}
@@ -783,11 +788,13 @@ export default function DashboardClient() {
           </AnimatePresence>
         </div>
       </motion.aside>
+      )}
 
       {/* RIGHT: Scrollable main content */}
       <main className="flex-1 dot-grid h-[100dvh] flex flex-col relative overflow-hidden">
         
         {/* GLOBAL HEADER */}
+        {activeTab !== "extraction" && (
         <div className="shrink-0 h-16 bg-[var(--bg)] border-b border-[var(--border)] px-6 md:px-10 flex items-center justify-between z-40 sticky top-0">
           <div className="flex items-center gap-4">
             {/* Sidebar toggle control (only visible when sidebar is collapsed) */}
@@ -983,7 +990,9 @@ export default function DashboardClient() {
             </div>
           </div>
         </div>
+        )}
 
+        {activeTab !== "extraction" ? (
         <div className="flex-1 overflow-y-auto">
           <AnimatePresence mode="wait">
             {isNoWorkspaceActive && ["overview", "graph", "schema", "documents", "keys"].includes(activeTab) ? (
@@ -1664,11 +1673,6 @@ export default function DashboardClient() {
               setActiveTab={setActiveTab}
               setExtractionProjectId={setExtractionProjectId}
             />
-          ) : activeTab === "extraction" ? (
-            <ExtractionTab
-              projectId={extractionProjectId}
-              onExit={() => setActiveTab("workspace")}
-            />
           ) : activeTab === "graph" ? (
             <GraphTab key="graph" />
           ) : activeTab === "schema" ? (
@@ -1704,6 +1708,16 @@ export default function DashboardClient() {
           )}
         </AnimatePresence>
         </div>
+        ) : (
+          <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden bg-[#090a0f]">
+            <ExtractionTab
+              projectId={extractionProjectId}
+              onExit={() => {
+                setActiveTab("workspace");
+              }}
+            />
+          </div>
+        )}
 
         {/* SEARCH MODAL OVERLAY */}
         <AnimatePresence>
@@ -2069,6 +2083,25 @@ function WorkspaceTab({
 
   // Simulation progress state
   const [extractionProgress, setExtractionProgress] = useState<Record<string, number>>({});
+  const [regeneratingProjectId, setRegeneratingProjectId] = useState<string | null>(null);
+
+  const handleRegenerateDocs = (projId: string) => {
+    setRegeneratingProjectId(projId);
+    setTimeout(() => {
+      setRegeneratingProjectId(null);
+      setGlobalProjects(prev => prev.map(proj => {
+        if (proj.id === projId) {
+          return {
+            ...proj,
+            recentActivity: "Docs regenerated successfully just now",
+            docStatus: "KNOWLEDGE COMPLETE" as const,
+            completeness: 100
+          };
+        }
+        return proj;
+      }));
+    }, 2000);
+  };
 
   const simulateExtraction = (projectId: string) => {
     if (extractionProgress[projectId] === 100) return;
@@ -2117,7 +2150,9 @@ function WorkspaceTab({
       name: newProjName.trim(),
       color: newProjColor,
       description: newProjDesc.trim() || "A Momentum project knowledge base.",
-      recentActivity: "Project created · Knowledge extraction not started"
+      recentActivity: "Project created · Knowledge extraction not started",
+      docStatus: "NEVER EXTRACTED",
+      completeness: 0
     };
 
     setGlobalProjects(prev => [...prev, newProj]);
@@ -2541,26 +2576,37 @@ function WorkspaceTab({
             const isEditing = editingId === p.id;
 
             // status badge & progress computation
-            let extractionStatus: "EXTRACTION NEEDED" | "IN PROGRESS" | "KNOWLEDGE COMPLETE" = "EXTRACTION NEEDED";
-            let completeness = 0;
+            let extractionStatus: "NEVER EXTRACTED" | "EXTRACTION NEEDED" | "IN PROGRESS" | "KNOWLEDGE COMPLETE" | "DOCS STALE" = p.docStatus || "NEVER EXTRACTED";
+            let completeness = p.completeness !== undefined ? p.completeness : 0;
             let documentationText = "Documentation · Never generated";
             let repoText = "No repo connected";
 
-            if (p.id === "proj-0" || p.name === "Momentum Dashboard") {
-              completeness = 68;
-              extractionStatus = "IN PROGRESS";
-              documentationText = "Documentation · Generated 12m ago";
-              repoText = "github.com/momentum-docs/core · main";
-            } else if (p.recentActivity?.includes("Knowledge capture complete") || p.recentActivity?.includes("Extraction Complete") || p.recentActivity?.includes("complete")) {
+            if (p.id === "momentum-core" || p.name === "Momentum Core" || p.name === "Momentum Dashboard" || p.id === "proj-0" || p.name === "TEST PROJECT") {
+              extractionStatus = p.docStatus || "DOCS STALE";
+              completeness = p.completeness !== undefined ? p.completeness : 87;
+              documentationText = "Documentation · Stale / Outdated";
+              repoText = "github.com/buildwithmomentum/site · main";
+            } else if (p.id === "chrome-extension" || p.name === "Context Capture Extension") {
+              extractionStatus = p.docStatus || "KNOWLEDGE COMPLETE";
+              completeness = p.completeness !== undefined ? p.completeness : 100;
+              documentationText = "Documentation · Generated 2h ago";
+              repoText = "github.com/buildwithmomentum/browser-ext · main";
+            } else if (p.id === "pricing-engine" || p.name === "Stripe Billing Engine") {
+              extractionStatus = p.docStatus || "EXTRACTION NEEDED";
+              completeness = p.completeness !== undefined ? p.completeness : 42;
+              documentationText = "Documentation · Never generated";
+              repoText = "github.com/buildwithmomentum/billing · main";
+            } else if (p.id === "marketing-site" || p.name === "Marketing & Blog") {
+              extractionStatus = p.docStatus || "NEVER EXTRACTED";
+              completeness = p.completeness !== undefined ? p.completeness : 0;
+              documentationText = "Documentation · Never generated";
+              repoText = "No repo connected";
+            }
+
+            if (p.recentActivity?.includes("Knowledge capture complete") || p.recentActivity?.includes("Extraction Complete") || p.recentActivity?.includes("complete")) {
               completeness = 100;
               extractionStatus = "KNOWLEDGE COMPLETE";
               documentationText = "Documentation · Generated just now";
-              repoText = `github.com/momentum-docs/${p.name.toLowerCase().replace(/[^a-z0-9]/g, "-")} · main`;
-            } else if (p.recentActivity?.includes("In Progress") || p.recentActivity?.includes("Extraction running")) {
-              extractionStatus = "IN PROGRESS";
-              completeness = 42;
-              documentationText = "Documentation · Extracting...";
-              repoText = "No repo connected";
             }
 
             const progress = extractionProgress[p.id];
@@ -2569,7 +2615,6 @@ function WorkspaceTab({
               if (progress === 100) {
                 extractionStatus = "KNOWLEDGE COMPLETE";
                 documentationText = "Documentation · Generated just now";
-                repoText = `github.com/momentum-docs/${p.name.toLowerCase().replace(/[^a-z0-9]/g, "-")} · main`;
               } else {
                 extractionStatus = "IN PROGRESS";
                 documentationText = `Documentation · Extracting (${progress}%)`;
@@ -2668,21 +2713,70 @@ function WorkspaceTab({
                         </div>
                       </div>
                     ) : (
-                      <div className="mb-6">
-                        <h3 className="text-base font-bold font-sans text-[var(--text-primary)] tracking-tight mb-2">
+                      <div className="mb-2.5">
+                        <h3 className="text-sm font-bold font-sans text-[var(--text-primary)] tracking-tight mb-1">
                           {p.name}
                         </h3>
-                        <p className="text-xs text-[var(--text-muted)] leading-relaxed h-[36px] overflow-hidden text-ellipsis line-clamp-2">
-                          {p.description || "A Momentum project knowledge base with nested graphs and documentation."}
-                        </p>
+                        {(() => {
+                          const isDescEmptyOrDuplicate = !p.description || p.description.trim() === "" || p.description.trim().toLowerCase() === p.name.trim().toLowerCase();
+                          return isDescEmptyOrDuplicate ? (
+                            <p className="text-[11px] text-[var(--text-muted)] italic leading-relaxed select-none">
+                              No description added yet
+                            </p>
+                          ) : (
+                            <p className="text-[11px] text-[var(--text-secondary)] line-clamp-2 leading-relaxed">
+                              {p.description}
+                            </p>
+                          );
+                        })()}
                       </div>
                     )}
+
+                    {/* TECH STACK TAGS SECTION */}
+                    {(() => {
+                      let tagsToRender: string[] = [];
+                      const upperName = p.name.trim().toUpperCase();
+                      if (upperName === "MOMENTUM CORE" || p.id === "momentum-core" || p.id === "proj-0" || p.name === "TEST PROJECT") {
+                        tagsToRender = ["Next.js", "Node.js", "PostgreSQL"];
+                      } else if (p.id === "test2" || upperName === "test2" || upperName === "TEST2") {
+                        tagsToRender = ["Draft"];
+                      } else if (p.id === "chrome-extension") {
+                        tagsToRender = ["React", "TypeScript", "Chrome API"];
+                      } else if (p.id === "pricing-engine") {
+                        tagsToRender = ["Node.js", "Stripe", "PostgreSQL"];
+                      } else if (p.id === "marketing-site") {
+                        tagsToRender = ["Next.js", "Tailwind", "MDX"];
+                      }
+                      
+                      return (
+                        <div className="flex flex-wrap items-center gap-1.5 mb-2.5 select-none h-[18px] overflow-hidden">
+                          {tagsToRender.length > 0 ? (
+                            tagsToRender.map(tag => (
+                              <span 
+                                key={tag} 
+                                className={`text-[8px] font-mono uppercase px-2 py-0.5 rounded-full bg-[var(--bg-surface)] leading-none font-bold border ${
+                                  tag === "Draft" 
+                                    ? "text-neutral-500 border-neutral-500/20" 
+                                    : "text-[var(--text-secondary)] border-[var(--border)]"
+                                }`}
+                              >
+                                {tag}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-[8px] font-mono uppercase px-2 py-0.5 rounded-full bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border)] leading-none italic">
+                              No stack defined
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   <div>
                     {/* MIDDLE SECTION — Knowledge Status */}
-                    <div className="border-t border-[var(--border)] pt-4 mt-2">
-                      <div className="space-y-2 mb-4">
+                    <div className="border-t border-[var(--border)] pt-2.5 mt-1.5">
+                      <div className="space-y-1.5 mb-2.5">
                         <div className="flex justify-between items-center text-[10px] font-mono">
                           <span className="text-[var(--text-secondary)] font-medium">Knowledge Completeness</span>
                           <span className="font-bold text-[var(--text-primary)]">{completeness}%</span>
@@ -2700,11 +2794,11 @@ function WorkspaceTab({
                         </div>
 
                         {/* Connected status rows */}
-                        <div className="flex flex-col gap-1 pt-1">
-                          <span className="text-[11px] text-[var(--text-muted)]">
+                        <div className="flex flex-col gap-0.5 pt-0.5">
+                          <span className="text-[10px] text-[var(--text-muted)]">
                             {documentationText}
                           </span>
-                          <span className="text-[10px] font-mono text-[var(--text-muted)] truncate">
+                          <span className="text-[9px] font-mono text-[var(--text-muted)] truncate">
                             {repoText === "No repo connected" ? (
                               <span className="opacity-60">{repoText}</span>
                             ) : (
@@ -2718,8 +2812,8 @@ function WorkspaceTab({
                       <span className="text-[8px] uppercase tracking-wider font-mono text-[var(--text-muted)] font-bold block mb-1">
                         RECENT ACTIVITY
                       </span>
-                      <div className="flex items-center gap-2 p-2 rounded-xl bg-[var(--bg)]/30 border border-[var(--border)] font-mono text-[9px] text-[var(--text-secondary)] leading-tight mb-4 select-none">
-                        <Activity className="w-3.5 h-3.5 shrink-0" style={{ color: p.color }} />
+                      <div className="flex items-center gap-1.5 p-1.5 rounded-lg bg-[var(--bg)]/30 border border-[var(--border)] font-mono text-[9px] text-[var(--text-secondary)] leading-tight mb-3 select-none">
+                        <Activity className="w-3 h-3 shrink-0" style={{ color: p.color }} />
                         <span className="truncate">{p.recentActivity || "No records initialized."}</span>
                       </div>
 
@@ -2741,26 +2835,79 @@ function WorkspaceTab({
                             </button>
                           </div>
                         ) : (
-                          <div className="flex flex-col gap-2 w-full mt-1">
-                            {/* Primary Button full-width style */}
-                            <button
-                              onClick={() => {
-                                setExtractionProjectId(p.id);
-                                setActiveTab("extraction");
-                              }}
-                              className="w-full group/btn flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white [html.dark_&]:bg-neutral-900 border border-[var(--border)] hover:border-[var(--accent)] text-black [html.dark_&]:text-white text-xs font-semibold uppercase tracking-wider transition-all duration-300 cursor-pointer shadow-sm active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none"
-                            >
-                              {completeness > 0 && completeness < 100 ? (
-                                <span>Resume Knowledge Extraction ({completeness}%)</span>
-                              ) : extractionStatus === "KNOWLEDGE COMPLETE" ? (
-                                <span>Explore Knowledge Graph ↗</span>
-                              ) : (
+                          <div className="flex flex-col gap-2.5 w-full mt-1">
+                            {/* Context-aware Primary Button */}
+                            {extractionStatus === "NEVER EXTRACTED" && (
+                              <motion.button 
+                                whileHover={{ scale: 1.01 }} 
+                                whileTap={{ scale: 0.99 }}
+                                onClick={() => {
+                                  setExtractionProjectId(p.id);
+                                  setActiveTab("extraction");
+                                }}
+                                className="w-full py-2 bg-[var(--text-primary)] hover:bg-white text-[var(--bg)] text-[11px] font-bold rounded-lg transition-colors leading-none flex items-center justify-center gap-1.5 cursor-pointer border-none font-mono tracking-wide uppercase select-none font-semibold shadow-sm"
+                              >
                                 <span>Begin Knowledge Extraction</span>
-                              )}
-                              <span className="w-5 h-5 rounded-full bg-black/5 dark:bg-white/10 flex items-center justify-center shrink-0">
-                                <Plus className="w-3 h-3 text-[var(--accent)] group-hover/btn:scale-110 transition-transform" />
-                              </span>
-                            </button>
+                                <ArrowRight className="w-3.5 h-3.5" />
+                              </motion.button>
+                            )}
+
+                            {extractionStatus === "EXTRACTION NEEDED" && (
+                              <motion.button 
+                                whileHover={{ scale: 1.01 }} 
+                                whileTap={{ scale: 0.99 }}
+                                onClick={() => {
+                                  setExtractionProjectId(p.id);
+                                  setActiveTab("extraction");
+                                }}
+                                className="w-full py-2 bg-amber-500/[0.04] hover:bg-amber-500/[0.08] text-amber-500 border border-amber-500/25 hover:border-amber-500/40 text-[11px] font-bold rounded-lg transition-all leading-none flex items-center justify-center gap-1.5 cursor-pointer font-mono tracking-wide uppercase select-none font-semibold shadow-sm animate-pulse"
+                              >
+                                <span>Continue Extraction</span>
+                                <ArrowRight className="w-3.5 h-3.5" />
+                              </motion.button>
+                            )}
+
+                            {extractionStatus === "KNOWLEDGE COMPLETE" && (
+                              <motion.button 
+                                whileHover={{ scale: 1.01 }} 
+                                whileTap={{ scale: 0.99 }}
+                                onClick={() => {
+                                  setActiveGlobalProject(p.name);
+                                  setActiveTab("graph");
+                                }}
+                                className="w-full py-2 bg-[var(--text-primary)] hover:bg-white text-[var(--bg)] text-[11px] font-bold rounded-lg transition-colors leading-none flex items-center justify-center gap-1.5 cursor-pointer border-none font-mono tracking-wide uppercase select-none font-semibold shadow-sm"
+                              >
+                                <span>Explore Knowledge Graph</span>
+                                <ArrowUpRight className="w-3.5 h-3.5" />
+                              </motion.button>
+                            )}
+
+                            {extractionStatus === "DOCS STALE" && (
+                              <div className="flex flex-col gap-2 w-full">
+                                <motion.button 
+                                  whileHover={{ scale: 1.01 }} 
+                                  whileTap={{ scale: 0.99 }}
+                                  disabled={regeneratingProjectId === p.id}
+                                  onClick={() => handleRegenerateDocs(p.id)}
+                                  className="w-full py-2 bg-[var(--text-primary)] hover:bg-white text-[var(--bg)] text-[11px] font-bold rounded-lg transition-colors leading-none flex items-center justify-center gap-1.5 cursor-pointer border-none font-mono tracking-wide uppercase select-none font-semibold disabled:opacity-50"
+                                >
+                                  <RefreshCw className={`w-3.5 h-3.5 ${regeneratingProjectId === p.id ? "animate-spin" : ""}`} />
+                                  <span>{regeneratingProjectId === p.id ? "Regenerating..." : "Regenerate Docs"}</span>
+                                </motion.button>
+                                <motion.button 
+                                  whileHover={{ scale: 1.01 }} 
+                                  whileTap={{ scale: 0.99 }}
+                                  onClick={() => {
+                                    setActiveGlobalProject(p.name);
+                                    setActiveTab("graph");
+                                  }}
+                                  className="w-full py-2 bg-transparent hover:bg-white/5 border border-white/10 hover:border-white/20 text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-[11px] font-bold rounded-lg transition-colors leading-none flex items-center justify-center gap-1.5 cursor-pointer font-mono tracking-wide uppercase select-none font-semibold shadow-sm"
+                                >
+                                  <span>View Knowledge Graph</span>
+                                  <ArrowUpRight className="w-3.5 h-3.5" />
+                                </motion.button>
+                              </div>
+                            )}
 
                             {/* Secondary Row: Edit Project & Delete side-by-side */}
                             <div className="flex items-center gap-2 w-full text-[11px]">

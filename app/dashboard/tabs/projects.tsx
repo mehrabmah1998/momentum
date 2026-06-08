@@ -2,18 +2,22 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { useRouter } from "next/navigation";
 import {
   FolderGit2,
   ChevronDown,
   Plus,
   ArrowRight,
+  ArrowUpRight,
+  RefreshCw,
   GitPullRequest,
   CheckCircle2,
   X,
   FileText,
   Network,
   Clock,
-  Sparkles
+  Sparkles,
+  Check
 } from "lucide-react";
 
 interface Project {
@@ -80,11 +84,30 @@ const mockProjects: Project[] = [
   }
 ];
 
-export default function ProjectsTab() {
+export default function ProjectsTab({ onSelectTab, setActiveGlobalProject }: { onSelectTab?: (tab: string) => void; setActiveGlobalProject?: (name: string) => void } = {}) {
+  const router = useRouter();
   const [projects, setProjects] = useState<Project[]>(mockProjects);
   const [activeProjectId, setActiveProjectId] = useState("momentum-core");
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
   const [showSwitcherDropdown, setShowSwitcherDropdown] = useState(false);
+  const [regeneratingProjectId, setRegeneratingProjectId] = useState<string | null>(null);
+
+  const handleRegenerateDocs = (projId: string) => {
+    setRegeneratingProjectId(projId);
+    setTimeout(() => {
+      setRegeneratingProjectId(null);
+      setProjects(prev => prev.map(p => {
+        if (p.id === projId) {
+          return {
+            ...p,
+            lastGenerated: "Just now",
+            lastActivity: "Just now"
+          };
+        }
+        return p;
+      }));
+    }, 2000);
+  };
   
   // Modal state
   const [newName, setNewName] = useState("");
@@ -261,88 +284,235 @@ export default function ProjectsTab() {
       )}
 
       {/* PROJECTS GRID */}
-      {otherProjects.length > 0 && (
-        <>
-          <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-muted)] font-bold mb-4">
-            Other Projects
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            {otherProjects.map((proj, idx) => (
-              <motion.div
-                key={proj.id}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="bg-[var(--bg-card)] border border-[var(--border)] rounded-[1.5rem] p-6 hover:border-[var(--border-hover)] transition-colors flex flex-col justify-between group h-full"
-              >
-                {/* TOP ROW */}
-                <div className="mb-5">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center border border-[var(--border)] font-bold text-lg font-mono" style={{ backgroundColor: proj.color + "15", color: proj.color }}>
-                        {proj.name.charAt(0)}
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-[var(--text-primary)] whitespace-nowrap overflow-hidden text-ellipsis max-w-[200px]">{proj.name}</h3>
-                        <div className="flex gap-1.5 mt-1">
-                          {proj.techStack.slice(0, 3).map(tag => (
-                            <span key={tag} className="text-[9px] px-1.5 py-0.5 rounded bg-[var(--bg-surface)] text-[var(--text-secondary)] border border-[var(--border)] font-mono">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <span className={`text-[9px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full border font-bold shrink-0 ${getStatusColor(proj.docStatus)}`}>
-                      {proj.docStatus}
+      <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-muted)] font-bold mb-4 select-none">
+        All Projects
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+        {projects.map((proj, idx) => {
+          const isActive = proj.id === activeProjectId;
+          const isDescEmptyOrDuplicate = !proj.description || proj.description.trim() === "" || proj.description.trim().toLowerCase() === proj.name.trim().toLowerCase();
+          
+          let tagsToRender: string[] = [];
+          const upperName = proj.name.trim().toUpperCase();
+          if (upperName === "TEST PROJECT") {
+            tagsToRender = ["Next.js", "Node.js", "PostgreSQL"];
+          } else if (proj.id === "test2" || upperName === "test2" || upperName === "TEST2") {
+            tagsToRender = ["Draft"];
+          } else if (proj.techStack && proj.techStack.length > 0) {
+            tagsToRender = proj.techStack;
+          }
+
+          return (
+            <motion.div
+              key={proj.id}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.05, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className={`bg-[var(--bg-card)] border ${
+                isActive ? "border-[var(--accent)]/40 relative shadow-[0_8px_20px_rgba(6,182,212,0.03)]" : "border-[var(--border)]"
+              } rounded-[1.5rem] p-5 hover:border-[var(--border-hover)] transition-all flex flex-col justify-start group h-full`}
+            >
+              {/* Top accent glow line for active card */}
+              {isActive && (
+                <div className="absolute top-0 inset-x-0 h-[1.5px] bg-gradient-to-r from-[var(--accent)]/50 via-transparent to-transparent pointer-events-none" />
+              )}
+
+              {/* TITLE VIEW & STAUS BADGES */}
+              <div className="flex items-start justify-between gap-3 mb-2.5 select-none">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center border border-[var(--border)] font-bold text-lg font-mono shrink-0" style={{ backgroundColor: proj.color + "15", color: proj.color }}>
+                    {proj.name.charAt(0)}
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="font-bold text-[var(--text-primary)] whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]">{proj.name}</h3>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2 shrink-0">
+                  {isActive && (
+                    <span className="text-[9px] font-mono uppercase tracking-[0.15em] px-2.5 py-0.5 rounded-full bg-[var(--accent)]/15 border border-[var(--accent)]/30 text-[var(--accent)] font-extrabold select-none animate-pulse">
+                      ACTIVE
                     </span>
-                  </div>
+                  )}
+                  <span className={`text-[9px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full border font-bold shrink-0 ${getStatusColor(proj.docStatus)}`}>
+                    {proj.docStatus}
+                  </span>
                 </div>
+              </div>
 
-                {/* MIDDLE ROW */}
-                <div className="mb-6 space-y-3">
-                  <div>
-                    <div className="flex justify-between text-[11px] mb-1.5 font-medium">
-                      <span className="text-[var(--text-secondary)]">Knowledge Completeness</span>
-                      <span className="font-mono text-[var(--text-primary)]">{proj.completeness}%</span>
-                    </div>
-                    <div className="h-1.5 bg-[var(--bg-surface)] rounded-full overflow-hidden border border-[var(--border)]">
-                      <div className="h-full rounded-full transition-all duration-1000 ease-out" style={{ width: proj.completeness + "%", backgroundColor: proj.color }} />
-                    </div>
-                  </div>
-                  
-                  <div className="text-[11px] text-[var(--text-muted)] flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5" />
-                    <span>Docs · Last generated {proj.lastGenerated}</span>
-                  </div>
-                  <div className="text-[11px] text-[var(--text-muted)] flex items-center gap-1.5 font-mono">
-                    <GitPullRequest className="w-3.5 h-3.5" />
-                    <span className="truncate">{proj.repo}</span>
-                  </div>
-                </div>
+              {/* DESCRIPTION SECTION */}
+              <div className="mb-2.5">
+                {isDescEmptyOrDuplicate ? (
+                  <p className="text-[13px] text-[var(--text-muted)] italic leading-relaxed select-none">
+                    No description added yet
+                  </p>
+                ) : (
+                  <p className="text-[13px] text-[var(--text-secondary)] line-clamp-2 leading-relaxed">
+                    {proj.description}
+                  </p>
+                )}
+              </div>
 
-                {/* BOTTOM ROW */}
-                <div className="flex items-center justify-between pt-4 border-t border-[var(--border)] gap-2">
-                  <div className="flex gap-2">
-                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => setActiveProjectId(proj.id)} className="px-3 py-1.5 bg-[var(--text-primary)] hover:bg-white text-[var(--bg)] text-[11px] font-bold rounded-lg transition-colors leading-none">
-                      Open
-                    </motion.button>
-                    <button className="px-3 py-1.5 bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-primary)] text-[11px] font-semibold rounded-lg transition-colors leading-none">
-                      Generate
-                    </button>
-                    <button className="px-3 py-1.5 bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-primary)] text-[11px] font-semibold rounded-lg transition-colors leading-none hidden sm:block">
-                      Plan
-                    </button>
-                  </div>
-                  <div className="text-[10px] text-[var(--text-muted)] font-mono text-right whitespace-nowrap shrink-0">
-                    Active {proj.lastActivity}
-                  </div>
+              {/* TECH STACK TAGS SECTION */}
+              <div className="flex flex-wrap items-center gap-2 mb-2 select-none h-[22px] overflow-hidden">
+                {tagsToRender.length > 0 ? (
+                  tagsToRender.map(tag => (
+                    <span 
+                      key={tag} 
+                      className="text-[9px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-[var(--bg-surface)] text-[var(--text-secondary)] border border-[var(--border)] leading-none font-bold"
+                    >
+                      {tag}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-[9px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border)] leading-none italic">
+                    No stack defined
+                  </span>
+                )}
+              </div>
+
+              {/* COMPLETENESS PROGRESS BAR SECTION */}
+              <div className="mb-2.5 select-none">
+                <div className="flex justify-between text-[11px] mb-1.5 font-medium">
+                  <span className="text-[var(--text-secondary)]">Knowledge Completeness</span>
+                  <span className="font-mono text-[var(--text-primary)]">{proj.completeness}%</span>
                 </div>
-              </motion.div>
-            ))}
-          </div>
-        </>
-      )}
+                <div className="h-1.5 bg-[var(--bg-surface)] rounded-full overflow-hidden border border-[var(--border)]">
+                  <div className="h-full rounded-full transition-all duration-1000 ease-out" style={{ width: proj.completeness + "%", backgroundColor: proj.color }} />
+                </div>
+              </div>
+
+              {/* DOCUMENTATION STATUS SECTION */}
+              <div className="flex items-center gap-1.5 text-[11px] text-[var(--text-muted)] p-0 mb-2.5 h-[18px] max-h-[18px] select-none overflow-hidden">
+                <FileText className="shrink-0" style={{ width: '12px', height: '12px' }} />
+                <span className="truncate">Docs · Last generated {proj.lastGenerated}</span>
+              </div>
+
+              {/* RECENT ACTIVITY SECTION */}
+              <div className="flex items-center gap-1.5 text-[11px] text-[var(--text-muted)] font-mono max-w-full h-6 max-h-6 min-h-0 select-none overflow-hidden mb-3">
+                <Clock className="shrink-0" style={{ width: '12px', height: '12px' }} />
+                <span className="truncate text-ellipsis overflow-hidden whitespace-nowrap">Active {proj.lastActivity} · Connected {proj.repo}</span>
+              </div>
+
+              {/* ACTION BUTTONS SECTION (PINNED TO BOTTOM) */}
+              <div className="flex flex-col gap-3 pt-3 border-t border-[var(--border)] mt-auto select-none">
+                <div className="flex flex-wrap items-center justify-between gap-3 w-full">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* Render primary buttons based on docStatus */}
+                    {proj.docStatus === "NEVER EXTRACTED" && (
+                      <motion.button 
+                        whileHover={{ scale: 1.01 }} 
+                        whileTap={{ scale: 0.99 }}
+                        onClick={() => router.push(`/extraction/${proj.id}`)}
+                        className="px-3.5 py-2 bg-[var(--text-primary)] hover:bg-white text-[var(--bg)] text-[11px] font-bold rounded-lg transition-colors leading-none flex items-center gap-1.5 cursor-pointer border-none font-mono tracking-wide uppercase select-none font-semibold shadow-sm"
+                      >
+                        <span>Begin Knowledge Extraction</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </motion.button>
+                    )}
+
+                    {proj.docStatus === "EXTRACTION NEEDED" && (
+                      <motion.button 
+                        whileHover={{ scale: 1.01 }} 
+                        whileTap={{ scale: 0.99 }}
+                        onClick={() => router.push(`/extraction/${proj.id}`)}
+                        className="px-3.5 py-2 bg-amber-500/[0.04] hover:bg-amber-500/[0.08] text-amber-500 border border-amber-500/25 hover:border-amber-500/40 text-[11px] font-bold rounded-lg transition-all leading-none flex items-center gap-1.5 cursor-pointer font-mono tracking-wide uppercase select-none font-semibold shadow-sm animate-pulse"
+                      >
+                        <span>Continue Extraction</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </motion.button>
+                    )}
+
+                    {proj.docStatus === "KNOWLEDGE COMPLETE" && (
+                      <motion.button 
+                        whileHover={{ scale: 1.01 }} 
+                        whileTap={{ scale: 0.99 }}
+                        onClick={() => {
+                          localStorage.setItem("active_global_project_name", proj.name);
+                          setActiveProjectId(proj.id);
+                          if (onSelectTab) {
+                            onSelectTab("graph");
+                          } else if (setActiveGlobalProject) {
+                            setActiveGlobalProject(proj.name);
+                          }
+                        }}
+                        className="px-3.5 py-2 bg-[var(--text-primary)] hover:bg-white text-[var(--bg)] text-[11px] font-bold rounded-lg transition-colors leading-none flex items-center gap-1.5 cursor-pointer border-none font-mono tracking-wide uppercase select-none font-semibold shadow-sm"
+                      >
+                        <span>Explore Knowledge Graph</span>
+                        <ArrowUpRight className="w-3.5 h-3.5" />
+                      </motion.button>
+                    )}
+
+                    {proj.docStatus === "DOCS STALE" && (
+                      <div className="flex flex-col gap-2 w-full min-w-[210px]">
+                        <motion.button 
+                          whileHover={{ scale: 1.01 }} 
+                          whileTap={{ scale: 0.99 }}
+                          disabled={regeneratingProjectId === proj.id}
+                          onClick={() => handleRegenerateDocs(proj.id)}
+                          className="w-full justify-center px-4 py-2 bg-[var(--text-primary)] hover:bg-white text-[var(--bg)] text-[11px] font-bold rounded-lg transition-colors leading-none flex items-center gap-1.5 cursor-pointer border-none font-mono tracking-wide uppercase select-none font-semibold disabled:opacity-50"
+                        >
+                          <RefreshCw className={`w-3.5 h-3.5 ${regeneratingProjectId === proj.id ? "animate-spin" : ""}`} />
+                          <span>{regeneratingProjectId === proj.id ? "Regenerating..." : "Regenerate Docs"}</span>
+                        </motion.button>
+                        <motion.button 
+                          whileHover={{ scale: 1.01 }} 
+                          whileTap={{ scale: 0.99 }}
+                          onClick={() => {
+                            localStorage.setItem("active_global_project_name", proj.name);
+                            setActiveProjectId(proj.id);
+                            if (onSelectTab) {
+                              onSelectTab("graph");
+                            } else if (setActiveGlobalProject) {
+                              setActiveGlobalProject(proj.name);
+                            }
+                          }}
+                          className="w-full justify-center px-4 py-2 bg-transparent hover:bg-white/5 border border-white/10 hover:border-white/20 text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-[11px] font-bold rounded-lg transition-colors leading-none flex items-center gap-1.5 cursor-pointer font-mono tracking-wide uppercase select-none font-semibold shadow-sm"
+                        >
+                          <span>View Knowledge Graph</span>
+                          <ArrowUpRight className="w-3.5 h-3.5" />
+                        </motion.button>
+                      </div>
+                    )}
+
+                    {!isActive && (
+                      <button 
+                        onClick={() => {
+                          setActiveProjectId(proj.id);
+                          if (setActiveGlobalProject) {
+                            setActiveGlobalProject(proj.name);
+                          }
+                        }}
+                        className="px-3 py-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] text-[11px] font-semibold rounded-lg transition-colors leading-none bg-transparent hover:bg-white/5 border-none cursor-pointer focus:outline-none select-none font-sans"
+                      >
+                        Activate
+                      </button>
+                    )}
+                  </div>
+                  {proj.docStatus !== "DOCS STALE" && (
+                    <div className="text-[10px] text-[var(--text-muted)] font-mono text-right whitespace-nowrap shrink-0">
+                      Active {proj.lastActivity}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
+
+        {/* BOTTOM EMPTY STATE PROMPT CARD */}
+        {projects.length < 4 && (
+          <button
+            onClick={() => setShowNewProjectModal(true)}
+            className="border border-dashed border-[var(--border)] rounded-[1.5rem] p-6 hover:border-[var(--accent)]/50 hover:bg-white/[0.01] transition-all flex flex-col items-center justify-center text-center cursor-pointer min-h-[220px] h-full w-full bg-transparent outline-none focus:outline-none select-none"
+          >
+            <div className="w-8 h-8 rounded-full border border-[var(--border)] flex items-center justify-center mb-2 mx-auto text-[var(--text-muted)]">
+              <Plus className="w-4 h-4" />
+            </div>
+            <span className="text-xs font-sans text-[var(--text-muted)] font-medium">Add another project</span>
+          </button>
+        )}
+      </div>
 
       {/* NEW PROJECT MODAL */}
       <AnimatePresence>

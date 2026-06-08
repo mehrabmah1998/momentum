@@ -34,276 +34,44 @@ interface Edge {
 
 // --- Mock Data ---
 const NODES: Node[] = [
-  // MODULES — large, spaced around the canvas
-  { 
-    id: "m1", 
-    type: "Module", 
-    label: "Knowledge Graph", 
-    x: 420, 
-    y: 200, 
-    description: "Core graph engine. Stores all nodes and edges, routes new input through the mind map, and powers the semantic search that drives prompt generation.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "m2", 
-    type: "Module", 
-    label: "Extraction Engine", 
-    x: 180, 
-    y: 340, 
-    description: "Conducts dynamic extraction interviews. Generates targeted questions, validates answer quality, detects saturation, and routes confirmed claims into the graph.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "m3", 
-    type: "Module", 
-    label: "Document Engine", 
-    x: 660, 
-    y: 340, 
-    description: "Renders three document types (Insider, AI, Public) from the knowledge graph on demand. All documents are always consistent with the current graph state.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "m4", 
-    type: "Module", 
-    label: "Auth & Teams", 
-    x: 250, 
-    y: 510, 
-    description: "Handles user authentication, organization management, and role-based access control. Supports Owner, Admin, Editor, and Viewer roles.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "m5", 
-    type: "Module", 
-    label: "Prompt Engine", 
-    x: 600, 
-    y: 500, 
-    description: "Generates structured prompts for AI builders. Traverses the graph semantically, selects the most relevant nodes, and formats context for Claude Code, Codex, etc.", 
-    status: "confirmed" 
-  },
+  // MODULES — widely spaced as anchors
+  { id:"m1", type:"Module", label:"Knowledge Graph", x:560, y:320, description:"Core graph engine. Stores all nodes and edges, routes new input through the mind map, and powers the semantic search that drives prompt generation.", status:"confirmed" },
+  { id:"m2", type:"Module", label:"Extraction Engine", x:180, y:320, description:"Conducts dynamic extraction interviews. Generates targeted questions, validates answer quality, detects saturation, and routes confirmed claims into the graph.", status:"confirmed" },
+  { id:"m3", type:"Module", label:"Document Engine", x:900, y:320, description:"Renders three document types (Insider, AI, Public) from the knowledge graph on demand. All documents are always consistent with the current graph state.", status:"confirmed" },
+  { id:"m4", type:"Module", label:"Auth & Teams", x:280, y:620, description:"Handles user authentication, organization management, and role-based access control.", status:"confirmed" },
+  { id:"m5", type:"Module", label:"Prompt Engine", x:760, y:600, description:"Generates structured prompts for AI builders. Traverses the graph semantically, selects the most relevant nodes.", status:"confirmed" },
 
-  // FEATURES
-  { 
-    id: "f1", 
-    type: "Feature", 
-    label: "Mind map routing", 
-    x: 340, 
-    y: 120, 
-    description: "AI reads the mind map section descriptions and scores each section for match against new input. Routes claims to the correct section.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "f2", 
-    type: "Feature", 
-    label: "Semantic search", 
-    x: 510, 
-    y: 110, 
-    description: "pgvector embeddings on all node descriptions. A feature request triggers similarity search — not a full graph scan.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "f3", 
-    type: "Feature", 
-    label: "Constellation view", 
-    x: 560, 
-    y: 200, 
-    description: "Spatial graph visualization. Modules are the largest nodes. Features orbit their parent. Edges are typed and colored.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "f4", 
-    type: "Feature", 
-    label: "Confidence health map", 
-    x: 480, 
-    y: 290, 
-    description: "Renders each mind map section as a color-coded tile based on the confidence distribution of nodes inside it. Shows trust level at a glance.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "f5", 
-    type: "Feature", 
-    label: "Dynamic questions", 
-    x: 90, 
-    y: 270, 
-    description: "Questions are generated per-turn based on what is still missing from the graph and what the user just said. Not a fixed script.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "f6", 
-    type: "Feature", 
-    label: "Quality gate", 
-    x: 160, 
-    y: 430, 
-    description: "Every answer is evaluated on specificity, completeness, rationale, actionability, and consistency before the claim is stored as a node.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "f7", 
-    type: "Feature", 
-    label: "Saturation detection", 
-    x: 80, 
-    y: 390, 
-    description: "Tracks information density per answer. Stops extraction when new claim ratio drops below 20% for 3 consecutive answers.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "f8", 
-    type: "Feature", 
-    label: "Insider document", 
-    x: 720, 
-    y: 260, 
-    description: "Full narrative. Every module, feature, decision, and constraint explained in detail with all rationale included.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "f9", 
-    type: "Feature", 
-    label: "AI document", 
-    x: 790, 
-    y: 350, 
-    description: "Structured and terse. Only non-obvious decisions, constraints, module relationships, and data flows. The advanced CLAUDE.md.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "f10", 
-    type: "Feature", 
-    label: "Public document", 
-    x: 720, 
-    y: 430, 
-    description: "Plain language. What the product does, who it is for, high-level modules. No sensitive architectural details.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "f11", 
-    type: "Feature", 
-    label: "Prompt structure", 
-    x: 680, 
-    y: 510, 
-    description: "Every generated prompt follows a fixed format: Project Context, What to Build, Constraints to Respect, Do Not Break, Files Likely Involved.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "f12", 
-    type: "Feature", 
-    label: "Context window builder", 
-    x: 550, 
-    y: 580, 
-    description: "Top N most relevant nodes by semantic similarity. Never sends the full graph. Ranked and filtered per request.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "f13", 
-    type: "Feature", 
-    label: "OAuth (Google, GitHub)", 
-    x: 160, 
-    y: 570, 
-    description: "Social sign-in via Google and GitHub. Redirect URI: /api/auth/callback/{provider}.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "f14", 
-    type: "Feature", 
-    label: "Role-based access", 
-    x: 320, 
-    y: 560, 
-    description: "Owner / Admin / Editor / Viewer. All edits go through agent validation regardless of role.", 
-    status: "confirmed" 
-  },
+  // FEATURES — orbiting their parent modules
+  { id:"f1", type:"Feature", label:"Mind map routing", x:440, y:160, description:"AI reads the mind map section descriptions and scores each section for match against new input.", status:"confirmed" },
+  { id:"f2", type:"Feature", label:"Semantic search", x:620, y:160, description:"pgvector embeddings on all node descriptions.", status:"confirmed" },
+  { id:"f3", type:"Feature", label:"Constellation view", x:720, y:220, description:"Spatial graph visualization.", status:"confirmed" },
+  { id:"f4", type:"Feature", label:"Confidence health map", x:700, y:340, description:"Renders each mind map section as a color-coded tile.", status:"confirmed" },
+  { id:"f5", type:"Feature", label:"Dynamic questions", x:80, y:200, description:"Questions generated per-turn based on what is missing from the graph.", status:"confirmed" },
+  { id:"f6", type:"Feature", label:"Quality gate", x:180, y:160, description:"Every answer evaluated on specificity, completeness, rationale, actionability.", status:"confirmed" },
+  { id:"f7", type:"Feature", label:"Saturation detection", x:80, y:380, description:"Tracks information density per answer.", status:"confirmed" },
+  { id:"f8", type:"Feature", label:"Insider document", x:1020, y:200, description:"Full narrative document.", status:"confirmed" },
+  { id:"f9", type:"Feature", label:"AI document", x:1100, y:320, description:"Structured and terse document for AI agents.", status:"confirmed" },
+  { id:"f10", type:"Feature", label:"Public document", x:1020, y:440, description:"Plain language public-facing document.", status:"confirmed" },
+  { id:"f11", type:"Feature", label:"Prompt structure", x:880, y:500, description:"Every generated prompt follows a fixed format.", status:"confirmed" },
+  { id:"f12", type:"Feature", label:"Context window builder", x:760, y:480, description:"Top N most relevant nodes by semantic similarity.", status:"confirmed" },
+  { id:"f13", type:"Feature", label:"OAuth (Google, GitHub)", x:160, y:580, description:"Social sign-in via Google and GitHub.", status:"confirmed" },
+  { id:"f14", type:"Feature", label:"Role-based access", x:380, y:660, description:"Owner / Admin / Editor / Viewer roles.", status:"confirmed" },
 
   // DECISIONS
-  { 
-    id: "d1", 
-    type: "Decision", 
-    label: "PostgreSQL + pgvector", 
-    x: 420, 
-    y: 310, 
-    description: "Graph nodes, embeddings, and all relational data in one store. Avoids a separate vector DB. pgvector handles semantic search.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "d2", 
-    type: "Decision", 
-    label: "Claude API", 
-    x: 300, 
-    y: 200, 
-    description: "Best long-context reasoning for extraction interviews and document generation. All agents use the same provider.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "d3", 
-    type: "Decision", 
-    label: "No document storage", 
-    x: 750, 
-    y: 160, 
-    description: "Documents are not stored statically. They are rendered from the graph on demand. Graph is always the source of truth.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "d4", 
-    type: "Decision", 
-    label: "Cloudflare D1 + better-auth", 
-    x: 140, 
-    y: 490, 
-    description: "Auth uses better-auth backed by Cloudflare D1. Chosen for Cloudflare Pages deployment model.", 
-    status: "confirmed" 
-  },
+  { id:"d1", type:"Decision", label:"PostgreSQL + pgvector", x:520, y:420, description:"Graph nodes, embeddings, and all relational data in one store.", status:"confirmed" },
+  { id:"d2", type:"Decision", label:"Claude API", x:280, y:200, description:"Best long-context reasoning for extraction interviews.", status:"confirmed" },
+  { id:"d3", type:"Decision", label:"No document storage", x:900, y:160, description:"Documents rendered from graph on demand.", status:"confirmed" },
+  { id:"d4", type:"Decision", label:"Cloudflare D1 + better-auth", x:100, y:560, description:"Auth uses better-auth backed by Cloudflare D1.", status:"confirmed" },
 
   // CONSTRAINTS
-  { 
-    id: "c1", 
-    type: "Constraint", 
-    label: "Graph = source of truth", 
-    x: 380, 
-    y: 390, 
-    description: "Documents can never contradict the knowledge graph. No edit is committed without passing the agent validation gate.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "c2", 
-    type: "Constraint", 
-    label: "Quality gate is blocking", 
-    x: 90, 
-    y: 170, 
-    description: "The hard floor of required mind map sections must be met before document generation is allowed. No bypass.", 
-    status: "confirmed" 
-  },
-  { 
-    id: "c3", 
-    type: "Constraint", 
-    label: "Prompts select context", 
-    x: 530, 
-    y: 430, 
-    description: "Generated prompts must never include the full knowledge graph. Only top-N semantically relevant nodes.", 
-    status: "confirmed" 
-  },
+  { id:"c1", type:"Constraint", label:"Graph = source of truth", x:660, y:440, description:"Documents can never contradict the knowledge graph.", status:"confirmed" },
+  { id:"c2", type:"Constraint", label:"Quality gate is blocking", x:80, y:300, description:"Hard floor of required sections must be met before doc generation.", status:"confirmed" },
+  { id:"c3", type:"Constraint", label:"Prompts select context", x:860, y:460, description:"Generated prompts must never include the full knowledge graph.", status:"confirmed" },
 
   // ENTITIES
-  { 
-    id: "e1", 
-    type: "Entity", 
-    label: "Node", 
-    x: 310, 
-    y: 290, 
-    description: "id, section_id, type, name, description, rationale, status (proposed|confirmed|deprecated), confidence (human-confirmed|ai-suggested|git-inferred), created_by, updated_at", 
-    status: "confirmed" 
-  },
-  { 
-    id: "e2", 
-    type: "Entity", 
-    label: "Edge", 
-    x: 450, 
-    y: 390, 
-    description: "from_node_id, to_node_id, relationship (belongs_to|depends_on|constrained_by|governs|uses|conflicts_with), created_at", 
-    status: "confirmed" 
-  },
-  { 
-    id: "e3", 
-    type: "Entity", 
-    label: "Project", 
-    x: 420, 
-    y: 470, 
-    description: "id, org_id, name, description, created_at, updated_at, mind_map_version", 
-    status: "confirmed" 
-  },
+  { id:"e1", type:"Entity", label:"Node", x:460, y:320, description:"id, section_id, type, name, description, rationale, status, confidence", status:"confirmed" },
+  { id:"e2", type:"Entity", label:"Edge", x:560, y:480, description:"from_node_id, to_node_id, relationship, created_at", status:"confirmed" },
+  { id:"e3", type:"Entity", label:"Project", x:420, y:500, description:"id, org_id, name, description, created_at, updated_at", status:"confirmed" },
 ];
 
 const EDGES: Edge[] = [
@@ -360,12 +128,12 @@ const NODE_STYLES: Record<string, { color: string; badgeClass: string }> = {
 };
 
 const EDGE_STYLES: Record<string, { color: string; opacity: number; width: number; dashed: boolean }> = {
-  belongs_to: { color: "#4f8ef7", opacity: 0.3, width: 1, dashed: false },
-  depends_on: { color: "#a78bfa", opacity: 0.4, width: 1, dashed: true },
-  governs: { color: "#f59e0b", opacity: 0.4, width: 1, dashed: false },
-  constrained_by: { color: "#f87171", opacity: 0.4, width: 1, dashed: false },
+  belongs_to: { color: "#4f8ef7", opacity: 0.35, width: 1.5, dashed: false },
+  depends_on: { color: "#a78bfa", opacity: 0.45, width: 1.5, dashed: true },
+  governs: { color: "#f59e0b", opacity: 0.5, width: 2, dashed: false },
+  constrained_by: { color: "#f87171", opacity: 0.5, width: 2, dashed: false },
   uses: { color: "#34d399", opacity: 0.3, width: 1, dashed: false },
-  conflicts_with: { color: "#ef4444", opacity: 0.6, width: 2, dashed: true },
+  conflicts_with: { color: "#ef4444", opacity: 0.65, width: 2.5, dashed: true },
 };
 
 export default function GraphTab() {
@@ -376,7 +144,7 @@ export default function GraphTab() {
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<{ x: number; y: number; node: Node } | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>("All");
-  const [transform, setTransform] = useState({ x: 0, y: 0, scale: 1 });
+  const [transform, setTransform] = useState({ x: 0, y: 0, scale: 0.82 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
@@ -549,7 +317,13 @@ export default function GraphTab() {
               {opt !== "All" && (
                 <span className="w-2 h-2 rounded-full" style={{ backgroundColor: nodeColor }} />
               )}
-              <span>{opt}s</span>
+              <span>
+                {opt === "All"
+                  ? "All"
+                  : opt === "Entity"
+                  ? "Entities"
+                  : `${opt}s`}
+              </span>
             </button>
           );
         })}
@@ -565,7 +339,7 @@ export default function GraphTab() {
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
           onWheel={handleWheel}
-          className={`flex-1 relative overflow-hidden bg-[var(--bg)] border border-[var(--border)] rounded-2xl select-none parser-canvas min-h-[620px] max-h-[820px] flex justify-center items-center ${
+          className={`flex-1 relative overflow-hidden bg-[var(--bg)] border border-[var(--border)] rounded-2xl select-none parser-canvas min-h-[700px] max-h-[900px] flex justify-center items-center ${
             isDragging ? "cursor-grabbing" : "cursor-grab"
           }`}
           id="canvas-wrapper"
@@ -601,13 +375,18 @@ export default function GraphTab() {
           <svg
             width="100%"
             height="100%"
-            viewBox="0 0 900 620"
+            viewBox="0 0 1200 800"
             preserveAspectRatio="xMidYMid meet"
             id="svg-graph-frame"
             className="w-full h-full"
           >
+            <rect width="100%" height="100%" fill="url(#dotgrid)" />
             {/* SVG MARKERS/ARROWHEAD PROTOCOLS */}
             <defs>
+              <pattern id="dotgrid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+                <circle cx="1" cy="1" r="0.8" fill="rgba(255,255,255,0.04)" />
+              </pattern>
+
               {Object.entries(EDGE_STYLES).map(([key, value]) => (
                 <marker
                   key={key}
@@ -698,7 +477,13 @@ export default function GraphTab() {
                         <circle
                           cx={node.x}
                           cy={node.y}
-                          r={node.type === "Module" ? 44 : 26}
+                          r={
+                            node.type === "Module" ? 48 :
+                            node.type === "Feature" ? 20 :
+                            node.type === "Decision" ? 22 :
+                            node.type === "Constraint" ? 18 :
+                            28
+                          }
                           fill="none"
                           stroke="white"
                           strokeOpacity={0.6}
@@ -710,122 +495,37 @@ export default function GraphTab() {
                       {/* NODE SHAPE ENGINE */}
                       {node.type === "Module" ? (
                         <>
-                          <circle
-                            cx={node.x}
-                            cy={node.y}
-                            r={28}
-                            fill={color}
-                            fillOpacity={hoveredNode === node.id ? 0.3 : 0.15}
-                            stroke={color}
-                            strokeWidth={2}
-                          />
-                          <circle
-                            cx={node.x}
-                            cy={node.y}
-                            r={36}
-                            fill="none"
-                            stroke={color}
-                            strokeWidth={1.5}
-                            strokeOpacity={hoveredNode === node.id ? 0.6 : 0.4}
-                          />
-                          <text
-                            x={node.x}
-                            y={node.y}
-                            dy={47}
-                            className="font-mono text-[10px] font-bold fill-[var(--text-primary)] tracking-tight select-none pointer-events-none"
-                            textAnchor="middle"
-                          >
-                            {node.label}
-                          </text>
+                          <defs>
+                            <filter id={`glow-${node.id}`} x="-50%" y="-50%" width="200%" height="200%">
+                              <feGaussianBlur stdDeviation="8" result="blur" />
+                              <feFlood floodColor={color} floodOpacity="0.3" result="color" />
+                              <feComposite in="color" in2="blur" operator="in" result="glow" />
+                              <feMerge><feMergeNode in="glow" /><feMergeNode in="SourceGraphic" /></feMerge>
+                            </filter>
+                          </defs>
+                          <circle cx={node.x} cy={node.y} r={42} fill="none" stroke={color} strokeWidth={1} strokeOpacity={0.3} />
+                          <circle cx={node.x} cy={node.y} r={28} fill={color} fillOpacity={hoveredNode === node.id ? 0.35 : 0.18} stroke={color} strokeWidth={2.5} filter={`url(#glow-${node.id})`} />
+                          <text x={node.x} y={node.y + 58} className="font-mono" fontSize="11" fontWeight="bold" fill="white" textAnchor="middle" style={{pointerEvents:"none",userSelect:"none"}}>{node.label}</text>
                         </>
                       ) : node.type === "Feature" ? (
                         <>
-                          <circle
-                            cx={node.x}
-                            cy={node.y}
-                            r={16}
-                            fill={color}
-                            fillOpacity={hoveredNode === node.id ? 0.3 : 0.15}
-                            stroke={color}
-                            strokeWidth={1.5}
-                          />
-                          <text
-                            x={node.x}
-                            y={node.y}
-                            dy={28}
-                            className="font-mono text-[9px] fill-[var(--text-secondary)] select-none pointer-events-none"
-                            textAnchor="middle"
-                          >
-                            {node.label}
-                          </text>
+                          <circle cx={node.x} cy={node.y} r={14} fill={color} fillOpacity={hoveredNode === node.id ? 0.35 : 0.15} stroke={color} strokeWidth={1.5} />
+                          <text x={node.x} y={node.y + 26} fontSize="9" fill="rgba(255,255,255,0.6)" textAnchor="middle" style={{pointerEvents:"none",userSelect:"none"}}>{node.label}</text>
                         </>
                       ) : node.type === "Decision" ? (
                         <>
-                          <rect
-                            x={node.x - 14}
-                            y={node.y - 14}
-                            width={28}
-                            height={28}
-                            transform={`rotate(45, ${node.x}, ${node.y})`}
-                            fill={color}
-                            fillOpacity={hoveredNode === node.id ? 0.3 : 0.15}
-                            stroke={color}
-                            strokeWidth={1.5}
-                          />
-                          <text
-                            x={node.x}
-                            y={node.y}
-                            dy={29}
-                            className="font-mono text-[9px] fill-[var(--text-secondary)] select-none pointer-events-none"
-                            textAnchor="middle"
-                          >
-                            {node.label}
-                          </text>
+                          <rect x={node.x - 16} y={node.y - 16} width={32} height={32} transform={`rotate(45,${node.x},${node.y})`} fill={color} fillOpacity={hoveredNode === node.id ? 0.35 : 0.15} stroke={color} strokeWidth={1.5} />
+                          <text x={node.x} y={node.y + 32} fontSize="9" fill="rgba(255,255,255,0.6)" textAnchor="middle" style={{pointerEvents:"none",userSelect:"none"}}>{node.label}</text>
                         </>
                       ) : node.type === "Constraint" ? (
                         <>
-                          <circle
-                            cx={node.x}
-                            cy={node.y}
-                            r={14}
-                            fill={color}
-                            fillOpacity={hoveredNode === node.id ? 0.3 : 0.15}
-                            stroke={color}
-                            strokeWidth={1.5}
-                          />
-                          <text
-                            x={node.x}
-                            y={node.y}
-                            dy={25}
-                            className="font-mono text-[9px] fill-[var(--text-secondary)] select-none pointer-events-none"
-                            textAnchor="middle"
-                          >
-                            {node.label}
-                          </text>
+                          <circle cx={node.x} cy={node.y} r={12} fill={color} fillOpacity={hoveredNode === node.id ? 0.35 : 0.15} stroke={color} strokeWidth={1.5} />
+                          <text x={node.x} y={node.y + 24} fontSize="9" fill="#f87171" textAnchor="middle" style={{pointerEvents:"none",userSelect:"none"}}>{node.label}</text>
                         </>
                       ) : (
                         <>
-                          {/* Entity shape (rounded rect) */}
-                          <rect
-                            x={node.x - 18}
-                            y={node.y - 10}
-                            width={36}
-                            height={20}
-                            rx={4}
-                            fill={color}
-                            fillOpacity={hoveredNode === node.id ? 0.3 : 0.15}
-                            stroke={color}
-                            strokeWidth={1.5}
-                          />
-                          <text
-                            x={node.x}
-                            y={node.y}
-                            dy={24}
-                            className="font-mono text-[9px] fill-[var(--text-secondary)] select-none pointer-events-none"
-                            textAnchor="middle"
-                          >
-                            {node.label}
-                          </text>
+                          <rect x={node.x - 20} y={node.y - 11} width={40} height={22} rx={5} fill={color} fillOpacity={hoveredNode === node.id ? 0.35 : 0.15} stroke={color} strokeWidth={1.5} />
+                          <text x={node.x} y={node.y + 26} fontSize="9" fill="#34d399" textAnchor="middle" style={{pointerEvents:"none",userSelect:"none"}}>{node.label}</text>
                         </>
                       )}
                     </motion.g>
