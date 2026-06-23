@@ -29,7 +29,12 @@ import {
   FileText,
   Sparkles,
   Save,
-  CheckCircle2
+  CheckCircle2,
+  ArrowRight,
+  AlertTriangle,
+  X,
+  Info,
+  XCircle
 } from "lucide-react";
 
 type DocType = "insider" | "ai" | "public";
@@ -442,8 +447,10 @@ function renderContent(content: string, activeDocType: DocType): React.ReactNode
 
 export default function DocumentsTab({
   setIsSidebarCollapsed,
+  onNavigate,
 }: {
   setIsSidebarCollapsed?: (collapsed: boolean) => void;
+  onNavigate?: (tabId: string) => void;
 } = {}) {
   const [activeDocType, setActiveDocType] = useState<DocType>("insider");
   const [selectedPageId, setSelectedPageId] = useState<string>("mission-purpose");
@@ -455,6 +462,14 @@ export default function DocumentsTab({
   const [isSaving, setIsSaving] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Advanced Validation Agent States
+  const [isValidating, setIsValidating] = useState(false);
+  const [devPreviewCategory, setDevPreviewCategory] = useState<"additive" | "corrective" | "new_feature" | "contradictory">("additive");
+  const [validationModal, setValidationModal] = useState<{
+    isOpen: boolean;
+    category: "additive" | "corrective" | "new_feature" | "contradictory";
+  } | null>(null);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -542,15 +557,10 @@ export default function DocumentsTab({
   };
 
   // Find active Page and Section details
-  let activeSectionTitle = "";
-  let activePageTitle = "";
-  SECTIONS.forEach(sec => {
-    const found = sec.pages.find(p => p.id === selectedPageId);
-    if (found) {
-      activeSectionTitle = sec.title;
-      activePageTitle = found.title;
-    }
-  });
+  const activePage = SECTIONS.flatMap(s => s.pages).find(p => p.id === selectedPageId);
+  const activePageTitle = activePage ? activePage.title : "";
+  const activeSection = SECTIONS.find(sec => sec.pages.some(p => p.id === selectedPageId));
+  const activeSectionTitle = activeSection ? activeSection.title : "";
 
   const handleCopy = async () => {
     try {
@@ -562,19 +572,46 @@ export default function DocumentsTab({
     }
   };
 
+  const confirmSaveDraft = () => {
+    setPagesContent(prev => ({
+      ...prev,
+      [selectedPageId]: {
+        ...prev[selectedPageId],
+        [activeDocType]: editContent
+      }
+    }));
+    setHasUnsavedChanges(false);
+    setValidationModal(null);
+  };
+
   const handleSave = () => {
-    setIsSaving(true);
+    setIsValidating(true);
     setTimeout(() => {
-      setPagesContent(prev => ({
-        ...prev,
-        [selectedPageId]: {
-          ...prev[selectedPageId],
-          [activeDocType]: editContent
-        }
-      }));
-      setIsSaving(false);
-      setHasUnsavedChanges(false);
-    }, 1200);
+      setIsValidating(false);
+      
+      const currentCategory = devPreviewCategory;
+      setValidationModal({
+        isOpen: true,
+        category: currentCategory
+      });
+
+      // Aligned / Additive -> green; auto-confirms and saves.
+      if (currentCategory === "additive") {
+        setPagesContent(prev => ({
+          ...prev,
+          [selectedPageId]: {
+            ...prev[selectedPageId],
+            [activeDocType]: editContent
+          }
+        }));
+        setHasUnsavedChanges(false);
+
+        // Auto confirm and close after 1800ms
+        setTimeout(() => {
+          setValidationModal(prev => prev?.category === "additive" ? null : prev);
+        }, 1800);
+      }
+    }, 750);
   };
 
   const handleRegenerate = () => {
@@ -882,17 +919,50 @@ export default function DocumentsTab({
                 {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
               </button>
 
+              {/* Dev validation test toggles */}
+              {(viewMode === "edit" || viewMode === "split") && (
+                <div className="flex items-center gap-1 bg-black/10 dark:bg-white/[0.02] border border-[var(--border)] rounded-lg p-0.5 select-none text-[8px] font-mono font-bold text-[var(--text-muted)] mr-1">
+                  <span className="px-1.5 text-[var(--text-muted)] uppercase opacity-60">TEST:</span>
+                  {(["additive", "corrective", "new_feature", "contradictory"] as const).map(cat => {
+                    const isSelected = devPreviewCategory === cat;
+                    const label = cat === "additive" ? "Aligned" : cat === "corrective" ? "Corrective" : cat === "new_feature" ? "New" : "Conflict";
+                    return (
+                      <button
+                        key={cat}
+                        onClick={() => setDevPreviewCategory(cat)}
+                        className={`text-[8px] px-1.5 py-0.5 rounded transition-colors cursor-pointer border-none font-bold ${
+                          isSelected ? (
+                            cat === "additive" ? "bg-emerald-500/15 text-emerald-400 font-extrabold" :
+                            cat === "corrective" ? "bg-amber-500/15 text-amber-400 font-extrabold" :
+                            cat === "new_feature" ? "bg-blue-500/15 text-blue-400 font-extrabold" :
+                            "bg-rose-500/15 text-rose-400 font-extrabold"
+                          ) : "text-[var(--text-muted)] hover:text-[var(--text-secondary)] bg-transparent"
+                        }`}
+                        title={`Simulate ${cat} validation outcome`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
               {/* Save command button */}
               {(viewMode === "edit" || viewMode === "split") && (
                 <button
                   onClick={handleSave}
-                  disabled={isSaving}
+                  disabled={isSaving || isValidating}
                   className="rounded-lg text-white text-[10px] font-bold py-1.5 px-3.5 uppercase tracking-wider flex items-center gap-1.5 disabled:opacity-50 select-none cursor-pointer border-none shadow-md transition-all active:scale-[0.97]"
                   style={{ backgroundColor: themeColor }}
                 >
-                  {isSaving ? (
+                  {isValidating ? (
                     <>
-                      <Loader2 className="w-3 h-3 animate-spin" />
+                      <Loader2 className="w-3 h-3 animate-spin text-white" />
+                      <span>Verifying...</span>
+                    </>
+                  ) : isSaving ? (
+                    <>
+                      <Loader2 className="w-3 h-3 animate-spin text-white" />
                       <span>Syncing...</span>
                     </>
                   ) : (
@@ -909,8 +979,26 @@ export default function DocumentsTab({
           </div>
 
           {/* Inner Content writing/reading workspace container */}
-          <div className="flex-1 bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-6 relative overflow-hidden h-full min-h-[500px]">
+          <div className="flex-1 bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-6 relative overflow-hidden h-full min-h-[500px] flex flex-col">
             
+            {/* Needs input / empty banner */}
+            {activePage && activePage.completeness[activeDocType] < 90 && onNavigate && (
+              <div className="mb-4 bg-amber-500/[0.04] dark:bg-amber-500/[0.06] border border-amber-500/20 rounded-xl p-3 flex items-center justify-between gap-4 animate-fadeIn select-none">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0 animate-gpu" />
+                  <span className="text-xs text-[var(--text-secondary)] font-medium truncate font-sans">
+                    This section needs input — Resolve in interview
+                  </span>
+                </div>
+                <button
+                  onClick={() => onNavigate("interview")}
+                  className="shrink-0 text-xs text-[var(--accent)] hover:text-[var(--accent-hover)] font-mono font-bold transition-all flex items-center gap-1 focus:outline-none bg-transparent border-none p-0 cursor-pointer"
+                >
+                  <span>Resolve in interview &rarr;</span>
+                </button>
+              </div>
+            )}
+
             {/* Shimmer loading mask */}
             <AnimatePresence>
               {isGenerating && (
@@ -923,6 +1011,18 @@ export default function DocumentsTab({
                   <RefreshCw className="w-6 h-6 animate-spin mb-2" style={{ color: themeColor }} />
                   <span className="font-mono text-xs text-[var(--text-primary)] font-bold">REGENERATING DRAFT FROM GRAPH CONSTELLATION...</span>
                   <span className="font-mono text-[10px] text-[var(--text-muted)] mt-1">Verifying completeness index gates</span>
+                </motion.div>
+              )}
+              {isValidating && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 bg-[var(--bg-card)]/95 backdrop-blur-sm flex flex-col items-center justify-center z-20"
+                >
+                  <RefreshCw className="w-6 h-6 animate-spin mb-3 text-[var(--accent)]" style={{ color: themeColor }} />
+                  <span className="font-mono text-xs text-[var(--text-primary)] font-bold uppercase tracking-widest">G-VAL_AGENT: ANALYZING GRAFT CONGRUENCE...</span>
+                  <span className="font-mono text-[10px] text-[var(--text-muted)] mt-1.5 animate-pulse">Computing structural drift indices & rule gates</span>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -1215,6 +1315,163 @@ export default function DocumentsTab({
         </div>
 
       </div>
+
+      {/* Validation Result Modal Overlay */}
+      <AnimatePresence>
+        {validationModal && validationModal.isOpen && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4 select-none">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 320, damping: 26 }}
+              className="w-full max-w-lg bg-[var(--bg-surface)] p-[6px] rounded-[24px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] ring-1 ring-black/5 dark:ring-white/10"
+            >
+              <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-[18px] p-6 relative overflow-hidden flex flex-col justify-between">
+                
+                {/* Decorative Tech Grid/Line background */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[var(--border)] to-transparent opacity-10 pointer-events-none rounded-bl-full" />
+                <div className="absolute top-3 right-4 font-mono text-[8px] text-[var(--text-muted)] select-none uppercase tracking-widest font-bold">
+                  G-VAL // ACCURACY_PASS: {validationModal.category.toUpperCase()}
+                </div>
+
+                <div className="flex items-start gap-4 mb-5">
+                  {/* Category-based Icon/Styling in concentric circle */}
+                  <div className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-inner ${
+                    validationModal.category === "additive" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" :
+                    validationModal.category === "corrective" ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" :
+                    validationModal.category === "new_feature" ? "bg-blue-500/10 text-blue-400 border border-blue-500/20" :
+                    "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                  }`}>
+                    {validationModal.category === "additive" && <CheckCircle2 className="w-5 h-5" />}
+                    {validationModal.category === "corrective" && <AlertTriangle className="w-5 h-5 animate-pulse" />}
+                    {validationModal.category === "new_feature" && <Sparkles className="w-5 h-5 animate-spin" style={{ animationDuration: "3s" }} />}
+                    {validationModal.category === "contradictory" && <XCircle className="w-5 h-5" />}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <span className={`text-[10px] font-mono uppercase tracking-[0.15em] font-extrabold block mb-1 ${
+                      validationModal.category === "additive" ? "text-emerald-400" :
+                      validationModal.category === "corrective" ? "text-amber-400" :
+                      validationModal.category === "new_feature" ? "text-blue-400" :
+                      "text-rose-400"
+                    }`}>
+                      {validationModal.category === "additive" && "Aligned / Additive Check"}
+                      {validationModal.category === "corrective" && "Corrective Action Required"}
+                      {validationModal.category === "new_feature" && "New Entity Detected"}
+                      {validationModal.category === "contradictory" && "Graph Contradiction Block"}
+                    </span>
+                    
+                    <h3 className="text-base font-bold font-sans tracking-tight text-[var(--text-primary)] leading-snug mb-2">
+                      {validationModal.category === "additive" && "Aligned with Knowledge Graph"}
+                      {validationModal.category === "corrective" && "This changes existing knowledge inside the graph"}
+                      {validationModal.category === "new_feature" && "This introduces a completely new concept"}
+                      {validationModal.category === "contradictory" && "This conflicts with confirmed knowledge"}
+                    </h3>
+
+                    <p className="text-xs text-[var(--text-secondary)] leading-relaxed font-sans">
+                      {validationModal.category === "additive" && "Saved. Added detail to the knowledge graph."}
+                      {validationModal.category === "corrective" && "Your modifications alter established schema nodes or dependencies. Validate if this change represents the absolute system source of truth."}
+                      {validationModal.category === "new_feature" && "These edits define a completely new conceptual entity: 'Biometric Access Controller'. This entity must be structured before building."}
+                      {validationModal.category === "contradictory" && (
+                        <span>
+                          The validation agent found high semantic drift against the confirmed knowledge base constraints:
+                          <strong className="block mt-2 italic px-3 py-2 border border-rose-500/20 bg-rose-500/[0.04] rounded-lg text-rose-300 font-mono text-[10px]">
+                            &ldquo;The system uses a single database instance with no multi-region fallback.&rdquo;
+                          </strong>
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Simulated Telemetry Log stream inside modal */}
+                <div className="mb-6 p-3 rounded-xl bg-black/10 dark:bg-black/15 border border-[var(--border)] font-mono text-[10px] text-[var(--text-muted)] flex flex-col gap-1 leading-normal select-none">
+                  <div className="flex items-center justify-between text-[8px] opacity-60 border-b border-[var(--border)] pb-1 mb-1 font-bold">
+                    <span>AGENT METRIC DUMP</span>
+                    <span>PASS: OK</span>
+                  </div>
+                  <div>&gt;&gt;&gt; COMPILING CHANGES FOR: {selectedPageId.toUpperCase()}</div>
+                  <div>&gt;&gt;&gt; SECTOR_GAP_MATCH: {validationModal.category === "additive" ? "100.0%" : "34.2% (DIVERGENT)"}</div>
+                  <div>&gt;&gt;&gt; SCHEMA_COMPATIBILITY_SCORE: {validationModal.category === "contradictory" ? "10.0% (BLOCK)" : "100.0%"}</div>
+                </div>
+
+                {/* Footer Actions Based on Category */}
+                <div className="flex flex-col sm:flex-row items-center gap-2.5 justify-end">
+                  {validationModal.category === "additive" && (
+                    <button
+                      onClick={() => setValidationModal(null)}
+                      className="w-full sm:w-auto px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold font-sans transition-all active:scale-[0.98] cursor-pointer"
+                    >
+                      Dismiss (Auto-confirming...)
+                    </button>
+                  )}
+
+                  {validationModal.category === "corrective" && (
+                    <>
+                      <button
+                        onClick={() => {
+                          setValidationModal(null);
+                        }}
+                        className="w-full sm:w-auto px-4 py-2 bg-transparent hover:bg-black/5 dark:hover:bg-white/[0.04] text-xs font-semibold text-[var(--text-secondary)] border border-[var(--border)] rounded-xl transition-all cursor-pointer"
+                      >
+                        Keep document as written
+                      </button>
+                      <button
+                        onClick={confirmSaveDraft}
+                        className="w-full sm:w-auto px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold font-sans transition-all active:scale-[0.98] cursor-pointer animate-gpu"
+                      >
+                        Update the knowledge
+                      </button>
+                    </>
+                  )}
+
+                  {validationModal.category === "new_feature" && (
+                    <>
+                      <button
+                        onClick={() => setValidationModal(null)}
+                        className="w-full sm:w-auto px-4 py-2 bg-transparent hover:bg-black/5 dark:hover:bg-white/[0.04] text-xs font-semibold text-[var(--text-secondary)] border border-[var(--border)] rounded-xl transition-all cursor-pointer"
+                      >
+                        Keep Editing
+                      </button>
+                      {onNavigate && (
+                        <button
+                          onClick={() => {
+                            setValidationModal(null);
+                            onNavigate("interview");
+                          }}
+                          className="w-full sm:w-auto px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-xs font-bold font-sans flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] cursor-pointer animate-gpu"
+                        >
+                          <span>Define it in the interview</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </>
+                  )}
+
+                  {validationModal.category === "contradictory" && (
+                    <>
+                      <button
+                        onClick={() => setValidationModal(null)}
+                        className="w-full sm:w-auto px-4 py-2 bg-transparent hover:bg-black/5 dark:hover:bg-white/[0.04] text-xs font-semibold text-rose-400 border border-rose-500/20 rounded-xl transition-all cursor-pointer"
+                      >
+                        Fix the text
+                      </button>
+                      <button
+                        onClick={confirmSaveDraft}
+                        className="w-full sm:w-auto px-5 py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-bold font-sans transition-all active:scale-[0.98] cursor-pointer animate-gpu"
+                      >
+                        Update the knowledge base
+                      </button>
+                    </>
+                  )}
+                </div>
+
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
     </div>
   );

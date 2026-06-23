@@ -59,6 +59,8 @@ import InterviewTab from "./tabs/interview";
 import KeysTab from "./tabs/keys";
 import SettingsTab from "./tabs/settings";
 import ExtractionTab from "./tabs/extraction";
+import HealthTab from "./tabs/health";
+import FeaturesTab from "./tabs/features";
 
 const navItems = [
   { id: "documents", label: "Documents", icon: FileText },
@@ -1044,7 +1046,7 @@ export default function DashboardClient() {
 
                 <div className="flex items-center gap-3">
                   <button 
-                    onClick={() => setActiveTab("documents")}
+                    onClick={() => setActiveTab("interview")}
                     className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold uppercase tracking-wider transition-all duration-300 shadow-[0_4px_20px_-4px_var(--accent-glow)] active:scale-[0.98] cursor-pointer"
                   >
                     <MessageSquare className="w-3.5 h-3.5" />
@@ -1189,7 +1191,7 @@ export default function DashboardClient() {
                           </div>
 
                           <button 
-                            onClick={() => setActiveTab("documents")}
+                            onClick={() => setActiveTab("interview")}
                             className="text-[10px] font-mono text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors flex items-center gap-1 cursor-pointer bg-transparent border-none outline-none font-bold animate-gpu"
                           >
                             Resolve in interview &rarr;
@@ -1542,10 +1544,14 @@ export default function DashboardClient() {
             <GraphTab key="graph" />
           ) : activeTab === "schema" ? (
             <SchemaTab key="schema" />
+          ) : activeTab === "health" ? (
+            <HealthTab key="health" onNavigate={(tabId) => setActiveTab(tabId)} />
           ) : activeTab === "documents" ? (
-            <DocumentsTab key="documents" setIsSidebarCollapsed={setIsSidebarCollapsed} />
+            <DocumentsTab key="documents" setIsSidebarCollapsed={setIsSidebarCollapsed} onNavigate={(tabId) => setActiveTab(tabId)} />
           ) : activeTab === "interview" ? (
-            <InterviewTab key="interview" />
+            <InterviewTab key="interview" onNavigate={(tabId) => setActiveTab(tabId)} />
+          ) : activeTab === "features" ? (
+            <FeaturesTab key="features" onNavigate={(tabId) => setActiveTab(tabId)} />
           ) : activeTab === "keys" ? (
             <KeysTab key="keys" />
           ) : activeTab === "settings" ? (

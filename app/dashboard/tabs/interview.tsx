@@ -10,6 +10,7 @@ import {
   Sparkles,
   Clock,
   ArrowRight,
+  ArrowLeft,
   Shield,
   X,
   ChevronRight,
@@ -82,7 +83,7 @@ const INITIAL_COVERAGE: CoverageSection[] = [
 
 type FormatType = "open" | "options" | "examples" | "template" | "confirm" | "scale";
 
-export default function InterviewTab() {
+export default function InterviewTab({ onNavigate }: { onNavigate?: (tabId: string) => void } = {}) {
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   const [coverage, setCoverage] = useState<CoverageSection[]>(INITIAL_COVERAGE);
   const [selectedSection, setSelectedSection] = useState<string>("c2");
@@ -320,9 +321,18 @@ export default function InterviewTab() {
                     className="h-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] rounded-full transition-all duration-500 shadow-[0_0_8px_var(--accent-glow)] lg:shadow-none"
                   />
                 </div>
-                <p className="text-[10px] text-[var(--text-muted)] leading-relaxed">
+                <p className="text-[10px] text-[var(--text-muted)] leading-relaxed mb-4">
                   Momentum validates coherence thresholds automatically before triggering spec builds.
                 </p>
+                {onNavigate && (
+                  <button
+                    onClick={() => onNavigate("documents")}
+                    className="w-full py-2 bg-transparent hover:bg-black/5 dark:hover:bg-white/[0.04] text-xs font-semibold text-[var(--accent)] border border-[var(--border)] rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer outline-none active:scale-[0.98]"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span>Back to documents</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>

@@ -34,7 +34,7 @@ export interface ContextKey {
   status: "active" | "draft";
 }
 
-const CONTEXT_KEYS: ContextKey[] = [
+export const CONTEXT_KEYS: ContextKey[] = [
   {
     id: "core-stack",
     handle: "core-stack",
@@ -224,7 +224,7 @@ const CATEGORIES: { label: string; value: KeyCategory | "all" }[] = [
   { label: "People", value: "people" }
 ];
 
-const getCategoryBadgeStyle = (category: KeyCategory) => {
+export const getCategoryBadgeStyle = (category: KeyCategory) => {
   switch (category) {
     case "architecture":
       return "text-blue-400 bg-blue-500/[0.08] border-blue-500/20";
@@ -238,7 +238,7 @@ const getCategoryBadgeStyle = (category: KeyCategory) => {
   }
 };
 
-const getNodeTypeBadgeStyle = (type: string) => {
+export const getNodeTypeBadgeStyle = (type: string) => {
   switch (type) {
     case "Decision":
       return "text-[var(--accent)] bg-[var(--accent)]/[0.08] border-[var(--accent)]/20";

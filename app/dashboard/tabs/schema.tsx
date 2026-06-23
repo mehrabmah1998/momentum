@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 // --- Schema Types ---
-interface SchemaSection {
+export interface SchemaSection {
   id: string;
   label: string;
   type: "pre-defined" | "expandable" | "custom";
@@ -31,7 +31,7 @@ interface SchemaSection {
 }
 
 // --- Mind Map Schema Constant ---
-const SCHEMA: SchemaSection[] = [
+export const SCHEMA: SchemaSection[] = [
   {
     id: "organization",
     label: "Organization",
