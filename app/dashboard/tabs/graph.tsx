@@ -147,6 +147,7 @@ export default function GraphTab() {
   const [transform, setTransform] = useState({ x: 0, y: 0, scale: 0.82 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [dragStartTransform, setDragStartTransform] = useState({ x: 0, y: 0 });
 
   // Secondary states
   const [hoveredEdgeId, setHoveredEdgeId] = useState<string | null>(null);
@@ -166,16 +167,28 @@ export default function GraphTab() {
     const isInteractive = target.closest(".interactive-node") || target.closest("button");
     if (!isInteractive) {
       setIsDragging(true);
-      setDragStart({ x: e.clientX - transform.x, y: e.clientY - transform.y });
+      setDragStart({ x: e.clientX, y: e.clientY });
+      setDragStartTransform({ x: transform.x, y: transform.y });
     }
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (isDragging) {
+      const container = canvasRef.current;
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+
+      const dx = e.clientX - dragStart.x;
+      const dy = e.clientY - dragStart.y;
+
+      // Translate dragging distance from screen pixels into SVG coordinate units
+      const effScaleX = transform.scale * (rect.width / 1200);
+      const effScaleY = transform.scale * (rect.height / 800);
+
       setTransform(prev => ({
         ...prev,
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y,
+        x: dragStartTransform.x + dx / effScaleX,
+        y: dragStartTransform.y + dy / effScaleY,
       }));
     }
   };
@@ -184,14 +197,42 @@ export default function GraphTab() {
     setIsDragging(false);
   };
 
+  const zoomAtPoint = (factor: number, centerX?: number, centerY?: number) => {
+    const container = canvasRef.current;
+    if (!container) return;
+
+    const currentScale = transform.scale;
+    const targetScale = currentScale * factor;
+    const newScale = Math.max(0.4, Math.min(2.5, targetScale));
+
+    const scaleRatio = newScale / currentScale;
+
+    // Default to the center of the 1200x800 SVG coordinates (600, 400) if no coordinates are specified
+    const cx = centerX !== undefined ? centerX : 600;
+    const cy = centerY !== undefined ? centerY : 400;
+
+    setTransform(prev => ({
+      x: cx - (cx - prev.x) * scaleRatio,
+      y: cy - (cy - prev.y) * scaleRatio,
+      scale: newScale,
+    }));
+  };
+
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     e.preventDefault();
-    const zoomFactor = 1.08;
-    const newScale = e.deltaY < 0 ? transform.scale * zoomFactor : transform.scale / zoomFactor;
-    setTransform(prev => ({
-      ...prev,
-      scale: Math.max(0.4, Math.min(2.5, newScale)),
-    }));
+    const container = canvasRef.current;
+    if (!container) return;
+
+    const rect = container.getBoundingClientRect();
+    const clientX = e.clientX - rect.left;
+    const clientY = e.clientY - rect.top;
+
+    // Convert screen coordinates into the 1200x800 SVG viewBox coordinate system
+    const mouseX = (clientX / rect.width) * 1200;
+    const mouseY = (clientY / rect.height) * 800;
+
+    const factor = e.deltaY < 0 ? 1.08 : 1 / 1.08;
+    zoomAtPoint(factor, mouseX, mouseY);
   };
 
   // Node Interaction Handlers
@@ -347,7 +388,7 @@ export default function GraphTab() {
           {/* ZOOM CONTROLS */}
           <div className="absolute top-4 right-4 flex items-center gap-1.5 z-10" id="zoom-controls">
             <button
-              onClick={() => setTransform(prev => ({ ...prev, scale: Math.min(2.5, prev.scale + 0.15) }))}
+              onClick={() => zoomAtPoint(1.15)}
               className="w-8 h-8 rounded-lg bg-[var(--bg-card)] hover:bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-primary)] font-semibold flex items-center justify-center transition-colors shadow-sm cursor-pointer"
               id="zoom-in-btn"
               title="Zoom In"
@@ -355,7 +396,7 @@ export default function GraphTab() {
               <Plus className="w-3.5 h-3.5" />
             </button>
             <button
-              onClick={() => setTransform(prev => ({ ...prev, scale: Math.max(0.4, prev.scale - 0.15) }))}
+              onClick={() => zoomAtPoint(1 / 1.15)}
               className="w-8 h-8 rounded-lg bg-[var(--bg-card)] hover:bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-primary)] font-semibold flex items-center justify-center transition-colors shadow-sm cursor-pointer"
               id="zoom-out-btn"
               title="Zoom Out"
