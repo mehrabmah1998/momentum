@@ -49,6 +49,8 @@ export default function SettingsTab() {
   const [email, setEmail] = useState("alex@buildwithmomentum.io");
   const [orgName, setOrgName] = useState("BuildWithMomentum");
   const [orgMission, setOrgMission] = useState("Help technical founders maintain a single source of truth that makes AI tools dramatically more effective.");
+  const [orgVision, setOrgVision] = useState("To automate developer context alignment completely, enabling perfect software specifications generated dynamically.");
+  const [orgBrandVoice, setOrgBrandVoice] = useState("Empathetic, highly precise, clear, jargon-free, objective, and expert.");
   const [orgIndustry, setOrgIndustry] = useState("Developer Tools");
   const [orgWebsite, setOrgWebsite] = useState("https://buildwithmomentum.io");
   const [inviteEmail, setInviteEmail] = useState("");
@@ -354,6 +356,31 @@ export default function SettingsTab() {
                         />
                       </div>
 
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[10px] uppercase font-mono tracking-wider text-[var(--text-muted)] font-bold">
+                          Organization Vision
+                        </label>
+                        <textarea
+                          value={orgVision}
+                          onChange={(e) => setOrgVision(e.target.value)}
+                          className="bg-transparent border border-[var(--border)] focus:border-[var(--accent)] text-sm rounded-lg px-3 py-2 transition-colors outline-none text-[var(--text-primary)] placeholder-[var(--text-muted)] w-full resize-none h-20 leading-relaxed font-sans"
+                          placeholder="Organization core vision"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[10px] uppercase font-mono tracking-wider text-[var(--text-muted)] font-bold">
+                          Brand Voice / Tone
+                        </label>
+                        <input
+                          type="text"
+                          value={orgBrandVoice}
+                          onChange={(e) => setOrgBrandVoice(e.target.value)}
+                          className="bg-transparent border border-[var(--border)] focus:border-[var(--accent)] text-sm rounded-lg px-3 py-2 transition-colors outline-none text-[var(--text-primary)] placeholder-[var(--text-muted)] w-full font-sans text-sm"
+                          placeholder="Brand Voice / Tone (e.g. empathetic, highly precise)"
+                        />
+                      </div>
+
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1.5">
                           <label className="text-[10px] uppercase font-mono tracking-wider text-[var(--text-muted)] font-bold">
@@ -382,9 +409,30 @@ export default function SettingsTab() {
                         </div>
                       </div>
 
+                      {/* Read-only Personas and Goals Summary block */}
+                      <div className="border-t border-[var(--border)]/45 pt-4.5 flex flex-col gap-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-[10px] uppercase font-mono tracking-wider text-[var(--text-muted)] font-bold">
+                            Target Personas & Strategic Goals
+                          </label>
+                          <span className="text-[10px] font-mono text-[var(--accent)] font-semibold uppercase tracking-wider bg-[var(--accent)]/[0.06] px-2.5 py-0.5 rounded-full border border-[var(--accent)]/15">
+                            Edit these in the interview
+                          </span>
+                        </div>
+                        <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-3.5 flex flex-col gap-2">
+                          <div className="flex items-start gap-1.5 text-xs text-[var(--text-secondary)] font-medium font-sans">
+                            <span className="font-mono text-[9px] uppercase tracking-wider text-[var(--accent)] font-bold shrink-0 mt-0.5">Personas:</span>
+                            <span className="text-[11.5px]">Technical Founders, Software Architects, Engineering Leads, Product Managers</span>
+                          </div>
+                          <div className="flex items-start gap-1.5 text-xs text-[var(--text-secondary)] font-medium font-sans">
+                            <span className="font-mono text-[9px] uppercase tracking-wider text-[var(--accent)] font-bold shrink-0 mt-0.5">Goals:</span>
+                            <span className="text-[11.5px]">Maintain context alignment, produce direct-to-builder detailed specifications, minimize technical context creep</span>
+                          </div>
+                        </div>
+                      </div>
+
                       {/* Info Callout */}
                       <div className="mt-2 bg-[var(--accent)]/[0.04] border border-[var(--accent)]/15 rounded-xl p-3.5 flex gap-2.5 items-start">
-                        <Info className="w-4 h-4 text-[var(--accent)] shrink-0 mt-0.5" />
                         <p className="text-xs text-[var(--text-muted)] leading-relaxed">
                           Organization profile is pre-filled into all AI prompts and document generation. Changes apply to future generations only.
                         </p>
@@ -435,64 +483,47 @@ export default function SettingsTab() {
                           <Github className="w-5 h-5 text-[var(--text-primary)]" />
                           <span className="font-semibold text-sm text-[var(--text-primary)]">GitHub</span>
                         </div>
-                        <span className="font-mono text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-500/[0.1] border border-emerald-500/20 text-emerald-400 font-bold">
-                          Connected
+                        <span className="font-mono text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[var(--bg-surface)] border border-[var(--border)] text-[var(--text-muted)] font-bold">
+                          Optional — not connected
                         </span>
                       </div>
-                      <p className="text-xs text-[var(--text-muted)] mt-2 font-sans">
-                        Webhook active · 3 repositories syncing · Last push: 2 minutes ago
+                      <p className="text-xs text-[var(--text-muted)] mt-2 font-sans leading-relaxed">
+                        GitHub is only used for the optional feature feedback loop: after you take a generated prompt to your AI builder and commit, Momentum can diff that commit against the planned feature to confirm it was built.
                       </p>
-                      
-                      {/* Stats row */}
-                      <div className="flex flex-wrap gap-4 mt-3 pt-3 border-t border-[var(--border)]/50">
-                        <span className="font-mono text-[10px] text-[var(--text-muted)]">3 repos</span>
-                        <span className="font-mono text-[10px] text-[var(--text-muted)]">·</span>
-                        <span className="font-mono text-[10px] text-[var(--text-muted)]">1,847 nodes indexed</span>
-                        <span className="font-mono text-[10px] text-[var(--text-muted)]">·</span>
-                        <span className="font-mono text-[10px] text-[var(--text-muted)]">284 context calls today</span>
-                      </div>
                     </div>
 
                     <div className="flex gap-2.5 mt-4 pt-1">
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.97 }}
-                        className="rounded-full border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-secondary)] text-[10px] font-semibold py-2 px-4 uppercase tracking-wider bg-transparent cursor-not-allowed"
-                        id="github-manage-btn"
+                        className="rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white uppercase tracking-wider text-[10px] font-semibold py-2 px-4 shadow-[0_4px_15px_-4px_var(--accent-glow)] cursor-not-allowed border-none"
+                        id="github-connect-btn"
                       >
-                        Manage Repos
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.97 }}
-                        className="rounded-full bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 text-red-400 text-[10px] font-semibold py-2 px-4 uppercase tracking-wider cursor-not-allowed"
-                        id="github-disconnect-btn"
-                      >
-                        Disconnect
+                        Connect for feature verification
                       </motion.button>
                     </div>
                   </div>
 
-                  {/* Card 2 - Gemini API */}
+                  {/* Card 2 - Claude API (Anthropic) */}
                   <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-5 relative">
                     <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--accent)]/15 to-transparent" />
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
                         <Sparkles className="w-5 h-5 text-[var(--accent)]" />
-                        <span className="font-semibold text-sm text-[var(--text-primary)]">Gemini API</span>
+                        <span className="font-semibold text-sm text-[var(--text-primary)]">Claude API (Anthropic)</span>
                       </div>
                       <span className="font-mono text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-500/[0.1] border border-emerald-500/20 text-emerald-400 font-bold">
                         Active
                       </span>
                     </div>
-                    <p className="text-xs text-[var(--text-muted)] mt-2 font-sans">
-                      Used for extraction interview, quality validation, and prompt generation.
+                    <p className="text-xs text-[var(--text-muted)] mt-2 font-sans leading-relaxed">
+                      Powers the extraction interview, answer-quality validation, document generation, and prompt generation.
                     </p>
 
                     <div className="mt-4 flex items-center justify-between bg-[var(--bg-surface)] border border-[var(--border)] rounded-lg px-3 py-2 max-w-md">
                       <span className="font-mono text-xs text-[var(--text-secondary)] select-all">
-                        AIza••••••••••••••••••••••••••••XQ7f
+                        sk-ant-••••••••••••••••XQ7f
                       </span>
                       <button className="text-[var(--text-muted)] hover:text-[var(--text-primary)] leading-none transition-colors border-none bg-transparent cursor-not-allowed p-0.5">
                         <Eye className="w-4 h-4" />
@@ -504,7 +535,7 @@ export default function SettingsTab() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.97 }}
                         className="rounded-full border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-secondary)] text-[10px] font-semibold py-2 px-4 uppercase tracking-wider bg-transparent cursor-not-allowed"
-                        id="gemini-rotate-btn"
+                        id="anthropic-rotate-btn"
                       >
                         Rotate Key
                       </motion.button>
@@ -691,7 +722,7 @@ export default function SettingsTab() {
                       </div>
                       <div className="flex items-center gap-2">
                         <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                        <span className="text-xs text-[var(--text-secondary)]">GitHub + webhook integration</span>
+                        <span className="text-xs text-[var(--text-secondary)]">Feature feedback loop (optional)</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />

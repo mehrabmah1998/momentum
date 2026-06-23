@@ -41,7 +41,13 @@ import {
   Layers,
   Grid,
   ArrowRight,
-  ArrowUpRight
+  ArrowUpRight,
+  Sparkles,
+  CircleCheck,
+  CircleDashed,
+  HelpCircle,
+  MessageSquare,
+  Pencil
 } from "lucide-react";
 
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
@@ -49,75 +55,68 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "rec
 import GraphTab from "./tabs/graph";
 import SchemaTab from "./tabs/schema";
 import DocumentsTab from "./tabs/documents";
+import InterviewTab from "./tabs/interview";
 import KeysTab from "./tabs/keys";
 import SettingsTab from "./tabs/settings";
 import ExtractionTab from "./tabs/extraction";
 
 const navItems = [
-  { id: "overview", label: "Overview", icon: LayoutDashboard },
-  { id: "workspace", label: "Workspace", icon: Grid },
-  { id: "graph", label: "Knowledge Graph", icon: Network },
-  { id: "schema", label: "Schema Explorer", icon: Database },
   { id: "documents", label: "Documents", icon: FileText },
-  { id: "keys", label: "Context Keys", icon: Key },
+  { id: "interview", label: "Interview", icon: MessageSquare },
+  { id: "overview", label: "Home", icon: LayoutDashboard },
+  { id: "graph", label: "Knowledge Graph", icon: Network },
+  { id: "health", label: "Health Map", icon: Activity },
+  { id: "schema", label: "Schema Explorer", icon: Database },
+  { id: "features", label: "Features", icon: Sparkles },
 ];
 
-const mockProjects = [
-  { id: "api-service", name: "api-service", branch: "main", status: "Synced" },
-  { id: "web-frontend", name: "web-frontend", branch: "develop", status: "Syncing" },
-  { id: "auth-worker", name: "auth-worker", branch: "main", status: "Idle" },
+const mockDocuments = [
+  { id: "insider-spec", name: "Insider Specification", description: "Confidential source-of-truth spec detailing high-level requirements, core goals, and key user flows.", completeness: 86, status: "UP TO DATE" },
+  { id: "ai-spec", name: "AI Specification", description: "Optimized context layout crafted specifically to feed into LLMs to guide code generation.", completeness: 82, status: "UP TO DATE" },
+  { id: "public-spec", name: "Public Specification", description: "Simplified public-facing documentation highlighting features, changelogs, and integrations.", completeness: 73, status: "STALE" },
 ];
 
 const mockProjectDetails = [
   {
-    id: "api-service",
-    name: "api-service",
-    owner: "mehrabmah1998",
-    branch: "main",
-    status: "Synced",
-    lastSync: "2 min ago",
-    schemaNodes: 412,
-    apiNodes: 867,
-    webhookNodes: 234,
-    tables: 18,
-    contextCalls: 142,
-    commits: [
-      { hash: "a3f92c1", message: "Add users.verified_at column", time: "2m ago" },
-      { hash: "bb04d7e", message: "Update POST /v2/invoices route", time: "1h ago" },
-      { hash: "c91e03a", message: "Refactor auth_middleware token check", time: "3h ago" },
+    id: "momentum-core",
+    name: "Momentum Core Engine",
+    org: "BuildWithMomentum",
+    completeness: 88,
+    confirmedNodes: 147,
+    modules: 12,
+    openQuestions: 2,
+    lastInterview: "2h ago",
+    recentChanges: [
+      { id: "rc1", type: "confirmed", title: "Core state machine loop definition", time: "10m ago" },
+      { id: "rc2", type: "refined", title: "Target workspace sandbox constraints", time: "2h ago" },
+      { id: "rc3", type: "new", title: "Pricing tier multi-region scalability rules", time: "1d ago" },
     ],
   },
   {
-    id: "web-frontend",
-    name: "web-frontend",
-    owner: "mehrabmah1998",
-    branch: "develop",
-    status: "Syncing",
-    lastSync: "Syncing...",
-    schemaNodes: 87,
-    apiNodes: 204,
-    webhookNodes: 0,
-    tables: 4,
-    contextCalls: 98,
-    commits: [
-      { hash: "d44a1b2", message: "Add dashboard sidebar layout", time: "18m ago" },
-      { hash: "e02f8c9", message: "Wire up auth-client sign out", time: "2h ago" },
+    id: "momentum-ui",
+    name: "Momentum UI Library",
+    org: "BuildWithMomentum",
+    completeness: 64,
+    confirmedNodes: 84,
+    modules: 6,
+    openQuestions: 5,
+    lastInterview: "1d ago",
+    recentChanges: [
+      { id: "rc4", type: "confirmed", title: "Framer Motion layout transition curves", time: "1d ago" },
+      { id: "rc5", type: "new", title: "Tactile feedback haptic specification", time: "2d ago" },
     ],
   },
   {
-    id: "auth-worker",
-    name: "auth-worker",
-    owner: "mehrabmah1998",
-    branch: "main",
-    status: "Idle",
-    lastSync: "6 hours ago",
-    schemaNodes: 23,
-    apiNodes: 51,
-    webhookNodes: 12,
-    tables: 3,
-    contextCalls: 44,
-    commits: [
-      { hash: "f18b3d0", message: "Fix token expiry edge case", time: "6h ago" },
+    id: "momentum-auth",
+    name: "Momentum Secure Auth Gateway",
+    org: "BuildWithMomentum",
+    completeness: 92,
+    confirmedNodes: 110,
+    modules: 4,
+    openQuestions: 0,
+    lastInterview: "3d ago",
+    recentChanges: [
+      { id: "rc6", type: "refined", title: "Session storage & token storage policy", time: "3d ago" },
     ],
   },
 ];
@@ -125,66 +124,39 @@ const mockProjectDetails = [
 const mockActivity = [
   {
     id: 1,
-    icon: GitCommit,
-    iconColorClass: "text-amber-500",
-    rowClass: "border-l-[3px] border-l-amber-500/80 pl-2.5 -ml-[11px]",
-    action: "Schema updated — users table +3 columns",
-    meta: "api-service / main",
+    icon: CircleCheck,
+    iconColorClass: "text-emerald-400",
+    rowClass: "border-l-[3px] border-l-emerald-500/80 pl-2.5 -ml-[11px]",
+    action: "Confirmed: Extraction Engine quality gate",
+    meta: "Updated validation metrics",
     time: "2m ago",
   },
   {
     id: 2,
-    icon: Network,
-    iconColorClass: "text-zinc-500",
-    rowClass: "border-l-[3px] border-l-zinc-600/60 pl-2.5 -ml-[11px]",
-    action: "Graph rebuilt — 124 new nodes indexed",
-    meta: "api-service / main",
-    time: "2m ago",
-  },
-  {
-    id: 3,
-    icon: Zap,
-    iconColorClass: "text-[var(--accent)]",
-    rowClass: "border-l-[3px] border-l-[var(--accent)] pl-2.5 -ml-[11px]",
-    action: "Context injected to claude-agent-01",
-    meta: "web-frontend",
-    time: "18m ago",
-  },
-  {
-    id: 4,
-    icon: GitCommit,
-    iconColorClass: "text-zinc-500",
-    rowClass: "border-l-[3px] border-l-zinc-600/60 pl-2.5 -ml-[11px]",
-    action: "API route parsed — POST /v2/invoices",
-    meta: "api-service / main",
+    icon: Pencil,
+    iconColorClass: "text-amber-400",
+    rowClass: "border-l-[3px] border-l-amber-500/80 pl-2.5 -ml-[11px]",
+    action: "Refined: Target Users persona",
+    meta: "Updated core audience parameters",
     time: "1h ago",
   },
   {
-    id: 5,
-    icon: Network,
-    iconColorClass: "text-zinc-500",
-    rowClass: "border-l-[3px] border-l-zinc-600/60 pl-2.5 -ml-[11px]",
-    action: "Graph rebuilt — index complete",
-    meta: "auth-worker / main",
-    time: "2h ago",
+    id: 3,
+    icon: Plus,
+    iconColorClass: "text-[var(--accent)]",
+    rowClass: "border-l-[3px] border-l-[var(--accent)] pl-2.5 -ml-[11px]",
+    action: "New: Cloudflare deployment decision",
+    meta: "Infrastructure constraints updated",
+    time: "3h ago",
   },
   {
-    id: 6,
-    icon: AlertCircle,
-    iconColorClass: "text-amber-500",
+    id: 4,
+    icon: Pencil,
+    iconColorClass: "text-amber-400",
     rowClass: "border-l-[3px] border-l-amber-500/80 pl-2.5 -ml-[11px]",
-    action: "Schema drift detected — orders.total",
-    meta: "auth-worker / main",
-    time: "3h ago",
-  },
-  {
-    id: 7,
-    icon: AlertCircle,
-    iconColorClass: "text-red-500",
-    rowClass: "border-l-[3px] border-l-red-500/80 pl-2.5 -ml-[11px]",
-    action: "Type mismatch — orders.total float vs double",
-    meta: "auth-worker / main",
-    time: "3h ago",
+    action: "Refined: Key Database associations",
+    meta: "Adjusted relationship cardinality",
+    time: "5h ago",
   },
 ];
 
@@ -212,26 +184,28 @@ const agentActivity = [
 ];
 
 const miniStats = [
-  { label: "Schema Nodes", value: "412" },
-  { label: "API Nodes", value: "867" },
-  { label: "Webhook Nodes", value: "234" },
-  { label: "Edges", value: "334" },
+  { label: "Completed Sections", value: "18" },
+  { label: "Pending Loops", value: "3" },
+  { label: "Open Clarifications", value: "5" },
+  { label: "Valid Edges", value: "12" },
 ];
 
 const systemStatusRows = [
-  { label: "Graph Engine", status: "Operational", colorClass: "text-emerald-400 bg-emerald-500/[0.08] border-emerald-500/20", dotClass: "bg-emerald-400" },
-  { label: "Git Webhook Listener", status: "Active", colorClass: "text-[var(--accent)] bg-[var(--accent-subtle)] border-[var(--accent)]/20", dotClass: "bg-[var(--accent)] animate-pulse" },
-  { label: "Schema Parser", status: "Operational", colorClass: "text-emerald-400 bg-emerald-500/[0.08] border-emerald-500/20", dotClass: "bg-emerald-400" },
-  { label: "Context Injector", status: "Active", colorClass: "text-[var(--accent)] bg-[var(--accent-subtle)] border-[var(--accent)]/20", dotClass: "bg-[var(--accent)] animate-pulse" },
-  { label: "D1 Database", status: "Operational", colorClass: "text-emerald-400 bg-emerald-500/[0.08] border-emerald-500/20", dotClass: "bg-emerald-400" },
+  { label: "Knowledge Graph", status: "Ready", colorClass: "text-emerald-400 bg-emerald-500/[0.08] border-emerald-500/20", dotClass: "bg-emerald-400" },
+  { label: "Document Generator", status: "Ready", colorClass: "text-emerald-400 bg-emerald-500/[0.08] border-emerald-500/20", dotClass: "bg-emerald-400" },
+  { label: "Extraction Engine", status: "Ready", colorClass: "text-emerald-400 bg-emerald-500/[0.08] border-emerald-500/20", dotClass: "bg-emerald-400" },
+  { label: "Validation Agent", status: "Ready", colorClass: "text-emerald-400 bg-emerald-500/[0.08] border-emerald-500/20", dotClass: "bg-emerald-400" },
 ];
 
 const tabMetadata: Record<string, { label: string; icon: React.ComponentType<any> }> = {
+  overview: { label: "Home", icon: LayoutDashboard },
   workspace: { label: "Workspace", icon: Grid },
   graph: { label: "Knowledge Graph", icon: Network },
+  health: { label: "Health Map", icon: Activity },
   schema: { label: "Schema Explorer", icon: Database },
   documents: { label: "Documents", icon: FileText },
-  keys: { label: "Context Keys", icon: Key },
+  interview: { label: "Interview", icon: MessageSquare },
+  features: { label: "Features", icon: Sparkles },
   settings: { label: "Settings", icon: Settings },
 };
 
@@ -266,7 +240,7 @@ export interface WorkspaceProject {
 export default function DashboardClient() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("documents");
   const [extractionProjectId, setExtractionProjectId] = useState<string | null>(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [dateString, setDateString] = useState("");
@@ -397,10 +371,10 @@ export default function DashboardClient() {
       );
 
   const stats = [
-    { id: "repos", label: "Connected Repos", value: "3", sub: "2 syncing · 1 idle", icon: GitBranch, trend: "↑ 2 since last week", trendColorClass: "text-emerald-400" },
-    { id: "nodes", label: "Graph Nodes", value: "1,847", sub: "Distributed arch", icon: Network, trend: "↑ 12% vs yesterday", trendColorClass: "text-emerald-400" },
-    { id: "calls", label: "Context Calls", value: "284", sub: "Today all agents", icon: Zap, trend: "↓ 3% vs last week", trendColorClass: "text-amber-400" },
-    { id: "sync", label: "Last Sync", value: "2m ago", sub: "api-service / main", icon: Activity, trend: "↑ 99.8% uptime", trendColorClass: "text-emerald-400" },
+    { id: "completeness", label: "Documentation Completeness", value: "68%", sub: "Across all document specifications", icon: FileText, trend: "↑ 4% this session", trendColorClass: "text-emerald-400" },
+    { id: "nodes", label: "Confirmed Nodes", value: "41", sub: "Validated in knowledge graph", icon: CircleCheck, trend: "↑ 12 since yesterday", trendColorClass: "text-emerald-400" },
+    { id: "gaps", label: "Needs Input", value: "7", sub: "Missing crucial constraints", icon: CircleDashed, trend: "Resolve via interviewer", trendColorClass: "text-amber-400" },
+    { id: "questions", label: "Open Questions", value: "3", sub: "Awaiting your clarification", icon: HelpCircle, trend: "Active discussion items", trendColorClass: "text-emerald-400" },
   ];
 
   const meta = tabMetadata[activeTab];
@@ -534,13 +508,20 @@ export default function DashboardClient() {
                       {p.name === activeGlobalProject && <CheckCircle2 className="w-3.5 h-3.5 text-[var(--accent)] ml-auto shrink-0" />}
                     </button>
                   ))}
-                  <div className="border-t border-white/5 [html.light_&]:border-slate-100 mt-1 pt-1">
+                  <div className="border-t border-white/5 [html.light_&]:border-slate-100 mt-1 pt-1 flex flex-col gap-0.5">
                     <button 
-                      onClick={() => { setActiveTab("workspace"); setShowGlobalSwitcher(false); }}
+                      onClick={() => { setActiveTab("projects"); setShowGlobalSwitcher(false); }}
                       className="w-full text-left px-3.5 py-2 flex items-center gap-2.5 text-[11px] font-mono tracking-wide text-[var(--accent)] hover:text-[var(--accent-hover)] transition-all cursor-pointer border-none bg-transparent hover:bg-white/[0.04] [html.light_&]:hover:bg-slate-100/30 font-bold"
                     >
                       <Layers className="w-3.5 h-3.5" />
-                      <span>Manage Projects ↗</span>
+                      <span>View All Projects &rarr;</span>
+                    </button>
+                    <button 
+                      onClick={() => { setActiveTab("workspace"); setShowGlobalSwitcher(false); }}
+                      className="w-full text-left px-3.5 py-2 flex items-center gap-2.5 text-[11px] font-mono tracking-wide text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all cursor-pointer border-none bg-transparent hover:bg-white/[0.04] [html.light_&]:hover:bg-slate-100/30 font-bold"
+                    >
+                      <Settings className="w-3.5 h-3.5 text-[var(--accent)]" />
+                      <span>Manage Projects Settings ↗</span>
                     </button>
                   </div>
                 </motion.div>
@@ -993,7 +974,7 @@ export default function DashboardClient() {
         )}
 
         {activeTab !== "extraction" ? (
-        <div className="flex-1 overflow-y-auto">
+        <div className={`flex-1 min-h-0 flex flex-col ${activeTab === "interview" ? "overflow-hidden" : "overflow-y-auto"}`}>
           <AnimatePresence mode="wait">
             {isNoWorkspaceActive && ["overview", "graph", "schema", "documents", "keys"].includes(activeTab) ? (
               <motion.div
@@ -1041,27 +1022,33 @@ export default function DashboardClient() {
               className="w-full max-w-7xl xl:max-w-[1500px] 2xl:max-w-[1700px] mx-auto px-6 md:px-10 py-10"
             >
               {/* Page header */}
-              <div className="flex items-start justify-between mb-10">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10 pb-6 border-b border-[var(--border)]/60">
                 <div>
-                  <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--accent)] font-bold mb-1">
-                    COMMAND CENTER
+                  <div className="font-mono text-[9px] uppercase tracking-[0.25em] text-[var(--accent)] font-bold mb-1.5 px-3 py-1 bg-[var(--accent)]/[0.08] border border-[var(--accent)]/15 rounded-full w-fit">
+                    KNOWLEDGE BASE
                   </div>
-                  <h1 className="text-2xl font-bold font-sans text-[var(--text-primary)] tracking-tight">
-                    Good morning, {firstName}
+                  <h1 className="text-3xl font-semibold font-sans text-[var(--text-primary)] tracking-tight mt-1">
+                    Good to see you, {firstName}
                   </h1>
-                  <p className="font-mono text-[11px] text-[var(--text-muted)] mt-1.5">
-                    {dateString}
+                  <p className="font-mono text-[11px] text-[var(--text-muted)] mt-2 ml-0.5 flex flex-wrap items-center gap-2">
+                    <span>{dateString}</span>
+                    <span className="text-[var(--border)]">•</span>
+                    <button
+                      onClick={() => setActiveTab("projects")}
+                      className="text-[var(--accent)] hover:text-[var(--accent-hover)] cursor-pointer hover:underline border-none bg-transparent p-0 font-semibold text-[11.5px]"
+                    >
+                      View All Projects &rarr;
+                    </button>
                   </p>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--bg-card)] border border-[var(--border)] hover:border-[var(--border-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer outline-none">
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Connect Repo</span>
-                  </button>
-                  <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold uppercase tracking-wider transition-all shadow-[0_4px_20px_-4px_var(--accent-glow)] active:scale-[0.98] cursor-pointer border-none outline-none">
-                    <FileText className="w-3.5 h-3.5" />
-                    <span>Generate Docs</span>
+                  <button 
+                    onClick={() => setActiveTab("documents")}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold uppercase tracking-wider transition-all duration-300 shadow-[0_4px_20px_-4px_var(--accent-glow)] active:scale-[0.98] cursor-pointer"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    <span>Continue Interview</span>
                   </button>
                 </div>
               </div>
@@ -1098,9 +1085,9 @@ export default function DashboardClient() {
                           <span className="text-[11px] font-mono text-[var(--text-muted)] leading-none">
                             {stat.sub}
                           </span>
-                          {(stat as any).trend && (
-                            <span className={`text-[10px] font-mono font-bold leading-none ${(stat as any).trendColorClass}`}>
-                              {(stat as any).trend}
+                          {stat.trend && (
+                            <span className={`text-[10px] font-mono font-bold leading-none ${stat.trendColorClass}`}>
+                              {stat.trend}
                             </span>
                           )}
                         </div>
@@ -1117,178 +1104,132 @@ export default function DashboardClient() {
                 transition={{ delay: 0.35, duration: 0.6 }}
                 className="grid md:grid-cols-3 gap-6"
               >
-                {/* LEFT Column (SXS) */}
+                {/* LEFT Column */}
                 <div className="md:col-span-2 flex flex-col gap-6">
-                  {/* Connected Projects Card */}
+                  {/* Your Documents Card */}
                   <div className="bg-[var(--bg-card)] backdrop-blur-xl border border-[var(--border)] rounded-2xl p-6 relative overflow-hidden">
                     {/* Top highlight bar */}
                     <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--accent)]/20 to-transparent" />
 
                     <div className="flex justify-between items-center mb-5">
-                      <h3 className="text-xs font-semibold font-sans text-[var(--text-primary)] font-bold">
-                        Connected Projects
+                      <h3 className="text-sm font-bold font-sans text-[var(--text-primary)]">
+                        Your Documents
                       </h3>
-                      <span className="text-[11px] font-mono text-[var(--accent)] hover:text-[var(--accent-hover)] cursor-pointer transition-colors">
-                        Manage →
+                      <span className="text-[11px] font-mono text-[var(--text-muted)]">
+                        3 Specs Active
                       </span>
                     </div>
 
-                    <div className="flex flex-col gap-2">
-                      {mockProjects.map((proj) => (
+                    <div className="flex flex-col gap-4">
+                      {mockDocuments.map((doc) => (
                         <div
-                          key={proj.id}
-                          className="flex items-center gap-3 p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-hover)] transition-colors"
+                          key={doc.id}
+                          className="flex flex-col gap-3 p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-hover)] transition-all group"
                         >
-                          {/* Repo SVG Icon box */}
-                          <div className="w-8 h-8 rounded-lg bg-[var(--bg-card)] border border-[var(--border)] flex items-center justify-center shrink-0">
-                            <svg className="w-4 h-4 shrink-0 fill-[var(--text-muted)]" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482C19.138 20.197 22 16.44 22 12.017 22 6.484 17.522 2 12 2z" />
-                            </svg>
-                          </div>
-
-                          {/* Detail titles */}
-                          <div className="flex-1 min-w-0">
-                            <span className="text-sm font-mono font-semibold text-[var(--text-primary)] truncate block leading-tight">
-                              {proj.name}
-                            </span>
-                            <span className="text-[10px] font-mono text-[var(--text-muted)] mt-0.5 block leading-tight">
-                              {proj.branch}
-                            </span>
-                          </div>
-
-                          {/* Status Badge */}
-                          <div>
-                            {proj.status === "Synced" && (
-                              <span className="font-mono text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full border text-emerald-400 bg-emerald-500/[0.08] border-emerald-500/20 block font-bold">
-                                Synced
-                              </span>
-                            )}
-                            {proj.status === "Syncing" && (
-                              <span className="font-mono text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full border text-[var(--accent)] bg-[var(--accent-subtle)] border-[var(--accent)]/20 flex items-center gap-1.5 font-bold">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse" />
-                                <span>Syncing</span>
-                              </span>
-                            )}
-                            {proj.status === "Idle" && (
-                              <span className="font-mono text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full border text-[var(--text-muted)] bg-[var(--bg-card)] border-[var(--border)] block font-bold">
-                                Idle
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Documentation Status Card */}
-                  <div className="bg-[var(--bg-card)] backdrop-blur-xl border border-[var(--border)] rounded-2xl p-6 relative overflow-hidden">
-                    <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--accent)]/20 to-transparent" />
-                    <h3 className="text-xs font-semibold font-sans text-[var(--text-primary)] font-bold mb-5">
-                      Documentation Status
-                    </h3>
-                    <div className="flex flex-col gap-3">
-                      {docStatusData.map((doc) => (
-                        <div key={doc.id} className="flex flex-col gap-0 p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-hover)] transition-colors">
                           <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center justify-between mb-1">
-                                <span className="text-sm font-mono font-semibold text-[var(--text-primary)] leading-none">
-                                  {doc.name}
-                                  <span className="text-[10px] font-mono text-[var(--text-muted)] ml-2 bg-[var(--bg-card)] border border-[var(--border)] px-1.5 py-0.5 rounded">
-                                    {doc.branch}
-                                  </span>
-                                </span>
-                                <div>
-                                  {doc.status === "UP TO DATE" && (
-                                    <span className="font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 rounded border text-emerald-400 bg-emerald-500/[0.08] border-emerald-500/20 font-bold">
-                                      Up To Date
-                                    </span>
-                                  )}
-                                  {doc.status === "STALE" && (
-                                    <span className="font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 rounded border text-amber-400 bg-amber-500/[0.08] border-amber-500/20 font-bold">
-                                      Stale
-                                    </span>
-                                  )}
-                                  {doc.status === "NEVER GENERATED" && (
-                                    <span className="font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 rounded border text-rose-400 bg-rose-500/[0.08] border-rose-500/20 font-bold">
-                                      Never Generated
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                              
-                              <div className="flex items-center gap-2 mt-2 mb-1">
-                                <div className="flex-1 h-1.5 bg-[var(--bg-card)] rounded-full overflow-hidden border border-[var(--border)]">
-                                  <div 
-                                    className="h-full rounded-full transition-all duration-500" 
-                                    style={{ 
-                                      width: `${doc.completeness}%`, 
-                                      backgroundColor: doc.status === 'UP TO DATE' ? '#10B981' : doc.status === 'STALE' ? '#FBBF24' : 'var(--border)'
-                                    }} 
-                                  />
-                                </div>
-                                <span className="text-[10px] font-mono font-bold text-[var(--text-secondary)] min-w-[30px] text-right">
-                                  {doc.completeness}%
-                                </span>
-                              </div>
+                            <div className="flex-1 min-w-0 pr-4">
+                              <span className="text-sm font-semibold text-[var(--text-primary)] font-sans block leading-none">
+                                {doc.name}
+                              </span>
+                              <span className="text-xs text-[var(--text-muted)] mt-1.5 block leading-relaxed max-w-[600px]">
+                                {doc.description}
+                              </span>
                             </div>
-                          </div>
-                          
-                          <div className="flex items-center justify-between mt-1 pt-1.5 border-t border-[var(--border)]/50">
-                            <span className="text-[9px] font-mono text-[var(--text-muted)] flex items-center gap-1.5">
-                              <RefreshCw className="w-2.5 h-2.5" />
-                              Last Generated: {doc.lastGenerated}
-                            </span>
-                            <button className="text-[9px] uppercase font-mono font-bold tracking-wider px-2.5 py-1 rounded bg-[var(--accent)]/[0.08] hover:bg-[var(--accent)]/[0.15] border border-[var(--accent)]/20 text-[var(--accent)] transition-colors cursor-pointer outline-none">
-                              Generate
+                            
+                            <button 
+                              onClick={() => setActiveTab("documents")}
+                              className="text-[10px] font-mono tracking-wider text-[var(--accent)] group-hover:text-[var(--accent-hover)] transition-colors opacity-80 group-hover:opacity-100 flex items-center gap-1 shrink-0 bg-transparent border-none cursor-pointer outline-none font-bold"
+                            >
+                              View &rarr;
                             </button>
                           </div>
+
+                          <div className="flex items-center gap-3 pt-2 border-t border-[var(--border)]/40 mt-1">
+                            <div className="flex-1 h-1 bg-[var(--bg-card)] rounded-full overflow-hidden border border-[var(--border)]/20">
+                              <div 
+                                className="h-full rounded-full transition-all duration-500 bg-[var(--accent)]" 
+                                style={{ width: `${doc.completeness}%` }} 
+                              />
+                            </div>
+                            <span className="text-[10px] font-mono font-bold text-[var(--text-secondary)] min-w-[30px] text-right">
+                              {doc.completeness}% Ready
+                            </span>
+                          </div>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* Recent Activity Card */}
-                  <div className="bg-[var(--bg-card)] backdrop-blur-xl border border-[var(--border)] rounded-2xl p-6 relative overflow-hidden flex flex-col mb-8">
+                  {/* Knowledge Gaps Card */}
+                  <div className="bg-[var(--bg-card)] backdrop-blur-xl border border-[var(--border)] rounded-2xl p-6 relative overflow-hidden mb-8">
+                    <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--accent)]/20 to-transparent" />
+                    
+                    <h3 className="text-sm font-bold font-sans text-[var(--text-primary)] mb-5">
+                      Knowledge Gaps
+                    </h3>
+
+                    <div className="flex flex-col gap-3">
+                      {[
+                        { title: "Document Engine", status: "needs input", badgeClass: "text-amber-400 bg-amber-500/[0.08] border-amber-500/20" },
+                        { title: "Global Constraints", status: "empty", badgeClass: "text-rose-400 bg-rose-500/[0.08] border-rose-500/20" },
+                        { title: "Pricing & Business", status: "empty", badgeClass: "text-rose-400 bg-rose-500/[0.08] border-rose-500/20" }
+                      ].map((gap, i) => (
+                        <div 
+                          key={i}
+                          className="flex items-center justify-between p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border)] hover:border-[var(--border-hover)] transition-colors"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-2 h-2 rounded-full bg-[var(--accent)] opacity-60 shrink-0" />
+                            <span className="text-xs font-semibold text-[var(--text-primary)] font-sans">
+                              {gap.title}
+                            </span>
+                            <span className={`text-[9px] uppercase tracking-wider font-mono px-2 py-0.5 rounded border font-bold ${gap.badgeClass}`}>
+                              {gap.status}
+                            </span>
+                          </div>
+
+                          <button 
+                            onClick={() => setActiveTab("documents")}
+                            className="text-[10px] font-mono text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors flex items-center gap-1 cursor-pointer bg-transparent border-none outline-none font-bold animate-gpu"
+                          >
+                            Resolve in interview &rarr;
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* RIGHT Column */}
+                <div className="md:col-span-1 flex flex-col gap-6">
+                  {/* Recent Knowledge Changes Card */}
+                  <div className="bg-[var(--bg-card)] backdrop-blur-xl border border-[var(--border)] rounded-2xl p-6 relative overflow-hidden flex flex-col">
                     {/* Top highlight bar */}
                     <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--accent)]/20 to-transparent" />
 
                     <div className="flex items-center justify-between mb-5">
-                      <h3 className="text-xs font-semibold font-sans text-[var(--text-primary)] font-bold">
-                        Recent Activity
+                      <h3 className="text-sm font-bold font-sans text-[var(--text-primary)]">
+                        Recent Knowledge Changes
                       </h3>
-                      <button className="text-[10px] text-[var(--accent)] hover:text-[var(--text-primary)] transition-colors inline-flex items-center gap-1 font-medium font-sans">
-                        View all activity &rarr;
+                      <button className="text-[10px] text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors font-semibold font-sans bg-transparent border-none cursor-pointer outline-none">
+                        View feed &rarr;
                       </button>
                     </div>
 
-                    <div className="flex flex-col h-[300px] overflow-y-auto pr-2 -mr-2 mb-1 divide-y divide-[var(--border)]">
+                    <div className="flex flex-col divide-y divide-[var(--border)]/70">
                       {mockActivity.map((act) => {
                         const ActIcon = act.icon;
-                        const text = (act.action + " " + act.meta).toLowerCase();
-                        let borderColor = "transparent";
-                        if (text.includes("error") || text.includes("mismatch") || text.includes("failed") || text.includes("drift detected")) {
-                          borderColor = "#EF4444";
-                        } else if (text.includes("schema")) {
-                          borderColor = "#F59E0B";
-                        } else if (text.includes("graph") || text.includes("indexed")) {
-                          borderColor = "#6B7280";
-                        } else if (text.includes("context") || text.includes("claude-agent")) {
-                          borderColor = "#06B6D4";
-                        }
-
                         return (
                           <div 
                             key={act.id} 
-                            className="flex items-start gap-3 py-3 first:pt-0 last:pb-0 pl-3 -ml-[12px]" 
-                            style={{ borderLeft: `3px solid ${borderColor}` }}
+                            className="flex items-start gap-3.5 py-4 first:pt-0 last:pb-0"
                           >
-                            <div className="w-7 h-7 rounded-lg bg-[var(--bg-surface)] border border-[var(--border)] flex items-center justify-center shrink-0 mt-0.5">
-                              <ActIcon className={`w-3.5 h-3.5 ${act.iconColorClass}`} />
+                            <div className="w-8 h-8 rounded-lg bg-[var(--bg-surface)] border border-[var(--border)] flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                              <ActIcon className={`w-4 h-4 ${act.iconColorClass}`} />
                             </div>
 
                             <div className="flex-1 min-w-0 text-left">
-                              <div className="text-xs font-sans text-[var(--text-secondary)] leading-snug">
+                              <div className="text-xs font-semibold text-[var(--text-primary)] font-sans leading-snug">
                                 {act.action}
                               </div>
                               <div className="text-[10px] font-mono text-[var(--text-muted)] mt-0.5">
@@ -1296,111 +1237,12 @@ export default function DashboardClient() {
                               </div>
                             </div>
 
-                            <div className="text-[10px] font-mono text-[var(--text-muted)] shrink-0 self-start">
+                            <div className="text-[9px] font-mono text-[var(--text-muted)] shrink-0 self-start pt-0.5">
                               {act.time}
                             </div>
                           </div>
                         );
                       })}
-                    </div>
-                  </div>
-                </div>
-
-                {/* RIGHT Column */}
-                <div className="md:col-span-1 flex flex-col gap-6">
-                  {/* Knowledge Health Chart */}
-                  <div className="bg-[var(--bg-card)] backdrop-blur-xl border border-[var(--border)] rounded-2xl p-6 relative overflow-hidden flex flex-col">
-                    <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--accent)]/20 to-transparent" />
-
-                    <h3 className="text-xs font-semibold font-sans text-[var(--text-primary)] mb-5 font-bold">
-                      Knowledge Health Chart
-                    </h3>
-
-                    {/* Chart Container */}
-                    <div className="h-[180px] w-full -ml-4">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={healthData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
-                          <defs>
-                            <linearGradient id="colorApi" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/>
-                              <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
-                            </linearGradient>
-                            <linearGradient id="colorWeb" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.3}/>
-                              <stop offset="95%" stopColor="var(--accent)" stopOpacity={0}/>
-                            </linearGradient>
-                            <linearGradient id="colorAuth" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#A78BFA" stopOpacity={0.3}/>
-                              <stop offset="95%" stopColor="#A78BFA" stopOpacity={0}/>
-                            </linearGradient>
-                          </defs>
-                          <XAxis 
-                            dataKey="day" 
-                            axisLine={false} 
-                            tickLine={false} 
-                            tick={{ fill: 'var(--text-muted)', fontSize: 10, fontFamily: 'monospace' }} 
-                            dy={10}
-                          />
-                          <YAxis 
-                            axisLine={false} 
-                            tickLine={false} 
-                            tick={{ fill: 'var(--text-muted)', fontSize: 10, fontFamily: 'monospace' }}
-                            domain={[0, 100]}
-                            width={30}
-                          />
-                          <Tooltip 
-                            contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '12px' }}
-                            itemStyle={{ fontFamily: 'monospace' }}
-                            labelStyle={{ color: 'var(--text-primary)', marginBottom: '4px' }}
-                          />
-                          <Area type="monotone" dataKey="api-service" stroke="#10B981" strokeWidth={2} fillOpacity={1} fill="url(#colorApi)" />
-                          <Area type="monotone" dataKey="web-frontend" stroke="var(--accent)" strokeWidth={2} fillOpacity={1} fill="url(#colorWeb)" />
-                          <Area type="monotone" dataKey="auth-worker" stroke="#A78BFA" strokeWidth={2} fillOpacity={1} fill="url(#colorAuth)" />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    </div>
-                    
-                    {/* Legend */}
-                    <div className="flex items-center justify-center gap-8 mt-6">
-                      <div className="flex items-center gap-1.5 text-[9px] font-mono text-[var(--text-muted)]">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500" /> api-service
-                      </div>
-                      <div className="flex items-center gap-1.5 text-[9px] font-mono text-[var(--text-muted)]">
-                        <span className="w-2 h-2 rounded-full bg-[var(--accent)]" /> web-frontend
-                      </div>
-                      <div className="flex items-center gap-1.5 text-[9px] font-mono text-[var(--text-muted)]">
-                        <span className="w-2 h-2 rounded-full bg-purple-400" /> auth-worker
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* AI Agent Activity */}
-                  <div className="bg-[var(--bg-card)] backdrop-blur-xl border border-[var(--border)] rounded-2xl p-6 relative overflow-hidden">
-                    <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--accent)]/20 to-transparent" />
-                    <h3 className="text-xs font-semibold font-sans text-[var(--text-primary)] mb-5 font-bold">
-                      AI Agent Activity
-                    </h3>
-                    <div className="flex flex-col gap-4">
-                      {agentActivity.map((activity) => (
-                        <div key={activity.id} className="flex items-start gap-3">
-                          <div className="w-6 h-6 rounded border border-[var(--accent)]/20 bg-[var(--accent)]/[0.05] flex items-center justify-center shrink-0 mt-0.5">
-                            <Zap className="w-3 h-3 text-[var(--accent)]" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between mb-0.5">
-                              <span className="text-xs font-sans text-[var(--text-primary)] font-medium truncate">
-                                {activity.agent}
-                              </span>
-                              <span className="text-[10px] font-mono text-[var(--text-muted)] shrink-0">
-                                {activity.time}
-                              </span>
-                            </div>
-                            <div className="text-[10px] font-mono text-[var(--text-secondary)]">
-                              {activity.project} <span className="text-[var(--text-muted)] px-1">·</span> {activity.tokens}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
                     </div>
                   </div>
 
@@ -1409,11 +1251,11 @@ export default function DashboardClient() {
                     {/* Top highlight bar */}
                     <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--accent)]/20 to-transparent" />
 
-                    <h3 className="text-xs font-semibold font-sans text-[var(--text-primary)] mb-5 font-bold">
-                      System Status
+                    <h3 className="text-sm font-bold font-sans text-[var(--text-primary)] mb-5">
+                      Knowledge System Status
                     </h3>
 
-                    <div className="flex flex-col gap-2.5">
+                    <div className="flex flex-col gap-3">
                       {systemStatusRows.map((row) => (
                         <div key={row.label} className="flex items-center justify-between">
                           <span className="text-xs font-mono text-[var(--text-secondary)]">{row.label}</span>
@@ -1438,32 +1280,35 @@ export default function DashboardClient() {
               className="w-full max-w-7xl xl:max-w-[1500px] 2xl:max-w-[1700px] mx-auto px-6 md:px-10 py-10"
             >
               {/* PAGE HEADER */}
-              <div className="flex items-start justify-between mb-10">
+              <div className="flex items-start justify-between mb-10 pb-6 border-b border-[var(--border)]/60">
                 <div>
-                  <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--accent)] font-bold mb-1">
-                    CONNECTED REPOSITORIES
+                  <div className="font-mono text-[9px] uppercase tracking-[0.25em] text-[var(--accent)] font-bold mb-1.5 px-3 py-1 bg-[var(--accent)]/[0.08] border border-[var(--accent)]/15 rounded-full w-fit">
+                    ORGANIZATION: BuildWithMomentum
                   </div>
-                  <h1 className="text-2xl font-bold font-sans text-[var(--text-primary)] tracking-tight">
+                  <h1 className="text-3xl font-semibold font-sans text-[var(--text-primary)] tracking-tight">
                     Projects
                   </h1>
-                  <p className="font-mono text-[11px] text-[var(--text-muted)] mt-1.5">
-                    {mockProjectDetails.length} repositories connected · graph sync active
+                  <p className="font-mono text-[11px] text-[var(--text-muted)] mt-1.5 ml-0.5">
+                    {mockProjectDetails.length} active knowledge projects under BuildWithMomentum organization
                   </p>
                 </div>
 
-                <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold uppercase tracking-wider transition-all shadow-[0_4px_20px_-4px_var(--accent-glow)] active:scale-[0.98] cursor-pointer">
+                <button 
+                  onClick={() => setActiveTab("documents")}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold uppercase tracking-wider transition-all duration-300 shadow-[0_4px_20px_-4px_var(--accent-glow)] active:scale-[0.98] cursor-pointer"
+                >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Connect Repo</span>
+                  <span>New Project</span>
                 </button>
               </div>
 
               {/* SUMMARY STATS ROW */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 mt-10">
                 {[
-                  { id: "repos", label: "Total Repos", value: "3", sub: "All connected via webhook", icon: GitBranch },
-                  { id: "tables", label: "Schema Tables", value: "25", sub: "Across all projects", icon: Table2 },
-                  { id: "endpoints", label: "API Endpoints", value: "1,122", sub: "Parsed and indexed", icon: Code2 },
-                  { id: "calls", label: "Context Calls", value: "284", sub: "Total today", icon: Zap },
+                  { id: "projects", label: "Active Projects", value: "3", sub: "Under BuildWithMomentum", icon: Layers },
+                  { id: "nodes", label: "Confirmed Nodes", value: "341", sub: "Validated structured items", icon: Network },
+                  { id: "modules", label: "Modules Defined", value: "22", sub: "Visual functional scopes", icon: Grid },
+                  { id: "gaps", label: "Open Questions", value: "7", sub: "Awaiting clarification", icon: HelpCircle },
                 ].map((stat, idx) => {
                   const StatIcon = stat.icon;
                   return (
@@ -1515,50 +1360,35 @@ export default function DashboardClient() {
                     {/* CARD HEADER ROW */}
                     <div className="flex items-start justify-between mb-5">
                       <div className="flex items-center gap-3">
-                        {/* GitHub SVG icon box */}
-                        <div className="w-9 h-9 rounded-xl bg-[var(--bg-surface)] border border-[var(--border)] flex items-center justify-center shrink-0">
-                          <svg className="fill-[var(--text-muted)] w-4 h-4 shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482C19.138 20.197 22 16.44 22 12.017 22 6.484 17.522 2 12 2z" />
-                          </svg>
+                        {/* Custom visual cube icon box */}
+                        <div className="w-10 h-10 rounded-xl bg-[var(--bg-surface)] border border-[var(--border)] flex items-center justify-center shrink-0">
+                          <Layers className="w-4 h-4 text-[var(--accent)]" />
                         </div>
                         <div>
-                          <span className="text-base font-mono font-bold text-[var(--text-primary)] leading-tight block">
+                          <span className="text-base font-sans font-bold text-[var(--text-primary)] leading-tight block">
                             {proj.name}
                           </span>
-                          <div className="flex items-center gap-2 mt-0.5">
+                          <div className="flex items-center gap-1.5 mt-0.5">
                             <span className="text-[10px] font-mono text-[var(--text-muted)]">
-                              {proj.owner} / {proj.branch}
+                              org / {proj.org}
                             </span>
                             <span className="font-mono text-[9px] px-2 py-0.5 rounded-full bg-[var(--accent-subtle)] border border-[var(--accent)]/15 text-[var(--accent)] font-bold uppercase">
-                              {proj.branch}
+                              Active SPEC
                             </span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-4">
                         {/* Status Badge */}
-                        {proj.status === "Synced" && (
-                          <span className="font-mono text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full border text-emerald-400 bg-emerald-500/[0.08] border-emerald-500/20 font-bold">
-                            Synced
-                          </span>
-                        )}
-                        {proj.status === "Syncing" && (
-                          <span className="font-mono text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full border text-[var(--accent)] bg-[var(--accent-subtle)] border-[var(--accent)]/20 flex items-center gap-1.5 font-bold">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse" />
-                            <span>Syncing</span>
-                          </span>
-                        )}
-                        {proj.status === "Idle" && (
-                          <span className="font-mono text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full border text-[var(--text-muted)] bg-[var(--bg-card)] border-[var(--border)] font-bold">
-                            Idle
-                          </span>
-                        )}
+                        <span className="font-mono text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full border text-emerald-400 bg-emerald-500/[0.08] border-emerald-500/20 font-bold">
+                          Validated
+                        </span>
 
-                        {/* Last sync */}
+                        {/* Last Interview */}
                         <div className="flex items-center gap-1.5 text-[10px] font-mono text-[var(--text-muted)]">
                           <Clock className="w-3.5 h-3.5" />
-                          <span>{proj.lastSync}</span>
+                          <span>Last Interview: {proj.lastInterview}</span>
                         </div>
                       </div>
                     </div>
@@ -1566,23 +1396,37 @@ export default function DashboardClient() {
                     {/* STATS MINI ROW */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
                       {[
-                        { label: "Graph Nodes", value: String(proj.schemaNodes + proj.apiNodes + proj.webhookNodes), icon: Network },
-                        { label: "Tables", value: String(proj.tables), icon: Table2 },
-                        { label: "API Endpoints", value: String(proj.apiNodes), icon: Hash },
-                        { label: "Context Calls", value: String(proj.contextCalls), icon: Zap },
+                        { label: "Completeness", value: `${proj.completeness}%`, icon: FileText, showProgress: true, completeness: proj.completeness },
+                        { label: "Confirmed Nodes", value: String(proj.confirmedNodes), icon: Network },
+                        { label: "Modules", value: String(proj.modules), icon: Grid },
+                        { label: "Open Questions", value: String(proj.openQuestions), icon: HelpCircle },
                       ].map((mini, mIdx) => {
                         const MiniIcon = mini.icon;
                         return (
-                          <div key={mIdx} className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-3">
+                          <div key={mIdx} className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-3.5 flex flex-col justify-between h-24">
                             <div className="flex justify-between items-start">
                               <span className="text-[9px] uppercase font-mono tracking-wider text-[var(--text-muted)] font-bold block mb-1">
                                 {mini.label}
                               </span>
                               <MiniIcon className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
                             </div>
-                            <span className="text-xl font-bold font-sans text-[var(--text-primary)] leading-none mt-1 block">
-                              {mini.value}
-                            </span>
+                            {mini.showProgress ? (
+                              <div className="w-full mt-1.5">
+                                <span className="text-xl font-bold font-sans text-[var(--text-primary)] leading-none block">
+                                  {mini.value}
+                                </span>
+                                <div className="w-full h-1 bg-[var(--bg-card)] rounded-full overflow-hidden border border-[var(--border)]/20 mt-1.5">
+                                  <div 
+                                    className="h-full rounded-full bg-[var(--accent)] transition-all duration-500" 
+                                    style={{ width: `${mini.completeness}%` }} 
+                                  />
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="text-xl font-bold font-sans text-[var(--text-primary)] leading-none mt-1 block">
+                                {mini.value}
+                              </span>
+                            )}
                           </div>
                         );
                       })}
@@ -1590,50 +1434,68 @@ export default function DashboardClient() {
 
                     {/* BOTTOM ROW */}
                     <div className="grid md:grid-cols-2 gap-4">
-                      {/* LEFT - Recent Commits */}
-                      <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-4">
-                        <div className="flex items-center gap-1.5 mb-3">
-                          <GitCommit className="w-3.5 h-3.5 text-[var(--accent)]" />
-                          <span className="text-[10px] uppercase font-mono tracking-wider text-[var(--text-muted)] font-bold">
-                            Recent Commits
-                          </span>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                          {proj.commits.map((commit, cIdx) => (
-                            <div key={cIdx} className="flex items-start gap-2.5">
-                              <span className="font-mono text-[9px] bg-[var(--bg-card)] border border-[var(--border)] px-1.5 py-0.5 rounded text-[var(--text-muted)] shrink-0">
-                                {commit.hash}
-                              </span>
-                              <span className="text-xs font-sans text-[var(--text-secondary)] flex-1 leading-snug truncate">
-                                {commit.message}
-                              </span>
-                              <span className="text-[10px] font-mono text-[var(--text-muted)] shrink-0">
-                                {commit.time}
-                              </span>
-                            </div>
-                          ))}
+                      {/* LEFT - Recent Knowledge Changes */}
+                      <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-4 flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-center gap-1.5 mb-3">
+                            <Sparkles className="w-3.5 h-3.5 text-[var(--accent)]" />
+                            <span className="text-[10px] uppercase font-mono tracking-wider text-[var(--text-muted)] font-bold">
+                              Recent Knowledge Changes
+                            </span>
+                          </div>
+                          <div className="flex flex-col gap-2.5">
+                            {proj.recentChanges.map((change) => {
+                              let badgeColor = "bg-[var(--accent)]/[0.08] border-[var(--accent)]/20 text-[var(--accent)]";
+                              if (change.type === "confirmed") badgeColor = "bg-emerald-500/[0.08] border-emerald-500/20 text-emerald-400";
+                              if (change.type === "refined") badgeColor = "bg-amber-500/[0.08] border-amber-500/20 text-amber-400";
+                              return (
+                                <div key={change.id} className="flex items-start justify-between gap-3 text-xs leading-snug">
+                                  <div className="flex items-start gap-2 min-w-0">
+                                    <span className={`font-mono text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded border ${badgeColor} font-bold shrink-0 mt-0.5`}>
+                                      {change.type}
+                                    </span>
+                                    <span className="text-xs font-sans text-[var(--text-secondary)] font-medium truncate">
+                                      {change.title}
+                                    </span>
+                                  </div>
+                                  <span className="text-[10px] font-mono text-[var(--text-muted)] shrink-0 mt-0.5">
+                                    {change.time}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
                       </div>
 
-                      {/* RIGHT - Actions */}
+                      {/* RIGHT - Quick Actions */}
                       <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-4">
                         <span className="text-[10px] uppercase font-mono tracking-wider text-[var(--text-muted)] font-bold mb-3 block">
                           Quick Actions
                         </span>
                         <div className="flex flex-col gap-2">
-                          <button className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border)] hover:border-[var(--border-hover)] cursor-pointer transition-colors text-xs font-sans font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
-                            <Network className="w-3.5 h-3.5 text-[var(--accent)]" />
-                            <span>View Knowledge Graph</span>
-                            <ExternalLink className="w-3 h-3 text-[var(--text-muted)] ml-auto" />
-                          </button>
-                          <button className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border)] hover:border-[var(--border-hover)] cursor-pointer transition-colors text-xs font-sans font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
-                            <Database className="w-3.5 h-3.5 text-[var(--accent)]" />
-                            <span>Explore Schema</span>
-                            <ExternalLink className="w-3 h-3 text-[var(--text-muted)] ml-auto" />
-                          </button>
-                          <button className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border)] hover:border-[var(--border-hover)] cursor-pointer transition-colors text-xs font-sans font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+                          <button 
+                            onClick={() => setActiveTab("documents")}
+                            className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border)] hover:border-[var(--border-hover)] cursor-pointer transition-colors text-xs font-sans font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                          >
                             <FileText className="w-3.5 h-3.5 text-[var(--accent)]" />
                             <span>View Documents</span>
+                            <ExternalLink className="w-3 h-3 text-[var(--text-muted)] ml-auto" />
+                          </button>
+                          <button 
+                            onClick={() => setActiveTab("documents")}
+                            className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border)] hover:border-[var(--border-hover)] cursor-pointer transition-colors text-xs font-sans font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                          >
+                            <MessageSquare className="w-3.5 h-3.5 text-[var(--accent)]" />
+                            <span>Open Interview Tracker</span>
+                            <ExternalLink className="w-3 h-3 text-[var(--text-muted)] ml-auto" />
+                          </button>
+                          <button 
+                            onClick={() => setActiveTab("graph")}
+                            className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border)] hover:border-[var(--border-hover)] cursor-pointer transition-colors text-xs font-sans font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                          >
+                            <Network className="w-3.5 h-3.5 text-[var(--accent)]" />
+                            <span>View Knowledge Graph</span>
                             <ExternalLink className="w-3 h-3 text-[var(--text-muted)] ml-auto" />
                           </button>
                         </div>
@@ -1651,14 +1513,17 @@ export default function DashboardClient() {
                   <Plus className="w-5 h-5 text-[var(--accent)]" />
                 </div>
                 <h3 className="text-base font-bold font-sans text-[var(--text-primary)]">
-                  Connect a Repository
+                  Define a New Project
                 </h3>
                 <p className="text-sm text-[var(--text-muted)] font-sans max-w-sm">
-                  Link a GitHub repo to start parsing schemas, APIs and building your knowledge graph.
+                  A project is a body of structured knowledge you build through the interactive interview process, transforming open assumptions into solid specifications.
                 </p>
-                <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold uppercase tracking-wider transition-all shadow-[0_4px_20px_-4px_var(--accent-glow)] active:scale-[0.98] cursor-pointer">
+                <button 
+                  onClick={() => setActiveTab("documents")}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold uppercase tracking-wider transition-all shadow-[0_4px_20px_-4px_var(--accent-glow)] active:scale-[0.98] cursor-pointer"
+                >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Connect Repository</span>
+                  <span>New Project</span>
                 </button>
               </div>
 
@@ -1678,7 +1543,9 @@ export default function DashboardClient() {
           ) : activeTab === "schema" ? (
             <SchemaTab key="schema" />
           ) : activeTab === "documents" ? (
-            <DocumentsTab key="documents" />
+            <DocumentsTab key="documents" setIsSidebarCollapsed={setIsSidebarCollapsed} />
+          ) : activeTab === "interview" ? (
+            <InterviewTab key="interview" />
           ) : activeTab === "keys" ? (
             <KeysTab key="keys" />
           ) : activeTab === "settings" ? (

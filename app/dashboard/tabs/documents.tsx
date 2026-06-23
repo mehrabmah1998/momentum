@@ -440,7 +440,11 @@ function renderContent(content: string, activeDocType: DocType): React.ReactNode
   return nodes;
 }
 
-export default function DocumentsTab() {
+export default function DocumentsTab({
+  setIsSidebarCollapsed,
+}: {
+  setIsSidebarCollapsed?: (collapsed: boolean) => void;
+} = {}) {
   const [activeDocType, setActiveDocType] = useState<DocType>("insider");
   const [selectedPageId, setSelectedPageId] = useState<string>("mission-purpose");
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(["vision", "modules"]));
@@ -453,6 +457,13 @@ export default function DocumentsTab() {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Collapse sidebar when entering split mode
+  useEffect(() => {
+    if (viewMode === "split" && setIsSidebarCollapsed) {
+      setIsSidebarCollapsed(true);
+    }
+  }, [viewMode, setIsSidebarCollapsed]);
 
   // In-memory simulation of pages contents database edits
   const [pagesContent, setPagesContent] = useState<Record<string, Record<DocType, string>>>(() => {
@@ -626,51 +637,12 @@ export default function DocumentsTab() {
   return (
     <div className="flex flex-col min-h-screen bg-[var(--bg)] font-sans w-full text-[var(--text-primary)]" id="documents-tab-root">
       
-      {/* PAGE HEADER */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 px-8 pt-8 pb-4" id="documents-header">
-        <div className="flex flex-col gap-1">
-          <motion.span
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0 }}
-            className="font-mono text-[9px] uppercase tracking-[0.2em] text-[var(--accent)] font-bold px-3 py-1 rounded-full border border-[var(--accent)]/25 bg-[var(--accent)]/[0.08] inline-block w-fit"
-            style={{ color: themeColor, borderColor: `${themeColor}35`, backgroundColor: `${themeColor}12` }}
-          >
-            Structure & Reading
-          </motion.span>
-          <motion.h1
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.06 }}
-            className="text-2xl font-bold tracking-tight text-[var(--text-primary)] mt-1"
-          >
-            Project Documentation
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.12 }}
-            className="text-sm text-[var(--text-muted)] mt-1 font-medium"
-          >
-            Inspect or edit three dynamic viewport specs. Integrated inline Markdown, live completeness checks & connected components.
-          </motion.p>
-        </div>
-
-        <button
-          onClick={handleRegenerate}
-          disabled={isGenerating}
-          className="flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--bg-card)] hover:bg-[var(--border-hover)] text-[var(--text-secondary)] font-semibold text-xs px-5 py-2.5 transition-all select-none hover:text-[var(--text-primary)] disabled:opacity-50 cursor-pointer shadow-sm"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${isGenerating ? "animate-spin" : ""}`} style={{ color: themeColor }} />
-          <span>{isGenerating ? "Syncing..." : "Regenerate Live Docs"}</span>
-        </button>
-      </div>
-
       {/* BODY */}
-      <div className="flex flex-col lg:flex-row gap-6 px-8 pb-8 flex-1 min-h-0" id="documents-body">
+      <div className="flex flex-col lg:flex-row gap-6 px-8 py-8 flex-1 min-h-0" id="documents-body">
         
         {/* LEFT SIDEBAR: Standard Doppelrand structure nested perfectly */}
-        <div className="w-full lg:w-72 shrink-0 flex flex-col gap-4" id="documents-sidebar">
+        {viewMode !== "split" && (
+          <div className="w-full lg:w-72 shrink-0 flex flex-col gap-4" id="documents-sidebar">
           
           <div className="bg-[var(--bg-surface)] p-[6px] border border-[var(--border)] rounded-[20px] shadow-sm flex flex-col gap-3">
             
@@ -720,7 +692,7 @@ export default function DocumentsTab() {
                 <div className="flex flex-col gap-2">
                   {SECTIONS.map((section) => {
                     const isExpanded = expandedSections.has(section.id);
-                    const IconComponent = section.icon;
+                    const IconComponent = section.icon as any;
 
                     const filteredPages = section.pages.filter(page =>
                       page.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -848,6 +820,7 @@ export default function DocumentsTab() {
           </div>
 
         </div>
+        )}
 
         {/* RIGHT PANEL: Workspace Canvas */}
         <div className="flex-1 flex flex-col min-w-0" id="documents-right-pane">
