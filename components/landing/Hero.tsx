@@ -24,18 +24,18 @@ export default function Hero() {
   const stepsInfo = [
     {
       title: "01 / The Blind Build",
-      subtitle: "Silent Regression Era",
-      desc: "Without Momentum, active AI builders write legacy sqlite queries, blind to live PostgreSQL production migrations.",
+      subtitle: "Context Amnesia Era",
+      desc: "Without Momentum, your AI builder guesses: it re-invents decisions you already made, violates constraints nobody wrote down, and contradicts the architecture in its own last session.",
     },
     {
-      title: "02 / Live Knowledge Graph",
-      subtitle: "Continuous Git Sync",
-      desc: "Momentum intercepts commits, parsing Postgres schemas, webhook signatures, and APIs into a living semantic graph.",
+      title: "02 / The Extraction Interview",
+      subtitle: "Knowledge Built From Conversation",
+      desc: "Momentum interviews you — one sharp question at a time, validating every answer for specificity and rationale — and files each fact into a structured knowledge graph of modules, decisions, and constraints.",
     },
     {
-      title: "03 / Grounded Injection",
-      subtitle: "Real-Time Context Delivery",
-      desc: "The developer agent receives live schemas instantly injected. Code compiles cleanly on first run with zero regressions.",
+      title: "03 / The Precision Prompt",
+      subtitle: "Exact Context, Zero Guessing",
+      desc: "When you plan a feature, Momentum debates it against your graph — flags conflicts, names affected modules — and exports a precision prompt with exact constraints and what must not break, ready to paste into Claude Code or Cursor.",
     }
   ];
 
@@ -56,7 +56,7 @@ export default function Hero() {
           >
             <Sparkles className="w-3.5 h-3.5 text-[var(--accent)]" strokeWidth={1.5} />
             <span className="text-[10px] uppercase tracking-[0.2em] font-mono text-[var(--text-secondary)] font-medium">
-              The Living Knowledge Graph for Software Architecture
+              The Living Knowledge Base for AI-Built Software
             </span>
           </motion.div>
 
@@ -80,7 +80,7 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="text-[var(--text-secondary)] text-lg md:text-xl font-sans font-normal max-w-4xl lg:max-w-5xl leading-relaxed mb-10"
           >
-            Claude Code, Cursor, and Codex operate on flat markdown files and loose logs. Momentum preserves a real-time, structured database of your project’s schema, architecture constraints, and hooks—rendering pixel-perfect prompt grounding and preventing codebase decay automatically.
+            Claude Code, Cursor, and Codex operate on flat markdown files and loose context. Momentum interviews you, structures what you know into a living knowledge graph — every module, decision, and constraint with its why — and turns it into three living documents and precision prompts your AI builder can actually trust.
           </motion.p>
 
           {/* Dual CTAs with Button-in-Button Arrow interaction */}
@@ -140,7 +140,7 @@ export default function Hero() {
                   <div className="flex items-center gap-1.5 font-mono text-[9px] tracking-wider text-[var(--text-muted)] font-bold">
                     <span>MOMENTUM_RUN</span>
                     <span className="text-[var(--accent)]">/</span>
-                    <span className="text-[var(--text-secondary)]">CONTEXT_HYPOTHESIS_SIMULATOR</span>
+                    <span className="text-[var(--text-secondary)]">KNOWLEDGE_LOOP_SIMULATOR</span>
                   </div>
                 </div>
 
@@ -254,51 +254,53 @@ export default function Hero() {
                         <div className="p-3 bg-rose-500/5 rounded-xl border border-rose-500/10">
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-[10px] text-rose-500 font-bold uppercase tracking-wider">▲ Stale File: CLAUDE.md</span>
-                            <span className="text-[9px] text-[var(--text-muted)] bg-rose-500/10 px-1.5 py-0.5 rounded">14 Days Ago</span>
+                            <span className="text-[9px] text-[var(--text-muted)] bg-rose-500/10 px-1.5 py-0.5 rounded">30 Days Stale</span>
                           </div>
                           <p className="text-[var(--text-muted)] text-[11px] leading-relaxed">
-                            # Database Setup<br />
-                            - schema: SQLite db file local state.<br />
-                            - queue: Standard redis in-memory stack.<br />
+                            # Project Settings<br />
+                            - auth: basic cookies.<br />
+                            - core module: routing logic.<br />
                             <span className="text-rose-400 font-bold italic block mt-1.5 font-sans">
-                              (Wait, the engineering team migrated to Postgres and deprecated Redis 2 days ago via Git commit #92fa3d)
+                              (Missing: active token rotation rules, org hierarchy limits, and recent auth security constraints)
                             </span>
                           </p>
                         </div>
 
                         {/* Flat folder structure mismatch visualization */}
                         <div className="space-y-1 text-[11px] text-[var(--text-muted)] bg-[var(--bg-card)]/40 p-3 rounded-lg border border-[var(--border)]">
-                          <p className="text-[10px] font-bold text-[var(--text-secondary)] mb-1 uppercase tracking-wider">Loose flat context fed to AI:</p>
-                          <p className="text-rose-400 line-through">✓ database: sqlite3</p>
-                          <p className="text-rose-400 line-through">✓ queue: standard redis core</p>
-                          <p className="text-[var(--text-muted)] opacity-60">✓ main_router.ts</p>
+                          <p className="text-[10px] font-bold text-[var(--text-secondary)] mb-1 uppercase tracking-wider">Flat context fed to AI:</p>
+                          <p className="text-rose-400 line-through">✗ Missing: Auth & organization rules</p>
+                          <p className="text-rose-400 line-through">✗ Missing: Multi-tenant design decisions</p>
+                          <p className="text-[var(--text-muted)] opacity-60">✓ raw_router_v2.ts</p>
                         </div>
                       </motion.div>
                     )}
 
                     {activeStep === 1 && (
                       <motion.div
-                        key="state-syncing"
+                        key="state-extracting"
                         initial={{ opacity: 0, scale: 0.98 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.98 }}
                         transition={{ duration: 0.5 }}
                         className="space-y-4"
                       >
+                        {/* Interactive interview question & answer block */}
                         <div className="p-3 bg-amber-500/5 border border-amber-500/15 rounded-xl text-xs font-mono">
                           <div className="flex items-center justify-between mb-2">
                             <span className="flex items-center gap-1.5 text-amber-500 font-bold text-[10px] uppercase tracking-wider">
-                              <GitBranch className="w-3 h-3 text-amber-500 animate-spin-slow" /> Running Git Parser Sync
+                              <Sparkles className="w-3 h-3 text-amber-500 animate-spin-slow" /> ACTIVE EXTRACTION INTERVIEW
                             </span>
-                            <span className="text-[9px] bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded font-bold">COMMIT_IN</span>
+                            <span className="text-[9px] bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded font-bold">QA_INTAKE</span>
                           </div>
-                          <p className="text-[var(--text-secondary)] text-[11px] leading-relaxed">
-                            Analyzing diff <span className="text-amber-400 font-bold font-mono">#92fa3d</span> (feat: postgres transition with relational constraints & NextEdge integration)...
-                          </p>
+                          <div className="space-y-2 text-[11px] leading-relaxed">
+                            <p className="text-amber-400">Q: Why did you choose better-auth over Clerk for user authentication?</p>
+                            <p className="text-[var(--text-secondary)] italic">&quot;We wanted organization-scoped invites that don&apos;t trigger per-seat price limitations.&quot;</p>
+                          </div>
                         </div>
 
-                        {/* Live active dependency graph simulation */}
-                        <div className="relative h-44 rounded-xl border border-[var(--border)] bg-[var(--bg-card)]/50 flex flex-col justify-center items-center overflow-hidden">
+                        {/* Storing and validating animation block */}
+                        <div className="relative h-44 rounded-xl border border-[var(--border)] bg-[var(--bg-card)]/50 flex flex-col justify-center items-center overflow-hidden p-4">
                           <div className="absolute inset-0 grid grid-cols-4 grid-rows-4 opacity-[0.03] pointer-events-none">
                             <div className="border border-[var(--text-primary)]" />
                             <div className="border border-[var(--text-primary)]" />
@@ -306,55 +308,33 @@ export default function Hero() {
                             <div className="border border-[var(--text-primary)]" />
                           </div>
 
-                          {/* Render nodes and connections */}
-                          <div className="flex items-center gap-4 relative z-10">
-                            {/* Postgres Node */}
-                            <motion.div 
-                              animate={{ scale: [1, 1.05, 1] }}
-                              transition={{ repeat: Infinity, duration: 2.5 }}
-                              className="px-2.5 py-1.5 rounded bg-blue-500/10 border border-blue-500/30 text-blue-400 font-mono text-[9px] flex flex-col items-center"
+                          {/* Quality gate pass label & check animation */}
+                          <div className="flex flex-col items-center gap-2 relative z-10 text-center">
+                            <motion.div
+                              animate={{ scale: [1, 1.05, 1], opacity: [0.8, 1, 0.8] }}
+                              transition={{ repeat: Infinity, duration: 2 }}
+                              className="px-3 py-1 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-[10px] font-bold"
                             >
-                              <Database className="w-3.5 h-3.5 mb-1" />
-                              <span>Live Postgres</span>
+                              QUALITY_GATE: PASS · RATIONALE CAPTURED
                             </motion.div>
 
-                            {/* Connecting Line */}
-                            <div className="w-8 h-[2px] bg-gradient-to-r from-blue-500/50 to-emerald-500/50 relative overflow-hidden">
-                              <motion.div 
-                                animate={{ x: ["-100%", "100%"] }}
-                                transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
-                                className="absolute top-0 h-full w-2 bg-white"
-                              />
+                            {/* Connecting and mapping node flow */}
+                            <div className="flex items-center gap-2 mt-2">
+                              <div className="px-2 py-1 rounded bg-amber-500/10 border border-amber-500/30 text-amber-500 font-mono text-[9px]">
+                                Conversation Input
+                              </div>
+                              <div className="w-6 h-[1px] bg-amber-500/40" />
+                              <div className="p-1 rounded-full bg-[var(--accent)] text-[var(--bg)] flex items-center justify-center">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                              </div>
+                              <div className="w-6 h-[1px] bg-emerald-500/40" />
+                              <div className="px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-[9px]">
+                                project.modules.auth.decisions
+                              </div>
                             </div>
 
-                            {/* Momentum Graph Hub */}
-                            <div className="p-2 rounded-full bg-[var(--accent)] text-[var(--bg)] animate-pulse">
-                              <Cpu className="w-4 h-4" />
-                            </div>
-
-                            {/* Connecting Line */}
-                            <div className="w-8 h-[2px] bg-gradient-to-r from-[var(--accent)]/50 to-[var(--text-secondary)]/50 relative overflow-hidden">
-                              <motion.div 
-                                animate={{ x: ["-100%", "100%"] }}
-                                transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-                                className="absolute top-0 h-full w-2 bg-emerald-400"
-                              />
-                            </div>
-
-                            {/* Mapped Hook Endpoint Node */}
-                            <motion.div 
-                              animate={{ scale: [1, 1.03, 1] }}
-                              transition={{ repeat: Infinity, duration: 3, delay: 0.5 }}
-                              className="px-2.5 py-1.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-[9px] flex flex-col items-center"
-                            >
-                              <Code className="w-3.5 h-3.5 mb-1" />
-                              <span>Stripe Endpoint</span>
-                            </motion.div>
-                          </div>
-
-                          <div className="absolute bottom-2 text-center">
-                            <span className="font-mono text-[8px] uppercase tracking-widest text-[var(--text-muted)] animate-pulse">
-                              Syncing dependency nodes: Postgres relations + constraints detected
+                            <span className="font-mono text-[9px] uppercase tracking-wider text-emerald-400 font-bold block mt-3">
+                              NODE STORED → org-invite-auth
                             </span>
                           </div>
                         </div>
@@ -370,37 +350,35 @@ export default function Hero() {
                         transition={{ duration: 0.4 }}
                         className="space-y-4 font-mono text-xs"
                       >
-                        {/* Synced Knowledge Base */}
+                        {/* Synced Knowledge Base showing prompt bundle */}
                         <div className="p-3 bg-emerald-500/5 rounded-xl border border-emerald-500/15">
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                              <CheckCircle2 className="w-3 h-3" /> SYNCHRONIZED ARCHITECTURE SYSTEM
+                              <CheckCircle2 className="w-3 h-3" /> PRECISION PROMPT COMPILED
                             </span>
-                            <span className="text-[9px] text-emerald-500 bg-emerald-500/15 px-2 py-0.5 rounded font-bold">100% UP-TO-DATE</span>
+                            <span className="text-[9px] text-emerald-500 bg-emerald-500/15 px-2 py-0.5 rounded font-bold">PROMPT_READY</span>
                           </div>
                           
-                          <p className="text-[var(--text-secondary)] text-[10.5px] leading-relaxed mb-2 font-sans">
-                            Continuous commit mapping ensures Momentum knows perfectly thatSQLite was migrated and Redis deprecated.
-                          </p>
-
-                          <div className="space-y-1.5 text-[10px] border-t border-[var(--border)] pt-2 mt-2">
-                            <p className="text-emerald-400 flex items-center gap-1">
-                              ✓ database_schema: postgresql (primary schemas fully compiled)
-                            </p>
-                            <p className="text-emerald-400 flex items-center gap-1">
-                              ✓ auth_bridge: Clerk webhooks docked correctly
-                            </p>
-                            <p className="text-emerald-400 flex items-center gap-1">
-                              ✓ queue_layer: Active NextEdge serverless routing limit verified
-                            </p>
-                          </div>
+                          {/* Generated prompt mock block */}
+                          <div className="bg-black/30 p-2 rounded-lg border border-emerald-500/10 font-mono text-[9px] leading-relaxed text-[var(--text-secondary)] space-y-2 max-h-44 overflow-y-auto">
+                             <p className="text-emerald-400 font-bold">## Project Context</p>
+                             <p className="text-[var(--text-muted)]">- @core-stack: organization-scoped invites, better-auth with organization boundaries</p>
+                             <p className="text-emerald-400 font-bold">## What to Build</p>
+                             <p className="text-[var(--text-muted)]">- Organizers must manually approve guest invitations before guest gets seat access</p>
+                             <p className="text-emerald-400 font-bold">## Constraints to Respect</p>
+                             <p className="text-[var(--text-muted)]">- Organizations owner invitation overrides, NextEdge edge function rules</p>
+                             <p className="text-emerald-400 font-bold">## Do Not Break</p>
+                             <p className="text-[var(--text-muted)]">- D1 and better-auth multi-tenant custom session middleware</p>
+                             <p className="text-emerald-400 font-bold">## Files Likely Involved</p>
+                             <p className="text-[var(--text-muted)]">- /lib/auth.ts, /app/dashboard/tabs/keys.tsx</p>
+                           </div>
                         </div>
 
-                        {/* Interactive floating particles container */}
+                        {/* Interactive prompt clipboard action indicator */}
                         <div className="p-3 bg-[var(--bg-card)] rounded-lg border border-[var(--border)] flex items-center justify-between text-[11px] text-[var(--text-secondary)]">
-                          <span>Graph status tracing: verified.</span>
-                          <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 text-[9px] rounded font-mono uppercase tracking-wider font-bold">
-                            Grounding Active
+                          <span className="flex items-center gap-1.5 text-emerald-400 font-bold">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                            Copied to clipboard → Ready for Claude Code / Cursor
                           </span>
                         </div>
                       </motion.div>
@@ -411,9 +389,9 @@ export default function Hero() {
                 {/* Left card bottom state summary pill */}
                 <div className="mt-4 border-t border-[var(--border)] pt-4 z-10">
                   <span className="font-mono text-[9px] text-[var(--text-muted)] tracking-wider">
-                    {activeStep === 0 && "SYSTEM STATUS: OUT-OF-DATE FLAT DOCUMENTATION"}
-                    {activeStep === 1 && "SYSTEM STATUS: CONSTRUCTING KNOWLEDGE SCHEMA"}
-                    {activeStep === 2 && "SYSTEM STATUS: ACTIVE CONTEXT INTEGRATION"}
+                    {activeStep === 0 && "SYSTEM STATUS: AMNESIA MODE · OUT-OF-DATE CONTEXT"}
+                    {activeStep === 1 && "SYSTEM STATUS: GRAPH GENERATION IN PROGRESS"}
+                    {activeStep === 2 && "SYSTEM STATUS: PRECISION GROUNDING PROMPT COMPILED"}
                   </span>
                 </div>
               </div>
@@ -436,9 +414,15 @@ export default function Hero() {
 
                   {/* Dev Input Bubble */}
                   <div className="mb-4 bg-[var(--bg-card)] rounded-xl border border-[var(--border)] p-3 text-xs">
-                    <span className="font-mono text-[9px] text-[var(--accent)] font-bold uppercase tracking-wider block mb-1">Developer Command Inputs</span>
+                    <span className="font-mono text-[9px] text-[var(--accent)] font-bold uppercase tracking-wider block mb-1">
+                      {activeStep === 0 && "Developer Request"}
+                      {activeStep === 1 && "Interview Interaction"}
+                      {activeStep === 2 && "Active Feature Plan"}
+                    </span>
                     <p className="text-[var(--text-primary)] font-mono text-[11px] leading-tight">
-                      &quot;Write payment checkout API route and map transaction records&quot;
+                      {activeStep === 0 && "\"Add organization owner approvals to the user invitation module.\""}
+                      {activeStep === 1 && "\"Organization owners must manually approve guest invitations before they can access specifications.\""}
+                      {activeStep === 2 && "\"Export specification directory to ZIP bundle with integrity tag.\""}
                     </p>
                   </div>
 
@@ -457,12 +441,12 @@ export default function Hero() {
                             className="text-rose-400 space-y-2"
                           >
                             <p className="text-[10px] bg-rose-500/10 px-2 py-1 rounded inline-block font-sans font-bold">
-                              ❌ COMPILER ERROR: Database Mismatch
+                              ⚠️ DESIGN MISALIGNMENT: Wrong Assumptions
                             </p>
                             <p className="text-[11px] tracking-tight text-rose-500/90 leading-relaxed font-mono">
-                              &gt; initializing sqlite3 connection...<br />
-                              &gt; writing sqlite3_save_transaction_sqlite()...<br />
-                              &gt; <span className="font-bold underline text-rose-400">FAILED:</span> Table &apos;transactions&apos; does not inherit matching column constraints. Destination stack Postgres migration #92fa3d was ignored in flat context.
+                              &gt; AI: &quot;I will set up basic cookies and a standard database schema.&quot;<br />
+                              &gt; User: &quot;No, we decided to use D1 and better-auth inside organization-scopes!&quot;<br />
+                              &gt; AI: &quot;Understood. Rewriting auth layout... wait, where are the BetterAuth session constraints stored?&quot;
                             </p>
                           </motion.div>
                         )}
@@ -471,44 +455,50 @@ export default function Hero() {
                           <motion.div
                             key="gpt-waiting-out"
                             initial={{ opacity: 0 }}
-                            animate={{ opacity: 0.5 }}
+                            animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="text-amber-400 text-center py-6 italic font-sans"
+                            className="text-amber-400 space-y-2 font-mono"
                           >
-                            <RefreshCw className="w-5 h-5 mx-auto mb-2 animate-spin text-amber-500" />
-                            Intercepting Prompt Window...<br />
-                            Awaiting synchronized knowledge coordinates.
+                            <p className="text-[10px] bg-amber-500/10 px-2 py-1 rounded inline-block font-sans font-bold">
+                              ⚙️ CONVERSATIONAL SYNTHESIS ENGINE
+                            </p>
+                            <p className="text-[11px] tracking-tight text-amber-500/90 leading-relaxed font-mono">
+                              &gt; validating answers against existing graph...<br />
+                              &gt; resolving dependency overlaps on org validation...<br />
+                              &gt; building node-relations mapping...<br />
+                              &gt; <span className="font-bold text-amber-300">SYSTEM:</span> Ready to export grounded prompt guidelines for target design specifications.
+                            </p>
                           </motion.div>
                         )}
 
-                        {activeStep === 2 && (
-                          <motion.div
-                            key="gpt-success-out"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="text-emerald-400 space-y-2"
-                          >
-                            <p className="text-[10px] bg-emerald-500/10 px-2 py-1 rounded inline-block font-sans font-bold">
-                              ✓ BUILD SUCCESS: Momentum Context Injected
-                            </p>
-                            <p className="text-[11px] text-emerald-500/90 leading-relaxed font-mono">
-                              &gt; model system mapping verified Postgres schema...<br />
-                              &gt; detected foreign keys constraints from Stripe module...<br />
-                              &gt; writing NextEdge Pg pool config connection...<br />
-                              &gt; <span className="font-bold text-emerald-400">COMPILE SUCCESS:</span> Zero regressions detected. Saved 10,240 development tokens.
-                            </p>
-                          </motion.div>
-                        )}
+                         {activeStep === 2 && (
+                           <motion.div
+                             key="gpt-success-out"
+                             initial={{ opacity: 0 }}
+                             animate={{ opacity: 1 }}
+                             exit={{ opacity: 0 }}
+                             className="text-emerald-400 space-y-2"
+                           >
+                             <p className="text-[10px] bg-emerald-500/10 px-2 py-1 rounded inline-block font-sans font-bold">
+                               ✓ CLAUDE_CODE: PRECISION PROMPT RECEIVED
+                             </p>
+                             <p className="text-[11px] text-emerald-500/90 leading-relaxed font-mono">
+                               &gt; aligned with 5/5 precision prompt constraints...<br />
+                               &gt; verified org authorization rules bypass risk...<br />
+                               &gt; writing organization owner invitations approval hook...<br />
+                               &gt; <span className="font-bold text-emerald-400">COMPILE SUCCESS:</span> Perfect execution. Saved 10,240 development tokens.
+                             </p>
+                           </motion.div>
+                         )}
                       </AnimatePresence>
                     </div>
 
                     {/* Grounding Context injection tag */}
                     <div className="mt-4 border-t border-[var(--border)]/30 pt-2 flex items-center justify-between">
                       <span className="text-[9px] text-[var(--text-muted)] font-mono">
-                        {activeStep === 0 && "CONSTRUCTOR STATUS: ZERO-GROUNDING PREDICTION"}
-                        {activeStep === 1 && "CONSTRUCTOR STATUS: CONSTRUCTING SHUNT INTEGRATION"}
-                        {activeStep === 2 && "CONSTRUCTOR STATUS: INJECTED SYNC_GRAPH_v2"}
+                        {activeStep === 0 && "ENGINE STATUS: ZERO-GROUNDING CONVERSATION"}
+                        {activeStep === 1 && "CONSTRUCTOR STATUS: STRUCTURING INTERVIEW NODES"}
+                        {activeStep === 2 && "BUILDER STATUS: FLAWLESS EXECUTION GATEWAY"}
                       </span>
                     </div>
                   </div>
@@ -517,7 +507,7 @@ export default function Hero() {
                 {/* Telemetry outcome feedback badge on Side B */}
                 <div className="mt-4 border-t border-[var(--border)] pt-4 relative z-10 flex items-center justify-between">
                   <span className="font-mono text-[9px] uppercase font-bold tracking-widest text-[var(--text-muted)]">
-                    MOMENTUM PREVENTATIVE PIPELINE
+                    MOMENTUM KNOWLEDGE SYSTEM
                   </span>
 
                   <AnimatePresence mode="wait">
@@ -541,7 +531,7 @@ export default function Hero() {
                         exit={{ opacity: 0 }}
                         className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[9px] font-mono font-bold uppercase tracking-wider"
                       >
-                        Resolving Context Decoupling
+                        Structuring Knowledge Graph
                       </motion.span>
                     )}
 

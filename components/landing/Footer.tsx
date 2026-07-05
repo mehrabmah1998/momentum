@@ -25,7 +25,7 @@ export default function Footer() {
 
         {/* Technical context indicators */}
         <div className="text-[10px] text-[var(--text-muted)]">
-          <span>&copy; {new Date().getFullYear()} Momentum Technology. All permissions reserved.</span>
+          <span>&copy; {new Date().getFullYear()} Momentum Technology. All rights reserved.</span>
         </div>
 
       </div>

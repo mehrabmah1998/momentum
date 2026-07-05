@@ -10,7 +10,7 @@ export default function WhoItsFor() {
       role: "SaaS Builder with Claude Code",
       frustration: "Your codebase crossed 12,000 lines. Suddenly, your AI builder can't fit everything into the context window, and is starting to overwrite vital API files because it lacks global constraint maps.",
       deliverable: "Locked Architectural Rails",
-      desc: "Momentum holds context rules in place. Claude Code refers directly to the target schema, completing work 3x faster with zero regression bugs.",
+      desc: "Momentum holds context rules in place so your AI builder stops re-deciding what you already decided. Generate precision prompts directly from your verified knowledge base to keep architectural rails locked.",
       icon: User,
       iconColor: "text-[var(--accent)]"
     },
@@ -18,8 +18,8 @@ export default function WhoItsFor() {
       title: "The Squad (2-4 Devs)",
       role: "High-Speed Indie Team",
       frustration: "Dev A updates the database schema. Dev B, prompting their AI locally with yesterday's layout config, accidentally commits conflicting code that breaks the staging builds.",
-      deliverable: "CI Git Collaborative Sync",
-      desc: "Real-time collaborative diagram coordinates instantly with code changes. Every member of the squad generates prompts from the identical source.",
+      deliverable: "Shared Source of Truth",
+      desc: "One confirmed knowledge base — every member generates prompts from the same decisions and constraints, so Dev A and Dev B stop shipping contradictions.",
       icon: Users,
       iconColor: "text-[var(--accent)]"
     },
@@ -28,7 +28,7 @@ export default function WhoItsFor() {
       role: "Precision Prompt Architect",
       frustration: "You spend hours writing design sheets, manually pasting JSON objects and database structures into Slack messages to tell engineers what context they need to prompt with.",
       deliverable: "One-Click Prompt Synthesis",
-      desc: "Momentum automates the context collection. Select the epic, query the dependencies, and instantly generate prompts containing exact constraints.",
+      desc: "Select the feature epic and Momentum assembles the exact constraints and architectural decisions from the knowledge graph into a precision prompt for your builders.",
       icon: FileSignature,
       iconColor: "text-[var(--accent)]"
     }

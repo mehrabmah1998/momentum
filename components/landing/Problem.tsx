@@ -115,7 +115,7 @@ export default function Problem() {
       icon: RefreshCw,
       tag: "Obsolete Standard",
       title: "Immediate Document Decay",
-      desc: "Static markdown documentation is a write-once, never-read graveyard. The minute your AI builder completes a PR, the README and schema descriptions are instantly out of sync.",
+      desc: "Hand-written documentation is a write-once, never-read graveyard. Static READMEs become instantly obsolete because humans forget to manually update them when project realities shift. Momentum renders your docs directly from a maintained knowledge graph kept fresh through conversation.",
     }
   ];
 

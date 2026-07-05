@@ -83,7 +83,7 @@ export default function ThreeDocuments() {
             Three documents. One single source of truth.
           </h2>
           <p className="text-[var(--text-secondary)] text-base md:text-lg">
-            Momentum renders three tailored formats from the identical underlying system graph. When code updates, all views sync perfectly—making contradictions physically impossible.
+            Momentum renders three tailored documents from one knowledge graph. When the knowledge updates, all three update with it — making contradictions physically impossible.
           </p>
         </div>
 
@@ -138,11 +138,11 @@ export default function ThreeDocuments() {
           })}
         </div>
 
-        {/* Sync message */}
+        {/* Knowledge pipeline message */}
         <div className="mt-16 flex flex-col sm:flex-row items-center gap-4 justify-center text-center sm:text-left bg-gradient-to-r from-[var(--accent-subtle)] to-transparent border border-[var(--border)] max-w-2xl mx-auto rounded-full py-4 px-8 backdrop-blur">
           <RefreshCw className="w-5 h-5 text-[var(--accent)] animate-spin-slow shrink-0" strokeWidth={1.5} />
           <p className="text-xs sm:text-sm font-sans text-[var(--text-primary)] text-center sm:text-left">
-            <strong>The Sync Pipeline:</strong> Changing a relationship in your graph instantly compiles and redeploys previews across all three target audiences.
+            <strong>The Knowledge Pipeline:</strong> Changing a relationship in your graph instantly compiles and updates all three target documents.
           </p>
         </div>
       </div>

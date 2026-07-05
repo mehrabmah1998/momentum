@@ -9,15 +9,15 @@ export default function HowItWorks() {
       step: "01",
       icon: MessageSquareCode,
       title: "Talk with the Extraction Engine",
-      desc: "Answer a dynamic context interview. Momentum doesn't just parse text—it actively validates answers for logical consistency, and queries design patterns to build the primary architecture node.",
-      tags: ["Conversational Extraction", "Context Check"]
+      desc: "The primary input for your project's knowledge. Momentum interviews you by asking one sharp question at a time, dynamically adapting its format to your style, and validating every answer for specificity and rationale before storing it.",
+      tags: ["Conversational Extraction", "Primary Input"]
     },
     {
       step: "02",
       icon: LayoutDashboard,
-      title: "Synthesize the 3 Document Layer",
-      desc: "One single knowledge graph compiles three dedicated formats: Insider Docs for your human engineers, high-speed structured markdown files for your LLMs, and indexable public API specifications.",
-      tags: ["Zero Disconnections", "Single Graph Output"]
+      title: "Build the Structured Knowledge Graph",
+      desc: "Your interview answers instantly compile into a living knowledge graph. It structures modules, features, decisions (along with their core rationales), constraints, and entities inside a pre-defined, queryable mind map.",
+      tags: ["Knowledge Graph", "Pre-defined Mind Map"]
     },
     {
       step: "03",
@@ -29,16 +29,16 @@ export default function HowItWorks() {
     {
       step: "04",
       icon: Copy,
-      title: "Export Pristine Prompt Context",
-      desc: "Momentum packs exactly what the LLM needs—including specific interfaces, constraints, and relationships. Copy/paste or inject the perfect context block straight into Claude Code or Cursor.",
-      tags: ["Token Saving", "Clean Prompts"]
+      title: "Export the Precision Prompt",
+      desc: "Momentum exports a compiled precision prompt containing exact guidelines across key sections: context, constraints to respect, what must not break, and files likely involved. Copy/paste this prompt straight into Claude Code or Cursor to start coding.",
+      tags: ["Precision Prompt", "Zero Guessing"]
     },
     {
       step: "05",
       icon: GitPullRequest,
-      title: "Git Hook Syncs the Loop",
-      desc: "Once your AI builder completes the task and you make a commit, Momentum listens to the repository hook, diffs the code changes, updates the graph variables, and logs confidence trust scores.",
-      tags: ["CI Hook", "Auto Refresh"]
+      title: "Optional Feature Verification",
+      desc: "Optionally connect GitHub, and after your AI builder commits, Momentum diffs the commit against the planned feature — confirming it was built as agreed, or flagging where it diverged. This verification outcome marks features as built and elevates graph confidence.",
+      tags: ["Optional", "Feature Verification"]
     }
   ];
 
@@ -56,7 +56,7 @@ export default function HowItWorks() {
             The Momentum loop makes development bulletproof.
           </h2>
           <p className="text-[var(--text-secondary)] text-base md:text-lg">
-            A precise, continuous loop where human design coordinates with structured context, prompting, and automated system synchronization.
+            A precise, continuous loop: you talk, Momentum structures, your AI builder executes — and the knowledge never goes stale.
           </p>
         </div>
 

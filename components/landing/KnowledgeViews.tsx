@@ -9,161 +9,128 @@ import {
 
 type ActiveView = "document" | "constellation" | "health";
 
+interface NodeConnection {
+  node: string;
+  edge: "depends_on" | "constrained_by" | "governs";
+}
+
 interface ConstellationNode {
   id: string;
   label: string;
   tag: string;
   desc: string;
-  features: number;
-  trust: string;
-  level: string;
+  trust: "Human-Confirmed" | "AI-Suggested" | "Code-Verified";
+  status: "confirmed" | "needs-input";
+  connections: NodeConnection[];
   x: number;
   y: number;
   icon: React.ComponentType<any>;
   textColor: string;
   borderColor: string;
   bgGlow: string;
-  incoming: string;
-  outgoing: string;
 }
 
 const constellationNodes: ConstellationNode[] = [
   { 
     id: "auth", 
-    label: "auth_middleware", 
-    tag: "MIDDLEWARE",
-    desc: "Token validation & session security credentials.",
-    features: 6, 
-    trust: "Git-Confirmed", 
-    level: "Verified",
+    label: "Auth & Teams", 
+    tag: "MODULE",
+    desc: "Core identity system managing multi-tenant organizational boundaries and workspace invitations.",
+    trust: "Human-Confirmed", 
+    status: "confirmed",
+    connections: [
+      { node: "User Profile", edge: "depends_on" },
+      { node: "OAuth Login", edge: "governs" }
+    ],
     x: 125, 
     y: 100, 
     icon: ShieldCheck, 
     textColor: "text-blue-400",
     borderColor: "border-blue-500/30 group-hover:border-blue-500",
-    bgGlow: "rgba(59, 130, 246, 0.08)",
-    incoming: "Client Web Browser / API Route",
-    outgoing: "users/:id/POST"
+    bgGlow: "rgba(59, 130, 246, 0.08)"
   },
   { 
-    id: "endpoint", 
-    label: "users/:id/POST", 
-    tag: "API ENDPOINT",
-    desc: "Primary creation schema, initiates Stripe billing flow.",
-    features: 8, 
-    trust: "Git-Confirmed", 
-    level: "Synced",
+    id: "oauth_node", 
+    label: "OAuth Login", 
+    tag: "FEATURE",
+    desc: "Provides seamless federated authentication using external OAuth credentials.",
+    trust: "Code-Verified", 
+    status: "confirmed",
+    connections: [
+      { node: "Auth & Teams", edge: "constrained_by" },
+      { node: "JWT over Sessions", edge: "depends_on" }
+    ],
     x: 235, 
     y: 285, 
     icon: FileText, 
     textColor: "text-indigo-400",
     borderColor: "border-indigo-500/30 group-hover:border-indigo-500",
-    bgGlow: "rgba(99, 102, 241, 0.08)",
-    incoming: "auth_middleware",
-    outgoing: "postgres_db_schema"
+    bgGlow: "rgba(99, 102, 241, 0.08)"
   },
   { 
     id: "queue", 
-    label: "redis_queue_handler", 
-    tag: "ASYNC QUEUE",
-    desc: "Handles async cache updates & Stripe webhook retries.",
-    features: 4, 
-    trust: "AI-Suggested", 
-    level: "AI Synced",
+    label: "JWT over Sessions", 
+    tag: "DECISION",
+    desc: "Leverages lightweight cryptographic tokens to achieve stateless, low-latency validation.",
+    trust: "Human-Confirmed", 
+    status: "confirmed",
+    connections: [
+      { node: "Auth & Teams", edge: "depends_on" },
+      { node: "Session Expiration", edge: "governs" }
+    ],
     x: 455, 
     y: 100, 
     icon: Cpu, 
     textColor: "text-amber-400",
     borderColor: "border-amber-500/30 group-hover:border-amber-500",
-    bgGlow: "rgba(245, 158, 11, 0.08)",
-    incoming: "stripe_webhook",
-    outgoing: "postgres_db_schema"
+    bgGlow: "rgba(245, 158, 11, 0.08)"
   },
   { 
     id: "database", 
-    label: "postgres_db_schema", 
-    tag: "RELATIONAL DB",
-    desc: "Core database storing user and subscription structures.",
-    features: 16, 
+    label: "User Profile", 
+    tag: "ENTITY",
+    desc: "Represents verified system actors, their subscription status, and role metadata.",
     trust: "Human-Confirmed", 
-    level: "Verified",
+    status: "confirmed",
+    connections: [
+      { node: "Auth & Teams", edge: "governs" }
+    ],
     x: 475, 
     y: 300, 
     icon: Database, 
     textColor: "text-emerald-400",
     borderColor: "border-emerald-500/30 group-hover:border-emerald-500",
-    bgGlow: "rgba(16, 185, 129, 0.08)",
-    incoming: "users/:id/POST, redis_queue_handler",
-    outgoing: "Analytics Pipeline"
+    bgGlow: "rgba(16, 185, 129, 0.08)"
   },
   { 
-    id: "webhook", 
-    label: "stripe_webhook", 
-    tag: "WEBHOOK RECEIVER",
-    desc: "Captures billing triggers & charge statuses.",
-    features: 12, 
-    trust: "Validated", 
-    level: "Consistent",
+    id: "session_expiry", 
+    label: "Session Expiration", 
+    tag: "CONSTRAINT",
+    desc: "Mandates a strict 15-minute key lifetime to mitigate replay vulnerability vectors.",
+    trust: "AI-Suggested", 
+    status: "needs-input",
+    connections: [
+      { node: "JWT over Sessions", edge: "constrained_by" }
+    ],
     x: 695, 
     y: 195, 
     icon: CheckCircle2, 
     textColor: "text-violet-400",
     borderColor: "border-violet-500/30 group-hover:border-violet-500",
-    bgGlow: "rgba(139, 92, 246, 0.08)",
-    incoming: "Stripe API Webhook Gate",
-    outgoing: "redis_queue_handler, postgres_db_schema"
+    bgGlow: "rgba(139, 92, 246, 0.08)"
   }
 ];
 
-// Active simulated telemetry payload values
-const liveTelemetryData: Record<string, any> = {
-  auth: {
-    latency: "14ms",
-    invocations: "14.2k/m",
-    lastEvent: "AUTH_SUCCESS",
-    codeRef: "src/lib/jwt_verifier.ts",
-    activeRevision: "rev-24.8"
-  },
-  endpoint: {
-    latency: "42ms",
-    invocations: "8.1k/m",
-    lastEvent: "POST_OK user_9ac",
-    codeRef: "src/app/api/users/route.ts",
-    activeRevision: "rev-10.2"
-  },
-  queue: {
-    latency: "3ms",
-    invocations: "2.4k/m",
-    lastEvent: "CACHE_INVALIDATED",
-    codeRef: "src/workers/redis_queue.ts",
-    activeRevision: "rev-04.5"
-  },
-  database: {
-    latency: "8ms",
-    invocations: "41.6k/m",
-    lastEvent: "COMMIT user_sub_9ac",
-    codeRef: "prisma/schema.prisma",
-    activeRevision: "rev-99.1"
-  },
-  webhook: {
-    latency: "19ms",
-    invocations: "4.8k/m",
-    lastEvent: "WEBHOOK_OK evt_SUBS_041",
-    codeRef: "src/app/api/stripe/route.ts",
-    activeRevision: "rev-08.9"
-  }
-};
-
 const healthTiles = [
-  { name: "Auth Module Config", trust: "Human-Confirmed", level: "high", textColor: "text-emerald-500" },
-  { name: "POST /v1/users Endpoint", trust: "Git-Confirmed", level: "high", textColor: "text-emerald-500" },
-  { name: "Database Schema postgres", trust: "Human-Confirmed", level: "high", textColor: "text-emerald-500" },
-  { name: "Stripe Event Router", trust: "Git-Confirmed", level: "high", textColor: "text-emerald-500" },
-  { name: "Redis Invalidation Queue", trust: "AI-Suggested", level: "medium", textColor: "text-amber-500" },
-  { name: "Clerk Session Webhook", trust: "AI-Suggested", level: "medium", textColor: "text-amber-500" },
-  { name: "S3 Picture Upload Hook", trust: "Empty / Unverified", level: "low", textColor: "text-rose-500" },
-  { name: "Postgres Vector Extension", trust: "Human-Confirmed", level: "high", textColor: "text-emerald-500" },
-  { name: "Sendgrid Email Router", trust: "Desynced (Git Diverged)", level: "low", textColor: "text-rose-500" }
+  { name: "Organization → Identity", trust: "Human-Confirmed", level: "high", textColor: "text-emerald-500" },
+  { name: "Organization → Goals", trust: "Human-Confirmed", level: "high", textColor: "text-emerald-500" },
+  { name: "Organization → Audience", trust: "Human-Confirmed", level: "high", textColor: "text-emerald-500" },
+  { name: "Project → Vision", trust: "Code-Verified", level: "high", textColor: "text-emerald-500" },
+  { name: "Project → Modules", trust: "Human-Confirmed", level: "high", textColor: "text-emerald-500" },
+  { name: "Project → Constraints", trust: "AI-Suggested", level: "medium", textColor: "text-amber-500" },
+  { name: "Project → Decisions", trust: "Code-Verified", level: "high", textColor: "text-emerald-500" },
+  { name: "Project → Integrations", trust: "AI-Suggested", level: "medium", textColor: "text-amber-500" },
+  { name: "Project → Edge Cases", trust: "Stale — needs re-confirmation", level: "low", textColor: "text-rose-500" }
 ];
 
 export default function KnowledgeViews() {
@@ -236,8 +203,6 @@ export default function KnowledgeViews() {
     ? constellationNodes.find(n => n.id === hoveredNodeId) || constellationNodes[0]
     : constellationNodes[activeCycleIndex];
 
-  const nodeStats = liveTelemetryData[activeNode.id] || liveTelemetryData["auth"];
-
   return (
     <section id="knowledge-views" className="relative py-32 bg-transparent overflow-hidden border-t border-[var(--border)] dot-grid select-none">
       <div className="absolute top-[25%] left-[20%] w-[500px] h-[500px] rounded-full bg-[var(--accent-glow)] glow-spot pointer-events-none" />
@@ -252,7 +217,7 @@ export default function KnowledgeViews() {
             Visualize your project&apos;s true state.
           </h2>
           <p className="text-[var(--text-secondary)] text-base md:text-lg">
-            Say goodbye to flat README folders. Momentum maps every logic endpoint, database query, and third-party event listener automatically.
+            Say goodbye to flat README folders. Every module, decision, and constraint you&apos;ve confirmed — rendered as living documents, an explorable graph, and a confidence map you can trust at a glance.
           </p>
         </div>
 
@@ -299,9 +264,9 @@ export default function KnowledgeViews() {
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
             </div>
             <div className="text-[10px] font-mono text-[var(--text-secondary)] tracking-widest">
-              {activeTab === "document" && "MOMENTUM // WORKSPACE // CODE_DOCUMENT"}
-              {activeTab === "constellation" && "MOMENTUM // WORKSPACE // REACTION_FLOW_GRAPH"}
-              {activeTab === "health" && "MOMENTUM // WORKSPACE // SCHEMA_INTEGRITY_MAP"}
+              {activeTab === "document" && "MOMENTUM // WORKSPACE // LIVING_DOCUMENTS"}
+              {activeTab === "constellation" && "MOMENTUM // WORKSPACE // KNOWLEDGE_GRAPH"}
+              {activeTab === "health" && "MOMENTUM // WORKSPACE // CONFIDENCE_HEALTH_MAP"}
             </div>
             <div className="w-10 flex justify-end font-mono text-[8px] text-[var(--text-secondary)] opacity-50 bg-[var(--bg-card)] px-1.5 py-0.5 rounded border border-[var(--border)] uppercase">
               LIVE
@@ -322,52 +287,52 @@ export default function KnowledgeViews() {
                 >
                   {/* Tree list */}
                   <div className="bg-[var(--bg-surface)] backdrop-blur-md border border-[var(--border)]/70 rounded-2xl p-4 font-mono text-xs space-y-2">
-                    <div className="text-[var(--text-muted)] uppercase tracking-widest text-[8px] mb-3 font-semibold select-none">Project Workspace Files</div>
+                    <div className="text-[var(--text-muted)] uppercase tracking-widest text-[8px] mb-3 font-semibold select-none">Living Document Chapters</div>
                     <div className="text-[var(--accent)] font-bold flex items-center gap-2 py-1.5 px-2.5 rounded bg-[var(--accent-subtle)] border-l-2 border-[var(--accent)]">
                       <FileText className="w-4 h-4 animate-pulse" />
-                      <span>1. billing_pipeline</span>
+                      <span>1. Identity & Auth Bounds</span>
                     </div>
                     <div className="text-[var(--text-secondary)] flex items-center gap-2 py-1.5 px-2.5 hover:bg-[var(--bg-card)]/50 rounded cursor-pointer transition-colors">
                       <FileText className="w-4 h-4" />
-                      <span>2. users_onboarding</span>
+                      <span>2. Team Invitation Spec</span>
                     </div>
                     <div className="text-[var(--text-secondary)] flex items-center gap-2 py-1.5 px-2.5 hover:bg-[var(--bg-card)]/50 rounded cursor-pointer transition-colors">
                       <FileText className="w-4 h-4" />
-                      <span>3. socket_notification</span>
+                      <span>3. Session Security Config</span>
                     </div>
                     <div className="text-[var(--text-secondary)] flex items-center gap-2 py-1.5 px-2.5 hover:bg-[var(--bg-card)]/50 rounded cursor-pointer transition-colors">
                       <FileText className="w-4 h-4" />
-                      <span>4. analytics_funnels</span>
+                      <span>4. Feature Integration Map</span>
                     </div>
                   </div>
 
                   {/* Render page views */}
                   <div className="md:col-span-2 bg-[var(--bg-surface)]/30 backdrop-blur-md border border-[var(--border)]/70 rounded-2xl p-6 font-mono text-xs text-[var(--text-secondary)] flex flex-col justify-between">
                     <div>
-                      <div className="flex items-center gap-2 mb-4 justify-between border-b border-[var(--border)]pb-3 pb-3">
+                      <div className="flex items-center gap-2 mb-4 justify-between border-b border-[var(--border)] pb-3">
                         <div className="flex items-center gap-2">
                           <span className="p-1 px-2 rounded bg-[var(--accent-subtle)] text-[var(--accent)] text-[9px] font-bold">active</span>
-                          <span className="text-[var(--text-primary)] font-bold">billing_pipeline.md</span>
+                          <span className="text-[var(--text-primary)] font-bold">Identity & Auth Bounds Spec</span>
                         </div>
                         <span className="text-[9px] text-[var(--text-muted)]">rev-a4.8</span>
                       </div>
                       
                       <div className="space-y-4 text-xs leading-relaxed">
                         <div>
-                          <p className="text-[var(--text-primary)] font-bold mb-1">### 1.1 Webhook Integrity Check</p>
-                          <p className="opacity-80">Our Stripe hooks require processing via unique idempotency values check. If duplicate signature matches, respond immediately with 204 status.</p>
+                          <p className="text-[var(--text-primary)] font-bold mb-1">### 1.1 Multi-Tenant Isolation</p>
+                          <p className="opacity-80">Our identity boundaries partition organizations cleanly. If workspace contexts shift, check user invitation mappings before session grant.</p>
                         </div>
                         <div>
-                          <p className="text-[var(--text-primary)] font-bold mb-1">### 1.2 DB Synchronization</p>
-                          <p className="opacity-80">Sync relational writes directly to <code className="text-[var(--accent)] bg-[var(--bg-card)] px-1.5 py-0.5 rounded border border-[var(--border)] font-mono font-semibold">user_subscription</code> keys with strict locking sequence.</p>
+                          <p className="text-[var(--text-primary)] font-bold mb-1">### 1.2 Access Validation</p>
+                          <p className="opacity-80">Validate authorization tokens directly against organizational boundaries with a strict single-seat security sequence.</p>
                         </div>
                       </div>
                     </div>
 
                     <div className="mt-8 border-t border-[var(--border)] pt-4 flex justify-between items-center text-[9px] text-[var(--text-muted)] font-mono">
-                      <span>Ref source: metadata_graph_v1.2</span>
+                      <span>Ref source: knowledge_graph_v1.2</span>
                       <span className="flex items-center gap-1.5 text-emerald-500 font-bold">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Complied & Consistent
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Compiled & Consistent
                       </span>
                     </div>
                   </div>
@@ -398,17 +363,17 @@ export default function KnowledgeViews() {
                       </defs>
 
                       {/* SVG Bezier path links connecting elements */}
-                      {/* Connection 1: Auth -> Endpoint */}
+                      {/* Connection 1: Auth -> OAuth Node */}
                       <path d="M 125 100 Q 180 192 235 285" stroke="url(#glow-grad)" strokeWidth="1" fill="none" strokeDasharray="3 3" />
-                      {/* Connection 2: Endpoint -> Database */}
+                      {/* Connection 2: OAuth Node -> Database */}
                       <path d="M 235 285 Q 355 292 475 300" stroke="url(#glow-grad)" strokeWidth="1" fill="none" strokeDasharray="3 3" />
                       {/* Connection 3: Auth -> Queue */}
                       <path d="M 125 100 Q 290 100 455 100" stroke="url(#glow-grad)" strokeWidth="1" fill="none" strokeDasharray="3 3" />
                       {/* Connection 4: Queue -> Database */}
                       <path d="M 455 100 Q 465 200 475 300" stroke="url(#glow-grad)" strokeWidth="1" fill="none" strokeDasharray="3 3" />
-                      {/* Connection 5: Webhook -> Database */}
+                      {/* Connection 5: Session Expiry -> Database */}
                       <path d="M 695 195 Q 585 247 475 300" stroke="url(#glow-grad)" strokeWidth="1" fill="none" strokeDasharray="3 3" />
-                      {/* Connection 6: Webhook -> Queue */}
+                      {/* Connection 6: Session Expiry -> Queue */}
                       <path d="M 695 195 Q 575 147 455 100" stroke="url(#glow-grad)" strokeWidth="1" fill="none" strokeDasharray="3 3" />
 
                       {/* Animated Flowing packet light indicators */}
@@ -482,11 +447,11 @@ export default function KnowledgeViews() {
                     })}
 
                     <span className="text-[8px] font-mono absolute bottom-3 left-4 text-[var(--text-muted)] uppercase bg-[var(--bg-card)]/70 px-2 py-0.5 rounded border border-[var(--border)] select-none">
-                      Scale: Contextual volume mapping
+                      Scale: Project knowledge mapping
                     </span>
                   </div>
 
-                  {/* Right Column: High Density Telemetry Monitor Panel */}
+                  {/* Right Column: Node Detail Panel */}
                   <div className="col-span-12 md:col-span-4 flex flex-col justify-between rounded-2xl border border-[var(--border)]/70 bg-[var(--bg-surface)]/25 px-5 py-6 font-mono text-left relative overflow-hidden">
                     {/* Visual active radar background overlay */}
                     <div className="absolute top-0 right-0 w-24 h-24 pointer-events-none opacity-[0.03] text-[var(--accent)] border-b border-l border-dashed border-current rounded-bl-full" />
@@ -495,44 +460,64 @@ export default function KnowledgeViews() {
                       <div className="flex items-center gap-2 text-[var(--text-secondary)] border-b border-[var(--border)] pb-3 mb-4 justify-between">
                         <div className="flex items-center gap-1.5">
                           <Terminal className="w-3.5 h-3.5 text-[var(--accent)]" />
-                          <span className="text-[10px] font-bold tracking-wider">TELEMETRY_LOG</span>
+                          <span className="text-[10px] font-bold tracking-wider">KNOWLEDGE_DETAIL</span>
                         </div>
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
                       </div>
 
                       <div className="space-y-4">
-                        <div className="bg-[var(--bg-card)]/50 p-2.5 rounded-xl border border-[var(--border)]/60">
-                          <div className="text-[7px] text-[var(--text-muted)] tracking-wider">INSPECTING_NODE</div>
-                          <div className="text-xs font-bold text-[var(--text-primary)] mt-1 flex items-center justify-between">
-                            <span>{activeNode.label}</span>
-                            <span className="text-[8px] font-bold bg-[var(--accent-subtle)] text-[var(--accent)] px-1.5 py-0.5 rounded-md border border-[var(--accent)]/10">{activeNode.trust}</span>
+                        <div className="bg-[var(--bg-card)]/50 p-3 rounded-xl border border-[var(--border)]/60">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-[8px] text-[var(--text-muted)] tracking-wider">NODE_TYPE</span>
+                            <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-[var(--accent-subtle)] text-[var(--accent)] border border-[var(--accent)]/10">{activeNode.tag}</span>
                           </div>
+                          <h3 className="text-sm font-sans font-bold text-[var(--text-primary)] mt-1">
+                            {activeNode.label}
+                          </h3>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3 text-[10px]">
+                        <div className="space-y-3">
                           <div>
-                            <span className="text-[8px] text-[var(--text-muted)] block">AVG_LATENCY</span>
-                            <span className="font-bold text-[var(--text-primary)]">{nodeStats.latency}</span>
+                            <span className="text-[8px] text-[var(--text-muted)] block mb-1">DESCRIPTION</span>
+                            <p className="text-[11px] font-sans text-[var(--text-secondary)] leading-relaxed">
+                              {activeNode.desc}
+                            </p>
                           </div>
-                          <div>
-                            <span className="text-[8px] text-[var(--text-muted)] block">HIT_FREQUENCY</span>
-                            <span className="font-bold text-[var(--text-primary)]">{nodeStats.invocations}</span>
-                          </div>
-                        </div>
 
-                        <div className="border-t border-[var(--border)]/60 pt-3 text-[10px] space-y-2.5">
-                          <div>
-                            <span className="text-[8px] text-[var(--text-muted)] block">INCOMING_FLOW</span>
-                            <span className="text-[9.5px] text-[var(--text-secondary)] truncate block">{activeNode.incoming}</span>
+                          <div className="grid grid-cols-2 gap-3 pt-1">
+                             <div>
+                               <span className="text-[8px] text-[var(--text-muted)] block mb-1">CONFIDENCE</span>
+                               <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/10">
+                                 {activeNode.trust}
+                               </span>
+                             </div>
+                             <div>
+                               <span className="text-[8px] text-[var(--text-muted)] block mb-1">STATUS</span>
+                               <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${
+                                 activeNode.status === "confirmed" 
+                                   ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/10" 
+                                   : "bg-amber-500/10 text-amber-400 border-amber-500/10"
+                               }`}>
+                                 {activeNode.status}
+                               </span>
+                             </div>
                           </div>
-                          <div>
-                            <span className="text-[8px] text-[var(--text-muted)] block">OUTGOING_TARGET</span>
-                            <span className="text-[9.5px] text-[var(--text-secondary)] truncate block">{activeNode.outgoing}</span>
-                          </div>
-                          <div>
-                            <span className="text-[8px] text-[var(--text-muted)] block">FILE_PATH_BOUNDS</span>
-                            <span className="text-[9.5px]/none text-indigo-400 font-semibold truncate block">{nodeStats.codeRef}</span>
-                          </div>
+
+                          {activeNode.connections && activeNode.connections.length > 0 && (
+                            <div className="border-t border-[var(--border)]/60 pt-3">
+                              <span className="text-[8px] text-[var(--text-muted)] block mb-2">CONNECTIONS & EDGES</span>
+                              <div className="space-y-1.5">
+                                {activeNode.connections.map((conn, cIdx) => (
+                                  <div key={cIdx} className="flex items-center justify-between text-[9px] bg-[var(--bg-card)]/30 px-2 py-1 rounded border border-[var(--border)]/40">
+                                    <span className="text-[var(--text-primary)] font-bold">{conn.node}</span>
+                                    <span className="text-[8px] font-bold text-[var(--accent)] bg-[var(--accent-subtle)] px-1 py-0.2 rounded border border-[var(--accent)]/5 uppercase">
+                                      {conn.edge}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -540,9 +525,9 @@ export default function KnowledgeViews() {
                     <div className="mt-6 border-t border-[var(--border)]/60 pt-3 flex items-center justify-between text-[8px] text-[var(--text-muted)]">
                       <div className="flex items-center gap-1">
                         <Activity className="w-2.5 h-2.5 text-[var(--accent)] animate-pulse" />
-                        <span>STATE_ID: {nodeStats.activeRevision}</span>
+                        <span>MOMENTUM KNOWLEDGE HUB</span>
                       </div>
-                      <span className="text-[9.5px] text-emerald-500 font-bold uppercase">{activeNode.level}</span>
+                      <span className="text-[9.5px] text-emerald-500 font-bold uppercase">{activeNode.status === "confirmed" ? "VERIFIED" : "PENDING REVIEW"}</span>
                     </div>
                   </div>
                 </motion.div>
@@ -560,7 +545,7 @@ export default function KnowledgeViews() {
                 >
                   <div className="mb-6 flex flex-wrap gap-4 items-center justify-between pointer-events-none border-b border-[var(--border)]/60 pb-3">
                     <div className="text-xs font-sans text-[var(--text-secondary)] text-left">
-                      <span className="text-[var(--accent)] font-bold">Confidence Engine:</span> Every schema and endpoint tracks logic integrity. Out of sync files highlight automatically.
+                      <span className="text-[var(--accent)] font-bold">Confidence Engine:</span> Every section of organizational and project knowledge tracks verified completeness and structural integrity.
                     </div>
                     {/* Color legends */}
                     <div className="flex gap-4 font-mono text-[9px] tracking-wider uppercase">
@@ -574,7 +559,7 @@ export default function KnowledgeViews() {
                       </div>
                       <div className="flex items-center gap-1.5 font-bold text-rose-500">
                         <span className="w-2 h-2 rounded bg-rose-500" />
-                        <span>Diverged</span>
+                        <span>Stale</span>
                       </div>
                     </div>
                   </div>
